@@ -56,11 +56,9 @@ class ScheduleForm(forms.ModelForm):
 
     class Meta:
         model = Schedule
-        fields = ['title', 'destination', 'start_date', 'end_date', 'budget', 'notes']
+        fields = ['title', 'destination', 'start_date']
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
-            'end_date': forms.DateInput(attrs={'type': 'date'}),
-            'notes': forms.Textarea(attrs={'rows': 4}),
         }
 
 

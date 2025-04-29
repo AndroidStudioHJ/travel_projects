@@ -244,8 +244,87 @@ def schedule_create(request):
         if form.is_valid():
             schedule = form.save(commit=False)
             schedule.user = request.user
+            
+            # 더미 AI 응답 생성
+            dummy_responses = {
+                "서울": """
+1. 경복궁과 북촌한옥마을 방문
+   - 전통 한복 체험
+   - 한옥 카페에서 휴식
+   - 전통 공예 체험
+
+2. 남산타워와 명동 관광
+   - 전망대에서 서울 전경 감상
+   - 명동 거리에서 쇼핑
+   - 한국 스트리트 푸드 체험
+
+3. 한강 공원에서 휴식
+   - 자전거 대여
+   - 피크닉
+   - 야경 감상
+""",
+                "부산": """
+1. 해운대 해변과 광안리
+   - 해운대 해변 산책
+   - 광안대교 야경 감상
+   - 해산물 시장 방문
+
+2. 감천문화마을과 태종대
+   - 감천문화마을 산책
+   - 태종대 전망대
+   - 부산 타워 방문
+
+3. 자갈치시장과 국제시장
+   - 신선한 해산물 시식
+   - 전통 시장 체험
+   - 부산 특산품 쇼핑
+""",
+                "제주": """
+1. 성산일출봉과 우도
+   - 일출 감상
+   - 우도 자전거 투어
+   - 해녀 체험
+
+2. 한라산과 오름
+   - 한라산 등반
+   - 오름 트레킹
+   - 제주 전통 음식 체험
+
+3. 서귀포와 중문
+   - 중문관광단지
+   - 천지연폭포
+   - 제주 특산품 쇼핑
+"""
+            }
+            
+            # 목적지에 따른 더미 응답 선택
+            destination = schedule.destination.lower()
+            if "서울" in destination:
+                schedule.notes = dummy_responses["서울"]
+            elif "부산" in destination:
+                schedule.notes = dummy_responses["부산"]
+            elif "제주" in destination:
+                schedule.notes = dummy_responses["제주"]
+            else:
+                schedule.notes = """
+1. 주요 관광지 방문
+   - 지역 대표 명소 탐방
+   - 전통 문화 체험
+   - 현지 음식 시식
+
+2. 자연 경관 감상
+   - 산책로 트레킹
+   - 전망대 방문
+   - 공원에서 휴식
+
+3. 쇼핑과 휴식
+   - 전통 시장 방문
+   - 특산품 쇼핑
+   - 카페에서 휴식
+"""
+            
             schedule.save()
-            messages.success(request, '일정이 성공적으로 생성되었습니다.')
+            messages.success(request, 'AI가 여행 계획을 추천했습니다.')
             return redirect('travel_input:schedule_detail', pk=schedule.pk)
     else:
         form = ScheduleForm()

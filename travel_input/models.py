@@ -17,7 +17,6 @@ class Schedule(models.Model):
     title = models.CharField(max_length=200, verbose_name='일정 제목')
     destination = models.CharField(max_length=200, verbose_name='여행지')
     start_date = models.DateField(verbose_name='시작일')
-    end_date = models.DateField(verbose_name='종료일')
     budget = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True, verbose_name='예산')
     notes = models.TextField(null=True, blank=True, verbose_name='메모')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='schedules', verbose_name='사용자')
@@ -30,7 +29,7 @@ class Schedule(models.Model):
         verbose_name_plural = '여행 일정들'
 
     def __str__(self):
-        return f"{self.title} ({self.start_date} ~ {self.end_date})"
+        return f"{self.title} ({self.start_date})"
 
 
 class Budget(models.Model):
