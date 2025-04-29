@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %}일정 {% if form.instance.pk %}수정{% else %}생성{% endif %}{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .schedule-form-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .page-title {
+        color: #007acc;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2rem;
+    }
+
+    .form-section {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        color: #333;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+
+    .form-textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .submit-button {
+        padding: 12px 25px;
+        background: #007acc;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .submit-button:hover {
+        background: #005f99;
+    }
+
+    .cancel-button {
+        padding: 12px 25px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: background 0.3s ease;
+    }
+
+    .cancel-button:hover {
+        background: #5a6268;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="schedule-form-container">
+    <h1 class="page-title">{% if form.instance.pk %}일정 수정{% else %}새 일정 만들기{% endif %}</h1>
+
+    <form method="post" class="form-section">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label class="form-label" for="{{ form.title.id_for_label }}">일정 제목</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+            <div class="error-message">{{ form.title.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.destination.id_for_label }}">여행지</label>
+            {{ form.destination }}
+            {% if form.destination.errors %}
+            <div class="error-message">{{ form.destination.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.start_date.id_for_label }}">시작일</label>
+            {{ form.start_date }}
+            {% if form.start_date.errors %}
+            <div class="error-message">{{ form.start_date.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.end_date.id_for_label }}">종료일</label>
+            {{ form.end_date }}
+            {% if form.end_date.errors %}
+            <div class="error-message">{{ form.end_date.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.budget.id_for_label }}">예산</label>
+            {{ form.budget }}
+            {% if form.budget.errors %}
+            <div class="error-message">{{ form.budget.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.notes.id_for_label }}">메모</label>
+            {{ form.notes }}
+            {% if form.notes.errors %}
+            <div class="error-message">{{ form.notes.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="submit-button">
+                {% if form.instance.pk %}수정 완료{% else %}일정 만들기{% endif %}
+            </button>
+            <a href="{% url 'travel_input:schedule_list' %}" class="cancel-button">취소</a>
+        </div>
+    </form>
+</div>
+{% endblock %} 

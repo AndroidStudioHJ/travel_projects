@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% block title %}일정 상세 보기{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .detail-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .page-title {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2rem;
+    }
+
+    .schedule-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .schedule-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .schedule-title {
+        font-size: 1.5rem;
+        color: #333;
+        margin: 0;
+    }
+
+    .schedule-info {
+        margin-bottom: 30px;
+    }
+
+    .info-item {
+        display: flex;
+        margin-bottom: 15px;
+        align-items: center;
+    }
+
+    .info-label {
+        width: 120px;
+        font-weight: 500;
+        color: #666;
+    }
+
+    .info-value {
+        flex: 1;
+        color: #333;
+    }
+
+    .schedule-notes {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    .notes-title {
+        font-size: 1.1rem;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .notes-content {
+        color: #666;
+        white-space: pre-line;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .edit-button, .delete-button, .back-button {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 30px;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: background 0.3s ease;
+    }
+
+    .edit-button {
+        background: #007bff;
+        color: white;
+    }
+
+    .edit-button:hover {
+        background: #0056b3;
+    }
+
+    .delete-button {
+        background: #dc3545;
+        color: white;
+    }
+
+    .delete-button:hover {
+        background: #c82333;
+    }
+
+    .back-button {
+        background: #6c757d;
+        color: white;
+    }
+
+    .back-button:hover {
+        background: #5a6268;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <h1 class="page-title">일정 상세 보기</h1>
+
+    <div class="schedule-card">
+        <div class="schedule-header">
+            <h2 class="schedule-title">{{ schedule.title }}</h2>
+        </div>
+
+        <div class="schedule-info">
+            <div class="info-item">
+                <span class="info-label">목적지:</span>
+                <span class="info-value">{{ schedule.destination }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">시작일:</span>
+                <span class="info-value">{{ schedule.start_date|date:"Y년 m월 d일" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">종료일:</span>
+                <span class="info-value">{{ schedule.end_date|date:"Y년 m월 d일" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">예산:</span>
+                <span class="info-value">{{ schedule.budget|floatformat:0 }}원</span>
+            </div>
+        </div>
+
+        {% if schedule.notes %}
+        <div class="schedule-notes">
+            <h3 class="notes-title">메모</h3>
+            <p class="notes-content">{{ schedule.notes }}</p>
+        </div>
+        {% endif %}
+
+        <div class="action-buttons">
+            <a href="{% url 'travel_input:schedule_update' schedule.pk %}" class="edit-button">수정</a>
+            <a href="{% url 'travel_input:schedule_delete' schedule.pk %}" class="delete-button">삭제</a>
+            <a href="{% url 'travel_input:schedule_list' %}" class="back-button">목록으로</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 
