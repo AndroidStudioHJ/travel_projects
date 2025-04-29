@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}일정 삭제{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .delete-confirm-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .page-title {
+        color: #dc3545;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2rem;
+    }
+
+    .confirm-box {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .schedule-info {
+        margin: 20px 0;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .schedule-title {
+        font-size: 1.2rem;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .schedule-details {
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    .warning-text {
+        color: #dc3545;
+        margin: 20px 0;
+        font-weight: 500;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .delete-button {
+        padding: 12px 25px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .delete-button:hover {
+        background: #c82333;
+    }
+
+    .cancel-button {
+        padding: 12px 25px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: background 0.3s ease;
+    }
+
+    .cancel-button:hover {
+        background: #5a6268;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-confirm-container">
+    <h1 class="page-title">일정 삭제</h1>
+
+    <div class="confirm-box">
+        <div class="schedule-info">
+            <h2 class="schedule-title">{{ schedule.title }}</h2>
+            <p class="schedule-details">여행지: {{ schedule.destination }}</p>
+            <p class="schedule-details">기간: {{ schedule.start_date }} ~ {{ schedule.end_date }}</p>
+        </div>
+
+        <p class="warning-text">정말로 이 일정을 삭제하시겠습니까?<br>이 작업은 되돌릴 수 없습니다.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="action-buttons">
+                <button type="submit" class="delete-button">삭제</button>
+                <a href="{% url 'travel_input:schedule_detail' schedule.id %}" class="cancel-button">취소</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

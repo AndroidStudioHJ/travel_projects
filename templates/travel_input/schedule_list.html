@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}일정 목록{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .schedule-list-container { 
+        display: flex; 
+        flex-direction: column;
+        max-width: max-content;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .page-title {
+        color: #007acc;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2rem;
+    }
+
+    .schedule-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .schedule-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .schedule-title {
+        color: #333;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+    .schedule-info {
+        color: #666;
+        margin-bottom: 15px;
+    }
+
+    .schedule-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .action-button {
+        padding: 8px 15px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .view-button {
+        background: #007acc;
+        color: white;
+    }
+
+    .edit-button {
+        background: #28a745;
+        color: white;
+    }
+
+    .delete-button {
+        background: #dc3545;
+        color: white;
+    }
+
+    .create-button {
+        display: inline-block;
+        background: #007acc;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 30px; 
+        margin: 0 auto;
+        width: 130px; 
+        bottom: 50px;
+        text-decoration: none;
+        margin-bottom: 30px;
+        transition: background 0.3s ease;
+    }
+
+    .create-button:hover {
+        background: #005f99;
+    }
+
+    .no-schedules {
+        text-align: center;
+        color: #666;
+        margin: 40px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="schedule-list-container">
+    <h1 class="page-title">내 여행 일정</h1>
+    
+    <a href="{% url 'travel_input:schedule_create' %}" class="create-button">+ 새 일정 만들기</a>
+
+    {% if schedules %}
+    <div class="schedule-grid">
+        {% for schedule in schedules %}
+        <div class="schedule-card">
+            <h3 class="schedule-title">{{ schedule.title }}</h3>
+            <div class="schedule-info">
+                <p>여행지: {{ schedule.destination }}</p>
+                <p>기간: {{ schedule.start_date }} ~ {{ schedule.end_date }}</p>
+            </div>
+            <div class="schedule-actions">
+                <a href="{% url 'travel_input:schedule_detail' schedule.id %}" class="action-button view-button">상세보기</a>
+                <a href="{% url 'travel_input:schedule_update' schedule.id %}" class="action-button edit-button">수정</a>
+                <a href="{% url 'travel_input:schedule_delete' schedule.id %}" class="action-button delete-button">삭제</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-schedules">
+        <p>아직 등록된 일정이 없습니다.</p>
+        <p>새로운 여행 일정을 만들어보세요!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 
