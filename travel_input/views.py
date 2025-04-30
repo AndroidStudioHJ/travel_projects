@@ -158,16 +158,13 @@ def recommendations(request):
 
 @login_required
 def budget_planning(request):
-    schedule = Schedule.objects.filter(user=request.user).order_by('-created_at').first()
     categories = ['숙박', '식비', '교통', '관광']
     budgets = {cat: 0 for cat in categories}
     percents = {cat: 0 for cat in categories}
-    total_budget = 0
-    if schedule:
-        total_budget = schedule.budget or 0
-        for b in Budget.objects.filter(schedule=schedule):
-            budgets[b.category] = b.amount
+    total_budget = 0  # 항상 0으로 초기화
+
     if request.method == 'POST':
+        schedule = Schedule.objects.filter(user=request.user).order_by('-created_at').first()
         total_budget = int(request.POST.get('total_budget', 0))
         if not schedule:
             # 일정이 없으면 새로 생성
@@ -182,30 +179,23 @@ def budget_planning(request):
         else:
             schedule.budget = total_budget
             schedule.save()
+        # 기존 예산 데이터 삭제
+        Budget.objects.filter(schedule=schedule).delete()
+        # 새로운 예산 데이터 저장
         for cat in categories:
             amount_str = request.POST.get(cat, '0')
             try:
                 amount = int(amount_str) if amount_str else 0
             except ValueError:
                 amount = 0
-            budget_obj, created = Budget.objects.get_or_create(
+            Budget.objects.create(
                 schedule=schedule,
                 category=cat,
-                defaults={'amount': amount}
+                amount=amount
             )
-            if not created:
-                budget_obj.amount = amount
-                budget_obj.save()
-        allocated = sum(budgets[cat] for cat in categories)
-        remaining = total_budget - allocated
         return redirect('travel_input:budget_planning')
-    # 카테고리별 비율 계산
-    if total_budget > 0:
-        for cat in categories:
-            try:
-                percents[cat] = int(budgets[cat] / total_budget * 100)
-            except Exception:
-                percents[cat] = 0
+
+    # GET 요청 시(새로고침) 무조건 0으로 초기화
     allocated = sum(budgets[cat] for cat in categories)
     remaining = total_budget - allocated
     return render(request, 'travel_input/budget_planning.html', {
