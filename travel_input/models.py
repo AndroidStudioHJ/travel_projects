@@ -17,8 +17,9 @@ class Schedule(models.Model):
     title = models.CharField(max_length=200, verbose_name='일정 제목')
     destination = models.CharField(max_length=200, verbose_name='여행지')
     start_date = models.DateField(verbose_name='시작일')
+    end_date = models.DateField(null=True, blank=True, verbose_name='종료일')
     budget = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True, verbose_name='예산')
-    notes = models.TextField(null=True, blank=True, verbose_name='메모')
+    notes = models.TextField(max_length=5000, null=True, blank=True, verbose_name='메모')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='schedules', verbose_name='사용자')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -29,7 +30,7 @@ class Schedule(models.Model):
         verbose_name_plural = '여행 일정들'
 
     def __str__(self):
-        return f"{self.title} ({self.start_date})"
+        return f"{self.title} - {self.destination} ({self.start_date})"
 
 
 class Budget(models.Model):
@@ -113,4 +114,18 @@ class GroupMessage(models.Model):
 
     def __str__(self):
         return f"{self.user.username}: {self.content[:50]}"
+
+class City(models.Model):
+    name = models.CharField(max_length=50, verbose_name='도시명')
+    slug = models.SlugField(unique=True, verbose_name='슬러그')
+    is_active = models.BooleanField(default=True, verbose_name='활성화 여부')
+    order = models.IntegerField(default=0, verbose_name='정렬 순서')
+
+    class Meta:
+        verbose_name = '도시'
+        verbose_name_plural = '도시'
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return self.name
 

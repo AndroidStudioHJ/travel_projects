@@ -43,6 +43,32 @@
         font-size: 1rem;
     }
 
+    .radio-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 8px;
+    }
+
+    .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    .checkbox-option {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
     .form-actions {
         display: flex;
         justify-content: center;
@@ -85,6 +111,14 @@
         font-size: 0.9rem;
         margin-top: 5px;
     }
+
+    .section-title {
+        color: #007acc;
+        font-size: 1.2rem;
+        margin: 30px 0 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007acc;
+    }
 </style>
 {% endblock %}
 
@@ -95,6 +129,7 @@
     <form method="post" class="form-section">
         {% csrf_token %}
         
+        <h2 class="section-title">기본 정보</h2>
         <div class="form-group">
             <label class="form-label" for="{{ form.title.id_for_label }}">여행 주제</label>
             {{ form.title }}
@@ -117,6 +152,73 @@
             {% if form.start_date.errors %}
             <div class="error-message">{{ form.start_date.errors }}</div>
             {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.end_date.id_for_label }}">여행 종료일</label>
+            {{ form.end_date }}
+            {% if form.end_date.errors %}
+            <div class="error-message">{{ form.end_date.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.num_people.id_for_label }}">여행 인원수</label>
+            {{ form.num_people }}
+            {% if form.num_people.errors %}
+            <div class="error-message">{{ form.num_people.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.budget.id_for_label }}">예산 (원)</label>
+            {{ form.budget }}
+            {% if form.budget.errors %}
+            <div class="error-message">{{ form.budget.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">선호하는 여행 스타일 (복수 선택 가능)</label>
+            <div class="checkbox-group">
+                <label class="checkbox-option">
+                    <input type="checkbox" name="travel_style" value="nature"> 자연경관
+                </label>
+                <label class="checkbox-option">
+                    <input type="checkbox" name="travel_style" value="city"> 도시 탐방
+                </label>
+                <label class="checkbox-option">
+                    <input type="checkbox" name="travel_style" value="culture"> 문화 체험
+                </label>
+                <label class="checkbox-option">
+                    <input type="checkbox" name="travel_style" value="activity"> 액티비티
+                </label>
+                <label class="checkbox-option">
+                    <input type="checkbox" name="travel_style" value="relax"> 휴식과 힐링
+                </label>
+            </div>
+        </div>
+
+        <h2 class="section-title">여행 시 중요 요소</h2>
+        <div class="form-group">
+            <label class="form-label">여행 시 중요 요소 (복수 선택 가능)</label>
+            <div class="checkbox-group">
+                <label class="checkbox-option">
+                    <input type="checkbox" name="important_factors" value="stay"> 숙소
+                </label>
+                <label class="checkbox-option">
+                    <input type="checkbox" name="important_factors" value="food"> 음식
+                </label>
+                <label class="checkbox-option">
+                    <input type="checkbox" name="important_factors" value="weather"> 날씨
+                </label>
+                <label class="checkbox-option">
+                    <input type="checkbox" name="important_factors" value="schedule"> 일정 편의성
+                </label>
+                <label class="checkbox-option">
+                    <input type="checkbox" name="important_factors" value="culture"> 현지 문화
+                </label>
+            </div>
         </div>
 
         <div class="form-actions">
