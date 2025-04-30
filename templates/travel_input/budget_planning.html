@@ -221,6 +221,11 @@
                 document.getElementById('ai-result').innerHTML = '<span style="color:red">AI 분배 실패: ' + data.error + '</span>';
             } else {
                 let resultText = '';
+                // 총 예산 계산 (AI가 반환한 값의 합)
+                const aiTotalBudget = Object.values(data).reduce((a, b) => a + b, 0);
+                // 총 예산 input과 요약란도 갱신
+                document.querySelector('input[name="total_budget"]').value = aiTotalBudget;
+                document.querySelectorAll('.summary-item span:last-child')[0].textContent = aiTotalBudget.toLocaleString() + '원';
                 for (const cat in data) {
                     const input = document.querySelector(`input[name="${cat}"]`);
                     if (input) {
@@ -229,7 +234,7 @@
                         const card = input.closest('.category-card');
                         if (card) {
                             const progress = card.querySelector('.progress');
-                            const percentage = (data[cat] / totalBudget) * 100;
+                            const percentage = (data[cat] / aiTotalBudget) * 100;
                             progress.style.width = Math.min(percentage, 100) + '%';
                         }
                     }
