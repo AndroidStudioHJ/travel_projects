@@ -1,6 +1,6 @@
 from django.contrib import admin 
 from .models import Destination, Schedule, Budget, Participant, \
-                    Place, Transport, TravelOptionCategory, TravelOption, GroupTravel, GroupMember, GroupMessage
+                    Place, Transport, TravelOptionCategory, TravelOption, GroupTravel, GroupMember, GroupMessage, City
 
 # Register your models here.
 class BudgetInline(admin.TabularInline):
@@ -159,3 +159,10 @@ class GroupMessageAdmin(admin.ModelAdmin):
     list_display = ('group', 'user', 'created_at')
     list_filter = ('created_at',)
     search_fields = ('content', 'group__name', 'user__username')
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'is_active', 'order')
+    list_editable = ('is_active', 'order')
+    search_fields = ('name',)
+    prepopulated_fields = {'slug': ('name',)}

@@ -10,14 +10,6 @@ TRAVEL_STYLE_CHOICES = [
     ('relax', '휴식과 힐링'),
 ]
 
-COMPANION_CHOICES = [
-    ('alone', '혼자'),
-    ('family', '가족'),
-    ('friend', '친구'),
-    ('lover', '연인'),
-    ('group', '단체'),
-]
-
 IMPORTANT_CHOICES = [
     ('stay', '숙소'),
     ('food', '음식'),
@@ -27,38 +19,69 @@ IMPORTANT_CHOICES = [
 ]
 
 class TravelSurveyForm(forms.Form):
-    travel_style = forms.ChoiceField(
+    travel_style = forms.MultipleChoiceField(
         choices=TRAVEL_STYLE_CHOICES,
-        widget=forms.RadioSelect,
-        label="선호하는 여행 스타일"
+        widget=forms.CheckboxSelectMultiple,
+        label="선호하는 여행 스타일 (복수 선택 가능)"
     )
-    destination = forms.CharField(
-        max_length=100,
-        label="가고 싶은 여행지",
-        widget=forms.TextInput(attrs={'placeholder': '예: 파리, 제주도'})
-    )
-    companion = forms.ChoiceField(
-        choices=COMPANION_CHOICES,
-        widget=forms.RadioSelect,
-        label="여행 동반자"
-    )
+    
     important_factors = forms.MultipleChoiceField(
         choices=IMPORTANT_CHOICES,
         widget=forms.CheckboxSelectMultiple,
         label="여행 시 중요 요소 (복수 선택 가능)"
     )
 
+    num_people = forms.IntegerField(
+        min_value=1,
+        max_value=20,
+        initial=1,
+        label="여행 인원수"
+    )
+
+    budget = forms.DecimalField(
+        min_value=0,
+        max_digits=10,
+        decimal_places=0,
+        label="예산 (원)"
+    )
 
 class ScheduleForm(forms.ModelForm):
+    travel_style = forms.MultipleChoiceField(
+        choices=TRAVEL_STYLE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        label="선호하는 여행 스타일 (복수 선택 가능)"
+    )
+    
+    important_factors = forms.MultipleChoiceField(
+        choices=IMPORTANT_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        label="여행 시 중요 요소 (복수 선택 가능)"
+    )
+
+    num_people = forms.IntegerField(
+        min_value=1,
+        max_value=20,
+        initial=1,
+        label="여행 인원수"
+    )
+
+    budget = forms.DecimalField(
+        min_value=0,
+        max_digits=10,
+        decimal_places=0,
+        label="예산 (원)"
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['destination'].empty_label = "여행지를 선택하세요"
 
     class Meta:
         model = Schedule
-        fields = ['title', 'destination', 'start_date']
+        fields = ['title', 'destination', 'start_date', 'end_date', 'num_people', 'budget']
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
 

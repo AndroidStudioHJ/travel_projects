@@ -245,89 +245,230 @@ def schedule_create(request):
             schedule = form.save(commit=False)
             schedule.user = request.user
             
+            # 여행 스타일을 문자열로 변환하여 저장
+            travel_styles = form.cleaned_data.get('travel_style', [])
+            num_people = form.cleaned_data.get('num_people', 1)
+            budget = form.cleaned_data.get('budget', 0)
+            
+            if travel_styles:
+                schedule.notes = f"""선호 여행 스타일: {', '.join(travel_styles)}
+여행 인원수: {num_people}명
+예산: {budget:,}원
+
+"""
+            
+            schedule.save()
+            
             # 더미 AI 응답 생성
-            dummy_responses = {
-                "서울": """
-1. 경복궁과 북촌한옥마을 방문
-   - 전통 한복 체험
-   - 한옥 카페에서 휴식
-   - 전통 공예 체험
+            try:
+                # 목적지와 여행 스타일에 따른 더미 응답 선택
+                destination = schedule.destination.lower()
+                travel_style = travel_styles[0] if travel_styles else 'culture'
+                
+                # 예산에 따른 추천 추가
+                budget_level = "고급" if budget >= 1000000 else "중급" if budget >= 500000 else "저렴"
+                
+                dummy_responses = {
+                    "서울": {
+                        "nature": f"""
+1. 북한산과 남산
+   - 북한산 등반
+   - 남산 공원 산책
+   - 서울 전망대 방문
+   - 예상 비용: {budget_level} 레벨에 맞는 활동
 
-2. 남산타워와 명동 관광
-   - 전망대에서 서울 전경 감상
-   - 명동 거리에서 쇼핑
-   - 한국 스트리트 푸드 체험
-
-3. 한강 공원에서 휴식
+2. 한강 공원
    - 자전거 대여
    - 피크닉
    - 야경 감상
+   - {num_people}명이 함께 즐길 수 있는 활동
+
+3. 서울숲과 올림픽공원
+   - 자연 산책
+   - 사진 촬영
+   - 휴식
+   - 총 예산 {budget:,}원 내에서 즐길 수 있는 활동
 """,
-                "부산": """
-1. 해운대 해변과 광안리
-   - 해운대 해변 산책
-   - 광안대교 야경 감상
-   - 해산물 시장 방문
+                        "city": f"""
+1. 명동과 홍대
+   - 쇼핑
+   - 카페 투어
+   - 스트리트 푸드
+   - {num_people}명이 함께 즐길 수 있는 장소
 
-2. 감천문화마을과 태종대
-   - 감천문화마을 산책
-   - 태종대 전망대
-   - 부산 타워 방문
+2. 강남과 이태원
+   - 쇼핑몰 방문
+   - 레스토랑 체험
+   - 나이트라이프
+   - 예상 비용: {budget_level} 레벨에 맞는 장소
 
-3. 자갈치시장과 국제시장
-   - 신선한 해산물 시식
+3. 동대문과 인사동
+   - 전통 시장
+   - 공예품 쇼핑
+   - 전통 음식
+   - 총 예산 {budget:,}원 내에서 즐길 수 있는 장소
+""",
+                        "culture": f"""
+1. 경복궁과 북촌한옥마을
+   - 전통 한복 체험
+   - 한옥 카페
+   - 전통 공예 체험
+   - {num_people}명이 함께 즐길 수 있는 체험
+
+2. 국립중앙박물관
+   - 한국 역사 체험
+   - 전통 문화 전시
+   - 문화 공연
+   - 예상 비용: {budget_level} 레벨에 맞는 체험
+
+3. 남대문시장과 광장시장
    - 전통 시장 체험
-   - 부산 특산품 쇼핑
-""",
-                "제주": """
-1. 성산일출봉과 우도
-   - 일출 감상
-   - 우도 자전거 투어
-   - 해녀 체험
-
-2. 한라산과 오름
-   - 한라산 등반
-   - 오름 트레킹
-   - 제주 전통 음식 체험
-
-3. 서귀포와 중문
-   - 중문관광단지
-   - 천지연폭포
-   - 제주 특산품 쇼핑
+   - 전통 음식 시식
+   - 전통 공예품
+   - 총 예산 {budget:,}원 내에서 즐길 수 있는 체험
 """
-            }
-            
-            # 목적지에 따른 더미 응답 선택
-            destination = schedule.destination.lower()
-            if "서울" in destination:
-                schedule.notes = dummy_responses["서울"]
-            elif "부산" in destination:
-                schedule.notes = dummy_responses["부산"]
-            elif "제주" in destination:
-                schedule.notes = dummy_responses["제주"]
-            else:
-                schedule.notes = """
+                    },
+                    "부산": {
+                        "nature": """
+1. 해운대와 광안리
+   - 해변 산책
+   - 해수욕
+   - 야경 감상
+
+2. 태종대와 오륙도
+   - 해안 절경
+   - 등산로
+   - 전망대
+
+3. 금정산
+   - 등산
+   - 자연 탐방
+   - 휴식
+""",
+                        "city": """
+1. 해운대와 광안리
+   - 쇼핑몰
+   - 레스토랑
+   - 나이트라이프
+
+2. 서면과 남포동
+   - 쇼핑
+   - 카페
+   - 스트리트 푸드
+
+3. 센텀시티
+   - 쇼핑몰
+   - 영화관
+   - 레스토랑
+""",
+                        "culture": """
+1. 감천문화마을
+   - 전통 마을 탐방
+   - 공예 체험
+   - 전통 음식
+
+2. 자갈치시장과 국제시장
+   - 전통 시장 체험
+   - 해산물 시식
+   - 전통 공예품
+
+3. 부산타워와 용두산공원
+   - 전통 공원
+   - 전망대
+   - 문화 공연
+"""
+                    },
+                    "제주": {
+                        "nature": """
+1. 한라산과 오름
+   - 등산
+   - 자연 탐방
+   - 전망대
+
+2. 성산일출봉과 우도
+   - 일출 감상
+   - 자전거 투어
+   - 해변 산책
+
+3. 협재와 금능해수욕장
+   - 해수욕
+   - 스노클링
+   - 휴식
+""",
+                        "city": """
+1. 제주시와 서귀포
+   - 쇼핑몰
+   - 레스토랑
+   - 카페
+
+2. 중문관광단지
+   - 테마파크
+   - 쇼핑
+   - 레스토랑
+
+3. 제주올레
+   - 카페
+   - 레스토랑
+   - 쇼핑
+""",
+                        "culture": """
+1. 성읍민속마을
+   - 전통 마을 탐방
+   - 전통 체험
+   - 전통 음식
+
+2. 제주민속촌
+   - 전통 문화 체험
+   - 전통 공예
+   - 전통 공연
+
+3. 해녀박물관
+   - 해녀 문화 체험
+   - 전통 공예
+   - 전통 음식
+"""
+                    }
+                }
+                
+                # 목적지에 따른 더미 응답 선택
+                if "서울" in destination:
+                    response = dummy_responses["서울"].get(travel_style, dummy_responses["서울"]["culture"])
+                elif "부산" in destination:
+                    response = dummy_responses["부산"].get(travel_style, dummy_responses["부산"]["culture"])
+                elif "제주" in destination:
+                    response = dummy_responses["제주"].get(travel_style, dummy_responses["제주"]["culture"])
+                else:
+                    response = f"""
 1. 주요 관광지 방문
    - 지역 대표 명소 탐방
    - 전통 문화 체험
    - 현지 음식 시식
+   - {num_people}명이 함께 즐길 수 있는 활동
 
 2. 자연 경관 감상
    - 산책로 트레킹
    - 전망대 방문
    - 공원에서 휴식
+   - 예상 비용: {budget_level} 레벨에 맞는 활동
 
 3. 쇼핑과 휴식
    - 전통 시장 방문
    - 특산품 쇼핑
    - 카페에서 휴식
+   - 총 예산 {budget:,}원 내에서 즐길 수 있는 활동
 """
+                
+                schedule.notes += f"\nAI 여행 추천:\n{response}"
+                schedule.save()
+                
+                messages.success(request, 'AI가 여행 계획을 추천했습니다.')
+            except Exception as e:
+                messages.warning(request, 'AI 응답 생성 중 오류가 발생했습니다.')
             
-            schedule.save()
-            messages.success(request, 'AI가 여행 계획을 추천했습니다.')
             return redirect('travel_input:schedule_detail', pk=schedule.pk)
     else:
         form = ScheduleForm()
+    
     return render(request, 'travel_input/schedule_form.html', {'form': form})
 
 @login_required
