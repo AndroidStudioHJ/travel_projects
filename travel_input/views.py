@@ -584,38 +584,111 @@ def send_message(request, pk):
 @login_required
 def ai_budget_view(request):
     if request.method == 'POST':
-        if settings.DEBUG:
-            # 개발/테스트 환경에서는 더미 데이터 반환 (OpenAI 호출 X)
-            return JsonResponse({"숙박": 100000, "식비": 80000, "교통": 60000, "관광": 60000})
         import json
         data = json.loads(request.body)
         total_budget = data.get('total_budget', 0)
         categories = ['숙박', '식비', '교통', '관광']
+        
+        # OpenAI API 키 확인
         openai_api_key = os.environ.get('OPENAI_API_KEY')
         if not openai_api_key:
-            print('OPENAI_API_KEY 환경변수 없음')
             return JsonResponse({'error': 'OpenAI API 키가 설정되지 않았습니다.'}, status=400)
+            
+        # 프롬프트 구성
         prompt = f"""
         한국 여행 예산을 다음 네 가지 카테고리로 합리적으로 분배해줘.
-        - 총 예산: {total_budget}원
+        - 총 예산: {total_budget:,}원
         - 카테고리: 숙박, 식비, 교통, 관광
-        각 카테고리별로 얼마씩 배정할지 JSON 형식으로 알려줘. (예: {{"숙박": 100000, "식비": 80000, ...}})
+        
+        각 카테고리별로 얼마씩 배정할지 JSON 형식으로 알려줘.
+        예시: {{"숙박": 100000, "식비": 80000, "교통": 60000, "관광": 60000}}
+        
+        다음 사항을 고려해줘:
+        1. 숙박은 전체 예산의 30-40% 정도로 배정
+        2. 식비는 전체 예산의 20-30% 정도로 배정
+        3. 교통은 전체 예산의 15-25% 정도로 배정
+        4. 관광은 전체 예산의 15-25% 정도로 배정
+        5. 모든 카테고리의 합이 총 예산과 정확히 일치해야 함
         """
+        
         try:
-            llm = ChatOpenAI(openai_api_key=openai_api_key, temperature=0.2)
-            response = llm.invoke(prompt)
-            print('OpenAI 응답:', response)
-            import ast
-            json_text = response.content  # content 속성에 실제 JSON 문자열이 있음
+            from openai import OpenAI
+            client = OpenAI(api_key=openai_api_key)
+            
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "당신은 여행 예산 전문가입니다. 주어진 예산을 카테고리별로 합리적으로 분배해주세요. 반드시 JSON 형식으로만 응답해주세요."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.2,
+                response_format={ "type": "json_object" }
+            )
+            
+            # 응답에서 JSON 추출
+            content = response.choices[0].message.content
+            print("AI 응답:", content)  # 디버깅용
+            
             try:
-                result = ast.literal_eval(json_text)
-                return JsonResponse(result)
-            except Exception as e:
-                print('JSON 파싱 에러:', e)
-                return JsonResponse({'error': 'AI 응답 파싱 실패', 'raw_response': json_text}, status=500)
+                result = json.loads(content)
+            except json.JSONDecodeError:
+                # JSON 파싱 실패 시 정규식으로 시도
+                import re
+                json_str = re.search(r'\{.*\}', content)
+                if not json_str:
+                    print("JSON을 찾을 수 없음. 전체 응답:", content)  # 디버깅용
+                    return JsonResponse({'error': 'AI 응답에서 JSON을 찾을 수 없습니다.'}, status=500)
+                try:
+                    result = json.loads(json_str.group())
+                except json.JSONDecodeError as e:
+                    print("JSON 파싱 실패:", str(e))  # 디버깅용
+                    return JsonResponse({'error': f'JSON 파싱 실패: {str(e)}'}, status=500)
+            
+            # 필수 카테고리 확인
+            required_categories = ['숙박', '식비', '교통', '관광']
+            for category in required_categories:
+                if category not in result:
+                    return JsonResponse({'error': f'필수 카테고리 {category}가 누락되었습니다.'}, status=500)
+            
+            # 총액 검증
+            total_allocated = sum(result.values())
+            if total_allocated != total_budget:
+                # 차이를 숙박비에 추가/감소
+                diff = total_budget - total_allocated
+                result['숙박'] += diff
+            
+            # 데이터베이스에 예산 저장
+            schedule = Schedule.objects.filter(user=request.user).order_by('-created_at').first()
+            if not schedule:
+                schedule = Schedule.objects.create(
+                    title='예산 계획',
+                    destination='',
+                    start_date=None,
+                    end_date=None,
+                    budget=total_budget,
+                    user=request.user
+                )
+            else:
+                schedule.budget = total_budget
+                schedule.save()
+            
+            # 각 카테고리별 예산 저장
+            for category, amount in result.items():
+                budget_obj, created = Budget.objects.get_or_create(
+                    schedule=schedule,
+                    category=category,
+                    defaults={'amount': amount}
+                )
+                if not created:
+                    budget_obj.amount = amount
+                    budget_obj.save()
+            
+            return JsonResponse(result)
+            
         except Exception as e:
-            print('OpenAI 호출 에러:', e)
-            return JsonResponse({'error': f'OpenAI 호출 에러: {e}'}, status=500)
+            print('OpenAI API 호출 에러:', e)
+            return JsonResponse({'error': f'AI 예산 분배 중 오류가 발생했습니다: {str(e)}'}, status=500)
+            
     return JsonResponse({'error': 'POST 요청만 지원합니다.'}, status=405)
 
 @csrf_exempt
