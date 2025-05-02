@@ -7,7 +7,8 @@ from .views import (
     schedule_detail, schedule_update, schedule_delete, confirm_delete_all,
     GroupTravelListView, GroupTravelDetailView, GroupTravelCreateView,
     GroupTravelUpdateView, GroupTravelDeleteView, join_group, leave_group,
-    send_message, ai_budget_view, ai_recommend_view, ai_summarize_view
+    send_message, ai_budget_view, ai_recommend_view, ai_summarize_view,
+    get_participants, get_schedules, export_all_data
 )
 
 app_name = 'travel_input'
@@ -37,4 +38,11 @@ urlpatterns = [
     path('ai_budget/', ai_budget_view, name='ai_budget'),
     path('ai_recommend/', ai_recommend_view, name='ai_recommend'),
     path('ai_summarize/', ai_summarize_view, name='ai_summarize'),
+    
+    # API endpoints
+    path('api/participants/', get_participants, name='api_participants'),
+    path('api/schedules/', get_schedules, name='api_schedules'),
+    path('api/participants/export/', get_participants, {'export': True}, name='export_participants'),
+    path('api/schedules/export/', get_schedules, {'export': True}, name='export_schedules'),
+    path('api/export/all/', export_all_data, name='export_all_data'),
 ]

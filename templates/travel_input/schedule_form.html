@@ -269,6 +269,10 @@
                 <label class="form-label">반려동물 동반 여부</label>
                 {{ form.pet_friendly }}
             </div>
+            <div class="form-group">
+                <label class="form-label">선호 교통수단</label>
+                {{ form.transport }}
+            </div>
         </div>
 
         <div class="form-section">
@@ -276,6 +280,9 @@
             <div class="form-group">
                 <label class="form-label">숙소 요청사항</label>
                 {{ form.lodging_request }}
+                <div class="info-message">
+                    * 가족 여행인 경우, 가족 구성원 수를 입력해주세요.
+                </div>
             </div>
             <div class="form-group">
                 <label class="form-label">기타 요청사항</label>
@@ -290,28 +297,37 @@
                 {% for form in participant_formset %}
                 <div class="participant-form">
                     <div class="form-group">
-                        <label class="form-label">성별</label>
+                        <label class="form-label" for="{{ form.gender.id_for_label }}">성별</label>
                         {{ form.gender }}
                     </div>
                     <div class="form-group">
-                        <label class="form-label">인원수</label>
+                        <label class="form-label" for="{{ form.num_people.id_for_label }}">인원수</label>
                         {{ form.num_people }}
                     </div>
                     <div class="form-group">
-                        <label class="form-label">구분</label>
+                        <label class="form-label" for="{{ form.age_type.id_for_label }}">구분</label>
                         {{ form.age_type }}
                     </div>
                     <div class="form-group">
-                        <label class="form-label">고령자 여부</label>
+                        <label class="form-label" for="{{ form.age_range.id_for_label }}">연령대</label>
+                        {{ form.age_range }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.is_elderly.id_for_label }}">고령자 여부</label>
                         {{ form.is_elderly }}
                     </div>
                     <div class="form-group">
-                        <label class="form-label">가족 여부</label>
+                        <label class="form-label" for="{{ form.is_family.id_for_label }}">가족 여부</label>
                         {{ form.is_family }}
+                    </div>
+                    <div class="delete-form">
+                        {{ form.DELETE }}
+                        <label for="{{ form.DELETE.id_for_label }}">삭제</label>
                     </div>
                 </div>
                 {% endfor %}
             </div>
+            <button type="button" class="add-participant-button">참여자 추가</button>
         </div>
 
         <div class="form-actions">
@@ -324,88 +340,34 @@
 
 {% block extra_js %}
 <script>
-function addParticipantForm() {
+document.addEventListener('DOMContentLoaded', function() {
+    const addButton = document.querySelector('.add-participant-button');
     const formset = document.querySelector('.participant-formset');
-    const forms = formset.querySelectorAll('.participant-form');
-    const totalForms = document.getElementById('id_participant_set-TOTAL_FORMS');
+    const totalForms = document.querySelector('#id_participants-TOTAL_FORMS');
+    const emptyForm = document.querySelector('.participant-form').cloneNode(true);
     
-    // 마지막 폼 복사
-    const newForm = forms[0].cloneNode(true);
-    
-    // 폼 번호 업데이트
-    const formNum = forms.length;
-    newForm.innerHTML = newForm.innerHTML.replace(/-0-/g, `-${formNum}-`);
-    
-    // 입력값 초기화
-    newForm.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
-        input.value = '';
-    });
-    newForm.querySelectorAll('select').forEach(select => {
-        select.selectedIndex = 0;
-    });
-    newForm.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.checked = false;
-    });
-    
-    // 폼 추가
-    formset.appendChild(newForm);
-    totalForms.value = formNum + 1;
-}
-
-function addFamilyMembers() {
-    const formset = document.querySelector('.participant-formset');
-    const forms = formset.querySelectorAll('.participant-form');
-    const totalForms = document.getElementById('id_participant_set-TOTAL_FORMS');
-    
-    // 가족 구성원 수 입력 받기
-    const numMembers = prompt('가족 구성원 수를 입력하세요', '2');
-    if (!numMembers || isNaN(numMembers)) return;
-    
-    // 가족 구성원 추가
-    for (let i = 0; i < numMembers; i++) {
-        const newForm = forms[0].cloneNode(true);
-        const formNum = forms.length + i;
+    addButton.addEventListener('click', function() {
+        const newForm = emptyForm.cloneNode(true);
+        const formNum = parseInt(totalForms.value);
         
-        // 폼 번호 업데이트
-        newForm.innerHTML = newForm.innerHTML.replace(/-0-/g, `-${formNum}-`);
-        
-        // 입력값 초기화
-        newForm.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
-            input.value = '';
-        });
-        newForm.querySelectorAll('select').forEach(select => {
-            if (select.name.includes('age_type')) {
-                select.value = '가족';
-            } else {
-                select.selectedIndex = 0;
+        // 새로운 폼의 ID와 name 속성 업데이트
+        newForm.querySelectorAll('input, select').forEach(function(input) {
+            if (input.name) {
+                input.name = input.name.replace('-0-', '-' + formNum + '-');
+                input.id = input.id.replace('-0-', '-' + formNum + '-');
             }
         });
-        newForm.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            checkbox.checked = false;
+        
+        // 새로운 폼의 라벨 for 속성 업데이트
+        newForm.querySelectorAll('label').forEach(function(label) {
+            if (label.htmlFor) {
+                label.htmlFor = label.htmlFor.replace('-0-', '-' + formNum + '-');
+            }
         });
         
-        // 폼 추가
         formset.appendChild(newForm);
-    }
-    
-    totalForms.value = parseInt(totalForms.value) + parseInt(numMembers);
-}
-
-// 여행 목적이 '가족'일 때 가족 구성원 추가 버튼 표시
-document.addEventListener('DOMContentLoaded', function() {
-    const purposeSelect = document.querySelector('select[name="purpose"]');
-    const familyButton = document.querySelector('.add-family-button');
-    
-    function toggleFamilyButton() {
-        if (purposeSelect.value === '가족') {
-            familyButton.style.display = 'block';
-        } else {
-            familyButton.style.display = 'none';
-        }
-    }
-    
-    purposeSelect.addEventListener('change', toggleFamilyButton);
-    toggleFamilyButton(); // 초기 상태 설정
+        totalForms.value = formNum + 1;
+    });
 });
 </script>
 {% endblock %}
