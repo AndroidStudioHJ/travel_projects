@@ -304,14 +304,23 @@
 <div class="schedule-form-container">
     <h1 class="page-title">AI 여행 상담</h1>
 
-    <form method="post">
+    <form method="post" id="scheduleForm">
         {% csrf_token %}
+        {{ participant_formset.management_form }}
 
         <div class="form-section">
             <h2 class="section-title">기본 정보</h2>
+            {% if form.non_field_errors %}
+            <div class="error-message">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
             <div class="form-group">
                 <label class="form-label" for="{{ form.title.id_for_label }}">여행 주제</label>
                 {{ form.title }}
+                {% if form.title.errors %}
+                <div class="error-message">{{ form.title.errors }}</div>
+                {% endif %}
             </div>
             <div class="form-group">
                 <label class="form-label" for="{{ form.destination.id_for_label }}">여행지</label>
@@ -388,7 +397,11 @@
             <div class="info-message mb-3">
                 * 참여자 그룹별로 입력해주세요. (예: 성인 2명, 아동 1명)
             </div>
-            {{ participant_formset.management_form }}
+            {% if participant_formset.non_form_errors %}
+            <div class="error-message">
+                {{ participant_formset.non_form_errors }}
+            </div>
+            {% endif %}
             <div class="participant-formset">
                 {% for form in participant_formset %}
                 <div class="participant-form{% if form.DELETE.value %} to-delete{% endif %}">
@@ -413,31 +426,21 @@
                         </div>
                     </div>
                     <div class="participant-form-content">
+                        {% for field in form.visible_fields %}
+                        {% if field.name != 'DELETE' and field.name != 'is_family' and field.name != 'is_elderly' %}
                         <div class="form-group">
-                            <label class="form-label">인원수</label>
-                            <div class="input-group" style="width: 120px;">
-                                {{ form.num_people }}
-                                <span class="input-group-text">명</span>
-                            </div>
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <div class="error-message">{{ field.errors }}</div>
+                            {% endif %}
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">성별</label>
-                            <div class="radio-group">
-                                {{ form.gender }}
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">구분</label>
-                            <div class="radio-group">
-                                {{ form.age_type }}
-                            </div>
-                        </div>
-                        <div class="form-group age-range-group">
-                            <label class="form-label">연령대</label>
-                            {{ form.age_range }}
-                        </div>
+                        {% endif %}
+                        {% endfor %}
+                        {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                        {% endfor %}
                     </div>
-                    {{ form.DELETE.as_hidden }}
                 </div>
                 {% endfor %}
             </div>
@@ -459,86 +462,98 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('JS 로드됨');
     const addButton = document.querySelector('.add-participant-button');
     const formset = document.querySelector('.participant-formset');
-    const totalForms = document.querySelector('[name="participants-TOTAL_FORMS"]');
+    const totalForms = document.querySelector('#id_participants-TOTAL_FORMS');
+    const form = document.querySelector('#scheduleForm');
     
-    function initializeDeleteButtons() {
-        document.querySelectorAll('.delete-label').forEach(label => {
-            label.addEventListener('click', function(e) {
-                e.preventDefault();
-                const form = this.closest('.participant-form');
-                if (form) {
-                    // 폼 요소 삭제
-                    form.remove();
-                    
-                    // 남은 폼들의 인덱스 재정렬
-                    const forms = formset.querySelectorAll('.participant-form');
-                    forms.forEach((form, index) => {
-                        // 그룹 번호 업데이트
-                        const titleElement = form.querySelector('.participant-group-title');
-                        if (titleElement) {
-                            titleElement.textContent = `참여자 그룹 #${index + 1}`;
-                        }
-                        
-                        // 폼 필드들의 인덱스 업데이트
-                        form.querySelectorAll('input, select, label').forEach(element => {
-                            ['name', 'id', 'for'].forEach(attr => {
-                                if (element[attr]) {
-                                    element[attr] = element[attr].replace(/participants-\d+-/, `participants-${index}-`);
-                                }
-                            });
-                        });
-                    });
-                    
-                    // TOTAL_FORMS 값 업데이트
-                    totalForms.value = forms.length;
+    function updateFormIndex(element, index) {
+        ['name', 'id', 'for'].forEach(attr => {
+            if (element[attr]) {
+                element[attr] = element[attr].replace(/-\d+-/, `-${index}-`);
+            }
+        });
+    }
+    
+    function updateAgeRangeOptions(ageTypeRadios, ageRangeSelect) {
+        const ageRangesByType = {
+            '영유아': ['0-2세', '3-7세'],
+            '아동': ['3-7세', '8-13세'],
+            '청소년': ['14-19세'],
+            '성인': ['20대', '30대', '40대', '50대', '60대', '70대 이상']
+        };
+        
+        ageTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                const selectedType = this.value;
+                const validRanges = ageRangesByType[selectedType] || [];
+                
+                while (ageRangeSelect.firstChild) {
+                    ageRangeSelect.removeChild(ageRangeSelect.firstChild);
+                }
+                
+                validRanges.forEach(range => {
+                    const option = document.createElement('option');
+                    option.value = range;
+                    option.textContent = range;
+                    ageRangeSelect.appendChild(option);
+                });
+                
+                if (ageRangeSelect.options.length > 0) {
+                    ageRangeSelect.selectedIndex = 0;
                 }
             });
         });
     }
     
+    function validateForm() {
+        const activeForms = formset.querySelectorAll('.participant-form:not(.to-delete)');
+        if (activeForms.length === 0) {
+            alert('최소 한 명 이상의 참여자 정보를 입력해주세요.');
+            return false;
+        }
+        
+        let isValid = true;
+        activeForms.forEach(form => {
+            const numPeople = form.querySelector('input[name$="-num_people"]');
+            const gender = form.querySelector('input[name$="-gender"]:checked');
+            const ageType = form.querySelector('input[name$="-age_type"]:checked');
+            const ageRange = form.querySelector('select[name$="-age_range"]');
+            
+            if (!numPeople || !numPeople.value || parseInt(numPeople.value) < 1) {
+                alert('인원수를 입력해주세요.');
+                isValid = false;
+                return;
+            }
+            
+            if (!gender) {
+                alert('성별을 선택해주세요.');
+                isValid = false;
+                return;
+            }
+            
+            if (!ageType) {
+                alert('구분을 선택해주세요.');
+                isValid = false;
+                return;
+            }
+            
+            if (!ageRange || !ageRange.value) {
+                alert('연령대를 선택해주세요.');
+                isValid = false;
+                return;
+            }
+        });
+        
+        return isValid;
+    }
+    
     if (addButton && formset && totalForms) {
         const emptyForm = formset.querySelector('.participant-form').cloneNode(true);
         
-        // 연령대 필드 동적 업데이트
-        function updateAgeRangeOptions(ageTypeRadios, ageRangeSelect) {
-            const ageRangesByType = {
-                '영유아': ['0-2세', '3-7세'],
-                '아동': ['3-7세', '8-13세'],
-                '청소년': ['14-19세'],
-                '성인': ['20대', '30대', '40대', '50대', '60대', '70대 이상']
-            };
-            
-            ageTypeRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const selectedType = this.value;
-                    const validRanges = ageRangesByType[selectedType] || [];
-                    
-                    // 기존 옵션 제거
-                    while (ageRangeSelect.firstChild) {
-                        ageRangeSelect.removeChild(ageRangeSelect.firstChild);
-                    }
-                    
-                    // 새 옵션 추가
-                    validRanges.forEach(range => {
-                        const option = document.createElement('option');
-                        option.value = range;
-                        option.textContent = range;
-                        ageRangeSelect.appendChild(option);
-                    });
-                    
-                    // 첫 번째 옵션 선택
-                    if (ageRangeSelect.options.length > 0) {
-                        ageRangeSelect.selectedIndex = 0;
-                    }
-                });
-            });
-        }
-        
         // 초기 폼에 대해 연령대 필드 업데이트 설정
-        const initialForms = formset.querySelectorAll('.participant-form');
-        initialForms.forEach(form => {
+        formset.querySelectorAll('.participant-form').forEach(form => {
             const ageTypeRadios = form.querySelectorAll('input[name$="-age_type"]');
             const ageRangeSelect = form.querySelector('select[name$="-age_range"]');
             if (ageTypeRadios && ageRangeSelect) {
@@ -546,29 +561,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // 초기 삭제 버튼 설정
-        initializeDeleteButtons();
-        
         addButton.addEventListener('click', function() {
             const formCount = formset.querySelectorAll('.participant-form').length;
             const newForm = emptyForm.cloneNode(true);
             
-            // 폼 번호 업데이트
-            newForm.querySelectorAll('input, select, label').forEach(function(element) {
-                ['name', 'id', 'for'].forEach(attr => {
-                    if (element[attr]) {
-                        element[attr] = element[attr].replace(/participants-(\d+)-/, 'participants-' + formCount + '-');
-                    }
-                });
+            newForm.classList.remove('to-delete');
+            newForm.querySelectorAll('input, select, label').forEach(element => {
+                updateFormIndex(element, formCount);
             });
             
-            // 그룹 번호 업데이트
             const titleElement = newForm.querySelector('.participant-group-title');
             if (titleElement) {
                 titleElement.textContent = `참여자 그룹 #${formCount + 1}`;
             }
             
-            // 입력값 초기화
             newForm.querySelectorAll('input[type="number"]').forEach(input => {
                 input.value = '1';
             });
@@ -582,7 +588,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 checkbox.checked = false;
             });
             
-            // 새 폼에 대해 연령대 필드 업데이트 설정
             const ageTypeRadios = newForm.querySelectorAll('input[name$="-age_type"]');
             const ageRangeSelect = newForm.querySelector('select[name$="-age_range"]');
             if (ageTypeRadios && ageRangeSelect) {
@@ -591,15 +596,28 @@ document.addEventListener('DOMContentLoaded', function() {
             
             formset.appendChild(newForm);
             totalForms.value = formCount + 1;
-            
-            // 새로 추가된 폼의 삭제 버튼 초기화
-            initializeDeleteButtons();
         });
-    } else {
-        console.error('Required elements not found:', {
-            addButton: !!addButton,
-            formset: !!formset,
-            totalForms: !!totalForms
+        
+        form.addEventListener('submit', function(e) {
+            if (!validateForm()) {
+                e.preventDefault();
+            }
+        });
+
+        formset.addEventListener('click', function(e) {
+            const deleteBtn = e.target.closest('.delete-label');
+            if (deleteBtn) {
+                e.preventDefault();
+                const form = deleteBtn.closest('.participant-form');
+                if (form) {
+                    const deleteInput = form.querySelector('input[name$="-DELETE"]');
+                    if (deleteInput) {
+                        deleteInput.checked = true;
+                        form.classList.add('to-delete');
+                        form.style.display = 'none';
+                    }
+                }
+            }
         });
     }
 });
