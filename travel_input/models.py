@@ -21,6 +21,17 @@ class Schedule(models.Model):
     budget = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True, verbose_name='예산')
     notes = models.TextField(max_length=5000, null=True, blank=True, verbose_name='메모')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='schedules', verbose_name='사용자')
+    
+    # 새로 추가된 필드들
+    num_people = models.IntegerField(default=1, verbose_name='인원수')
+    departure_region = models.CharField(max_length=50, null=True, blank=True, verbose_name='출발 지역')
+    purpose = models.CharField(max_length=50, null=True, blank=True, verbose_name='여행 목적')
+    season_peak = models.CharField(max_length=50, null=True, blank=True, verbose_name='성수기 여부')
+    pet_friendly = models.CharField(max_length=10, null=True, blank=True, verbose_name='반려동물 동반 여부')
+    people_composition = models.CharField(max_length=100, null=True, blank=True, verbose_name='사람 구성')
+    lodging_request = models.CharField(max_length=200, null=True, blank=True, verbose_name='숙소 요청사항')
+    comments = models.TextField(max_length=1000, null=True, blank=True, verbose_name='기타 요청사항')
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -62,14 +73,12 @@ class Place(models.Model):
 
 class Transport(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='transports')
-    type = models.CharField(max_length=50)  # 예: 비행기, 기차, 버스
-    departure = models.CharField(max_length=100)
-    arrival = models.CharField(max_length=100)
-    time = models.DateTimeField()
-
-    def __str__(self):
-        return f"{self.type} ({self.departure} → {self.arrival})"
+    type = models.CharField(max_length=50, verbose_name='교통수단')
     
+    def __str__(self):
+        return f"{self.schedule.title} - {self.type}"
+
+
 class TravelOptionCategory(models.Model):
     name = models.CharField(max_length=100)
 
@@ -97,6 +106,7 @@ class GroupTravel(models.Model):
     def __str__(self):
         return self.name
 
+
 class GroupMember(models.Model):
     group = models.ForeignKey(GroupTravel, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -106,6 +116,7 @@ class GroupMember(models.Model):
     class Meta:
         unique_together = ('group', 'user')
 
+
 class GroupMessage(models.Model):
     group = models.ForeignKey(GroupTravel, on_delete=models.CASCADE, related_name='messages')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -114,6 +125,7 @@ class GroupMessage(models.Model):
 
     def __str__(self):
         return f"{self.user.username}: {self.content[:50]}"
+
 
 class City(models.Model):
     name = models.CharField(max_length=50, verbose_name='도시명')
@@ -128,4 +140,22 @@ class City(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# 여행 스타일 모델 추가
+class TravelStyle(models.Model):
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='travel_styles')
+    style = models.CharField(max_length=50, verbose_name='여행 스타일')
+    
+    def __str__(self):
+        return f"{self.schedule.title} - {self.style}"
+
+
+# 중요 요소 모델 추가
+class ImportantFactor(models.Model):
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='important_factors')
+    factor = models.CharField(max_length=50, verbose_name='중요 요소')
+    
+    def __str__(self):
+        return f"{self.schedule.title} - {self.factor}"
 

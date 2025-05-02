@@ -1,6 +1,6 @@
 from django.contrib import admin 
 from .models import Destination, Schedule, Budget, Participant, \
-                    Place, Transport, TravelOptionCategory, TravelOption, GroupTravel, GroupMember, GroupMessage, City
+                    Place, Transport, TravelOptionCategory, TravelOption, GroupTravel, GroupMember, GroupMessage, City, TravelStyle, ImportantFactor
 
 # Register your models here.
 class BudgetInline(admin.TabularInline):
@@ -24,19 +24,38 @@ class PlaceInline(admin.TabularInline):
 class TransportInline(admin.TabularInline):
     model = Transport
     extra = 1
+    verbose_name = '교통수단'
+    verbose_name_plural = '교통수단들'
 
+class TravelStyleInline(admin.TabularInline):
+    model = TravelStyle
+    extra = 1
+    verbose_name = '여행 스타일'
+    verbose_name_plural = '여행 스타일들'
+
+class ImportantFactorInline(admin.TabularInline):
+    model = ImportantFactor
+    extra = 1
+    verbose_name = '중요 요소'
+    verbose_name_plural = '중요 요소들'
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'destination', 'start_date', 'budget', 'user', 'created_at')
-    list_filter = ('destination', 'start_date', 'user')
-    search_fields = ('title', 'destination', 'notes')
+    list_display = ('title', 'destination', 'start_date', 'end_date', 'num_people', 'budget', 'user', 'created_at')
+    list_filter = ('destination', 'start_date', 'user', 'purpose', 'season_peak', 'pet_friendly')
+    search_fields = ('title', 'destination', 'notes', 'departure_region', 'people_composition', 'lodging_request', 'comments')
     date_hierarchy = 'start_date'
     ordering = ('-created_at', '-start_date')
-    inlines = [BudgetInline, ParticipantInline, PlaceInline]
+    inlines = [BudgetInline, ParticipantInline, PlaceInline, TransportInline, TravelStyleInline, ImportantFactorInline]
     fieldsets = (
         ('기본 정보', {
-            'fields': ('title', 'destination', 'start_date', 'budget', 'notes', 'user')
+            'fields': ('title', 'destination', 'start_date', 'end_date', 'num_people', 'budget', 'notes', 'user')
+        }),
+        ('여행 계획', {
+            'fields': ('departure_region', 'purpose', 'season_peak', 'pet_friendly')
+        }),
+        ('인원 및 요청사항', {
+            'fields': ('people_composition', 'lodging_request', 'comments')
         }),
         ('생성/수정 정보', {
             'fields': ('created_at', 'updated_at'),
@@ -106,12 +125,12 @@ class PlaceAdmin(admin.ModelAdmin):
 
 @admin.register(Transport)
 class TransportAdmin(admin.ModelAdmin):
-    list_display = ('type', 'departure', 'arrival', 'time', 'schedule')
+    list_display = ('schedule', 'type')
     list_filter = ('type',)
-    search_fields = ('departure', 'arrival', 'schedule__title')
+    search_fields = ('schedule__title', 'type')
     fieldsets = (
         ('교통 정보', {
-            'fields': ('schedule', 'type', 'departure', 'arrival', 'time')
+            'fields': ('schedule', 'type')
         }),
     )
 
@@ -166,3 +185,25 @@ class CityAdmin(admin.ModelAdmin):
     list_editable = ('is_active', 'order')
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
+
+@admin.register(TravelStyle)
+class TravelStyleAdmin(admin.ModelAdmin):
+    list_display = ('schedule', 'style')
+    list_filter = ('style',)
+    search_fields = ('schedule__title', 'style')
+    fieldsets = (
+        ('여행 스타일 정보', {
+            'fields': ('schedule', 'style')
+        }),
+    )
+
+@admin.register(ImportantFactor)
+class ImportantFactorAdmin(admin.ModelAdmin):
+    list_display = ('schedule', 'factor')
+    list_filter = ('factor',)
+    search_fields = ('schedule__title', 'factor')
+    fieldsets = (
+        ('중요 요소 정보', {
+            'fields': ('schedule', 'factor')
+        }),
+    )
