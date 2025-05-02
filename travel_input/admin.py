@@ -14,6 +14,8 @@ class ParticipantInline(admin.TabularInline):
     extra = 1
     verbose_name = '참여자'
     verbose_name_plural = '참여자들'
+    fields = ('gender', 'num_people', 'age_type', 'age_range', 'is_family', 'is_elderly')
+    classes = ('collapse',)
 
 class PlaceInline(admin.TabularInline):
     model = Place
@@ -41,26 +43,18 @@ class ImportantFactorInline(admin.TabularInline):
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'destination', 'start_date', 'end_date', 'budget', 'user', 'created_at')
-    list_filter = ('destination', 'start_date', 'user', 'purpose', 'pet_friendly')
-    search_fields = ('title', 'destination', 'notes')
-    inlines = [TravelStyleInline, ImportantFactorInline, TransportInline, ParticipantInline]
-    fieldsets = (
-        ('기본 정보', {
-            'fields': ('title', 'destination', 'start_date', 'end_date', 'budget', 'user')
-        }),
-        ('여행 정보', {
-            'fields': ('departure_region', 'purpose', 'pet_friendly')
-        }),
-        ('숙박 정보', {
-            'fields': ('lodging_request',)
-        }),
-        ('메모', {
-            'fields': ('notes',)
-        })
-    )
-    readonly_fields = ('created_at', 'updated_at')
-
+    list_display = ('title', 'destination', 'start_date', 'end_date', 'total_participants', 'family_groups')
+    list_filter = ('destination', 'start_date')
+    search_fields = ('title', 'destination__name')
+    inlines = [ParticipantInline, BudgetInline, TransportInline, TravelStyleInline, ImportantFactorInline]
+    
+    def total_participants(self, obj):
+        return sum(p.num_people for p in obj.participants.all())
+    total_participants.short_description = '총 참여자 수'
+    
+    def family_groups(self, obj):
+        return obj.participants.filter(is_family=True).count()
+    family_groups.short_description = '가족 그룹 수'
 
 class TravelOptionInline(admin.TabularInline):
     model = TravelOption
@@ -100,17 +94,17 @@ class BudgetAdmin(admin.ModelAdmin):
 
 @admin.register(Participant)
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('schedule', 'is_family', 'gender', 'num_people', 'age_type', 'age_range', 'is_elderly')
-    list_filter = ('is_family', 'gender', 'age_type', 'age_range', 'is_elderly')
-    list_editable = ('is_family', 'gender', 'age_type', 'age_range')
+    list_display = ('schedule', 'gender', 'num_people', 'age_type', 'age_range', 'is_family', 'is_elderly')
+    list_filter = ('gender', 'age_type', 'is_family', 'is_elderly')
     search_fields = ('schedule__title',)
-    
+    ordering = ('schedule', 'age_type')
+
     fieldsets = (
         ('기본 정보', {
-            'fields': ('schedule', 'is_family')
+            'fields': ('schedule', 'is_family', 'is_elderly')
         }),
-        ('개인 정보', {
-            'fields': ('gender', 'num_people', 'age_type', 'age_range', 'is_elderly')
+        ('참여자 정보', {
+            'fields': ('gender', 'num_people', 'age_type', 'age_range')
         }),
     )
 

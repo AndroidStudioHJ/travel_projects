@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # 여행 스타일 선택지
 TRAVEL_STYLE_CHOICES = [
@@ -74,35 +75,75 @@ class Budget(models.Model):
 
 
 class Participant(models.Model):
-    AGE_TYPE_CHOICES = [
-        ('성인', '성인'),
-        ('아동', '아동'),
-    ]
-    
     AGE_RANGE_CHOICES = [
-        ('10대', '10대'),
+        ('0-2세', '0-2세'),
+        ('3-7세', '3-7세'),
+        ('8-13세', '8-13세'),
+        ('14-19세', '14-19세'),
         ('20대', '20대'),
         ('30대', '30대'),
         ('40대', '40대'),
         ('50대', '50대'),
         ('60대', '60대'),
-        ('70대', '70대'),
-        ('80대', '80대'),
+        ('70대 이상', '70대 이상'),
+    ]
+    
+    AGE_TYPE_CHOICES = [
+        ('성인', '성인'),
+        ('청소년', '청소년'),
+        ('아동', '아동'),
+        ('영유아', '영유아')
     ]
     
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='participants')
-    gender = models.CharField(max_length=10, choices=[
-        ('남자', '남자'),
-        ('여자', '여자')
-    ], verbose_name='성별', default='남자')
-    num_people = models.IntegerField(verbose_name='인원수', default=1)
-    age_type = models.CharField(max_length=10, choices=AGE_TYPE_CHOICES, verbose_name='구분', default='성인')
-    age_range = models.CharField(max_length=10, choices=AGE_RANGE_CHOICES, verbose_name='연령대', default='20대')
-    is_elderly = models.BooleanField(default=False, verbose_name='고령자 여부')
-    is_family = models.BooleanField(default=False, verbose_name='가족 여부')
+    gender = models.CharField(
+        max_length=10,
+        choices=[
+            ('남자', '남자'),
+            ('여자', '여자')
+        ],
+        verbose_name='성별'
+    )
+    num_people = models.IntegerField(
+        verbose_name='인원수',
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(10)
+        ],
+        default=1
+    )
+    age_type = models.CharField(
+        max_length=10,
+        choices=AGE_TYPE_CHOICES,
+        verbose_name='구분'
+    )
+    age_range = models.CharField(
+        max_length=20,
+        choices=AGE_RANGE_CHOICES,
+        verbose_name='연령대'
+    )
+    is_family = models.BooleanField(
+        verbose_name='가족 여부',
+        default=False
+    )
+    is_elderly = models.BooleanField(
+        verbose_name='노인 여부',
+        default=False,
+        help_text='65세 이상인 경우 체크'
+    )
+
+    class Meta:
+        verbose_name = '참여자'
+        verbose_name_plural = '참여자들'
+
+    def save(self, *args, **kwargs):
+        # 연령대가 60대 이상이면 자동으로 is_elderly를 True로 설정
+        if self.age_range in ['60대', '70대 이상']:
+            self.is_elderly = True
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.gender} ({self.num_people}명, {self.age_type}, {self.age_range})"
+        return f"{self.get_age_type_display()} {self.get_gender_display()} {self.num_people}명"
 
 
 class Place(models.Model):
