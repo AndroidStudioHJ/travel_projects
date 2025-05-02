@@ -9,7 +9,7 @@ ParticipantFormSet = inlineformset_factory(
     Participant,
     fields=('gender', 'num_people', 'age_type', 'age_range', 'is_elderly', 'is_family'),
     extra=1,
-    can_delete=False,
+    can_delete=True,
     labels={
         'gender': '성별',
         'num_people': '인원수',
@@ -81,6 +81,13 @@ class TravelSurveyForm(forms.Form):
     )
 
 class ScheduleForm(forms.ModelForm):
+    travel_style = forms.MultipleChoiceField(
+        choices=TRAVEL_STYLE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        label="여행 스타일",
+        required=False
+    )
+
     important_factors = forms.MultipleChoiceField(
         choices=IMPORTANT_CHOICES,
         widget=forms.CheckboxSelectMultiple,
@@ -122,6 +129,19 @@ class ScheduleForm(forms.ModelForm):
         required=False
     )
 
+    transport = forms.ChoiceField(
+        choices=[
+            ('', '교통수단을 선택하세요'),
+            ('KTX', 'KTX'),
+            ('버스', '버스'),
+            ('비행기', '비행기'),
+            ('자동차', '자동차'),
+            ('기타', '기타'),
+        ],
+        label="선호 교통수단",
+        required=False
+    )
+
     lodging_request = forms.CharField(
         max_length=200,
         label="숙소 요청사항",
@@ -142,6 +162,10 @@ class ScheduleForm(forms.ModelForm):
         
         # 기존 인스턴스가 있는 경우
         if self.instance and self.instance.pk:
+            # 여행 스타일 초기화
+            travel_styles = list(self.instance.travel_styles.values_list('style', flat=True))
+            self.initial['travel_style'] = travel_styles
+            
             # 중요 요소 초기화
             important_factors = list(self.instance.important_factors.values_list('factor', flat=True))
             self.initial['important_factors'] = important_factors
@@ -152,10 +176,20 @@ class ScheduleForm(forms.ModelForm):
         if commit:
             schedule.save()
             
+            # 여행 스타일 저장
+            TravelStyle.objects.filter(schedule=schedule).delete()
+            for style in self.cleaned_data.get('travel_style', []):
+                TravelStyle.objects.create(schedule=schedule, style=style)
+            
             # 중요 요소 저장
             ImportantFactor.objects.filter(schedule=schedule).delete()
             for factor in self.cleaned_data.get('important_factors', []):
                 ImportantFactor.objects.create(schedule=schedule, factor=factor)
+            
+            # 교통수단 저장
+            Transport.objects.filter(schedule=schedule).delete()
+            if self.cleaned_data.get('transport'):
+                Transport.objects.create(schedule=schedule, type=self.cleaned_data['transport'])
         
         return schedule
 
@@ -164,7 +198,7 @@ class ScheduleForm(forms.ModelForm):
         fields = [
             'title', 'destination', 'start_date', 'end_date', 'budget',
             'departure_region', 'purpose', 'pet_friendly',
-            'lodging_request', 'notes'
+            'transport', 'lodging_request', 'notes'
         ]
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),

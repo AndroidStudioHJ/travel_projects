@@ -3,8 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction
 from ..forms import ScheduleForm, ParticipantFormSet
-from ..models import Schedule
+from ..models import Schedule, Participant
 from django.db.models import Q
+import logging
+
+logger = logging.getLogger(__name__)
 
 @login_required
 def schedule_list(request):
@@ -42,24 +45,50 @@ def schedule_detail(request, pk):
 @login_required
 def schedule_create(request):
     if request.method == 'POST':
+        logger.info("[DEBUG] Processing schedule creation POST request")
         form = ScheduleForm(request.POST)
         participant_formset = ParticipantFormSet(request.POST)
         
+        logger.info(f"[DEBUG] Form data: {request.POST}")
+        logger.info(f"[DEBUG] Form is valid: {form.is_valid()}")
+        logger.info(f"[DEBUG] Participant formset is valid: {participant_formset.is_valid()}")
+        
         if form.is_valid() and participant_formset.is_valid():
-            with transaction.atomic():
-                schedule = form.save(commit=False)
-                schedule.user = request.user
-                schedule.save()
-                
-                # 여행 스타일, 중요 요소, 교통수단 저장
-                form.save_m2m()
-                
-                # 참여자 정보 저장
-                participant_formset.instance = schedule
-                participant_formset.save()
-                
-                messages.success(request, '일정이 성공적으로 생성되었습니다.')
-                return redirect('travel_input:schedule_detail', pk=schedule.pk)
+            try:
+                with transaction.atomic():
+                    # 일정 저장
+                    schedule = form.save(commit=False)
+                    schedule.user = request.user
+                    schedule.save()
+                    logger.info(f"[DEBUG] Created schedule: {schedule.id} - {schedule.title}")
+                    
+                    # 여행 스타일, 중요 요소, 교통수단 저장
+                    form.save_m2m()
+                    
+                    # 참여자 정보 저장
+                    participants = []
+                    for participant_form in participant_formset:
+                        if participant_form.cleaned_data and not participant_form.cleaned_data.get('DELETE', False):
+                            participant = participant_form.save(commit=False)
+                            participant.schedule = schedule
+                            participant.save()
+                            participants.append(participant)
+                            logger.info(f"[DEBUG] Saved participant: {participant.id} - {participant.gender}, {participant.age_type}")
+                    
+                    # 저장된 참여자 확인
+                    saved_participants = Participant.objects.filter(schedule=schedule)
+                    logger.info(f"[DEBUG] Confirmed saved participants: {[p.id for p in saved_participants]}")
+                    
+                    messages.success(request, '일정이 성공적으로 생성되었습니다.')
+                    return redirect('travel_input:schedule_detail', pk=schedule.pk)
+            except Exception as e:
+                logger.error(f"[ERROR] Failed to save schedule: {str(e)}")
+                messages.error(request, f'일정 저장 중 오류가 발생했습니다: {str(e)}')
+        else:
+            logger.error("[ERROR] Form validation failed")
+            logger.error(f"[ERROR] Form errors: {form.errors}")
+            logger.error(f"[ERROR] Participant formset errors: {participant_formset.errors}")
+            messages.error(request, '입력 내용을 확인해주세요.')
     else:
         form = ScheduleForm()
         participant_formset = ParticipantFormSet()
@@ -73,15 +102,49 @@ def schedule_create(request):
 def schedule_update(request, pk):
     schedule = get_object_or_404(Schedule, pk=pk, user=request.user)
     if request.method == 'POST':
+        logger.info(f"[DEBUG] Processing schedule update POST request for schedule {pk}")
         form = ScheduleForm(request.POST, instance=schedule)
         participant_formset = ParticipantFormSet(request.POST, instance=schedule)
         
+        logger.info(f"[DEBUG] Form data: {request.POST}")
+        logger.info(f"[DEBUG] Form is valid: {form.is_valid()}")
+        logger.info(f"[DEBUG] Participant formset is valid: {participant_formset.is_valid()}")
+        
         if form.is_valid() and participant_formset.is_valid():
-            with transaction.atomic():
-                schedule = form.save()
-                participant_formset.save()
-                messages.success(request, '일정이 성공적으로 수정되었습니다.')
-                return redirect('travel_input:schedule_detail', pk=schedule.pk)
+            try:
+                with transaction.atomic():
+                    # 일정 업데이트
+                    schedule = form.save()
+                    logger.info(f"[DEBUG] Updated schedule: {schedule.id} - {schedule.title}")
+                    
+                    # 기존 참여자 정보 삭제
+                    Participant.objects.filter(schedule=schedule).delete()
+                    logger.info("[DEBUG] Deleted existing participants")
+                    
+                    # 새로운 참여자 정보 저장
+                    participants = []
+                    for participant_form in participant_formset:
+                        if participant_form.cleaned_data and not participant_form.cleaned_data.get('DELETE', False):
+                            participant = participant_form.save(commit=False)
+                            participant.schedule = schedule
+                            participant.save()
+                            participants.append(participant)
+                            logger.info(f"[DEBUG] Saved participant: {participant.id} - {participant.gender}, {participant.age_type}")
+                    
+                    # 저장된 참여자 확인
+                    saved_participants = Participant.objects.filter(schedule=schedule)
+                    logger.info(f"[DEBUG] Confirmed saved participants: {[p.id for p in saved_participants]}")
+                    
+                    messages.success(request, '일정이 성공적으로 수정되었습니다.')
+                    return redirect('travel_input:schedule_detail', pk=schedule.pk)
+            except Exception as e:
+                logger.error(f"[ERROR] Failed to update schedule: {str(e)}")
+                messages.error(request, f'일정 수정 중 오류가 발생했습니다: {str(e)}')
+        else:
+            logger.error("[ERROR] Form validation failed")
+            logger.error(f"[ERROR] Form errors: {form.errors}")
+            logger.error(f"[ERROR] Participant formset errors: {participant_formset.errors}")
+            messages.error(request, '입력 내용을 확인해주세요.')
     else:
         form = ScheduleForm(instance=schedule)
         participant_formset = ParticipantFormSet(instance=schedule)
