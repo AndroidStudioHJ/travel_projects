@@ -88,7 +88,15 @@ def schedule_create(request):
             logger.error("[ERROR] Form validation failed")
             logger.error(f"[ERROR] Form errors: {form.errors}")
             logger.error(f"[ERROR] Participant formset errors: {participant_formset.errors}")
-            messages.error(request, '입력 내용을 확인해주세요.')
+            if not form.is_valid():
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f'{form.fields[field].label}: {error}')
+            if not participant_formset.is_valid():
+                for form in participant_formset:
+                    for field, errors in form.errors.items():
+                        for error in errors:
+                            messages.error(request, f'참여자 정보: {error}')
     else:
         form = ScheduleForm()
         participant_formset = ParticipantFormSet()
