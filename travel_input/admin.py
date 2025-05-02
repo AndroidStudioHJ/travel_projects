@@ -41,26 +41,23 @@ class ImportantFactorInline(admin.TabularInline):
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'destination', 'start_date', 'end_date', 'num_people', 'budget', 'user', 'created_at')
-    list_filter = ('destination', 'start_date', 'user', 'purpose', 'season_peak', 'pet_friendly')
-    search_fields = ('title', 'destination', 'notes', 'departure_region', 'people_composition', 'lodging_request', 'comments')
-    date_hierarchy = 'start_date'
-    ordering = ('-created_at', '-start_date')
-    inlines = [BudgetInline, ParticipantInline, PlaceInline, TransportInline, TravelStyleInline, ImportantFactorInline]
+    list_display = ('title', 'destination', 'start_date', 'end_date', 'budget', 'user', 'created_at')
+    list_filter = ('destination', 'start_date', 'user', 'purpose', 'pet_friendly')
+    search_fields = ('title', 'destination', 'notes')
+    inlines = [TravelStyleInline, ImportantFactorInline, TransportInline, ParticipantInline]
     fieldsets = (
         ('기본 정보', {
-            'fields': ('title', 'destination', 'start_date', 'end_date', 'num_people', 'budget', 'notes', 'user')
+            'fields': ('title', 'destination', 'start_date', 'end_date', 'budget', 'user')
         }),
-        ('여행 계획', {
-            'fields': ('departure_region', 'purpose', 'season_peak', 'pet_friendly')
+        ('여행 정보', {
+            'fields': ('departure_region', 'purpose', 'pet_friendly')
         }),
-        ('인원 및 요청사항', {
-            'fields': ('people_composition', 'lodging_request', 'comments')
+        ('숙박 정보', {
+            'fields': ('lodging_request',)
         }),
-        ('생성/수정 정보', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
+        ('메모', {
+            'fields': ('notes',)
+        })
     )
     readonly_fields = ('created_at', 'updated_at')
 
@@ -103,12 +100,17 @@ class BudgetAdmin(admin.ModelAdmin):
 
 @admin.register(Participant)
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('name', 'age', 'schedule')
-    list_filter = ('age',)
-    search_fields = ('name', 'schedule__title')
+    list_display = ('schedule', 'is_family', 'gender', 'num_people', 'age_type', 'age_range', 'is_elderly')
+    list_filter = ('is_family', 'gender', 'age_type', 'age_range', 'is_elderly')
+    list_editable = ('is_family', 'gender', 'age_type', 'age_range')
+    search_fields = ('schedule__title',)
+    
     fieldsets = (
-        ('참여자 정보', {
-            'fields': ('schedule', 'name', 'age')
+        ('기본 정보', {
+            'fields': ('schedule', 'is_family')
+        }),
+        ('개인 정보', {
+            'fields': ('gender', 'num_people', 'age_type', 'age_range', 'is_elderly')
         }),
     )
 
