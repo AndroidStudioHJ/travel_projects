@@ -119,6 +119,91 @@
         font-size: 0.9rem;
         margin-top: 5px;
     }
+
+    .checkbox-group ul,
+    .radio-group ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .checkbox-group li,
+    .radio-group li {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.95rem;
+    }
+
+    .checkbox-group input[type="checkbox"],
+    .radio-group input[type="radio"] {
+        margin-right: 6px;
+    }
+
+    .checkbox-group label,
+    .radio-group label {
+        cursor: pointer;
+    }
+
+    .info-message {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    .participant-formset {
+        margin-bottom: 20px;
+    }
+    
+    .participant-form {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .delete-form {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .add-family-button {
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s;
+        margin-right: 10px;
+    }
+    
+    .add-family-button:hover {
+        background: #ff5252;
+    }
+
+    .add-participant-button {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s;
+    }
+    
+    .add-participant-button:hover {
+        background: #218838;
+    }
 </style>
 {% endblock %}
 
@@ -148,34 +233,25 @@
                 {{ form.end_date }}
             </div>
             <div class="form-group">
-                <label class="form-label" for="{{ form.num_people.id_for_label }}">인원수</label>
-                {{ form.num_people }}
-            </div>
-            <div class="form-group">
                 <label class="form-label" for="{{ form.budget.id_for_label }}">예산</label>
                 {{ form.budget }}
+            </div>
+            <div class="info-message">
+                * 여행 인원은 일정 생성 후 상세 페이지에서 추가할 수 있습니다.
             </div>
         </div>
 
         <div class="form-section">
-            <h2 class="section-title">선호 여행 스타일</h2>
+            <h2 class="section-title">여행 스타일</h2>
             <div class="checkbox-group">
-                <label class="checkbox-option"><input type="checkbox" name="travel_style" value="nature"> 자연경관</label>
-                <label class="checkbox-option"><input type="checkbox" name="travel_style" value="culture"> 문화 체험</label>
-                <label class="checkbox-option"><input type="checkbox" name="travel_style" value="city"> 도시 탐방</label>
-                <label class="checkbox-option"><input type="checkbox" name="travel_style" value="activity"> 액티비티</label>
-                <label class="checkbox-option"><input type="checkbox" name="travel_style" value="relax"> 휴식</label>
+                {{ form.travel_style }}
             </div>
         </div>
 
         <div class="form-section">
             <h2 class="section-title">여행 시 중요 요소</h2>
             <div class="checkbox-group">
-                <label class="checkbox-option"><input type="checkbox" name="important_factors" value="stay"> 숙소</label>
-                <label class="checkbox-option"><input type="checkbox" name="important_factors" value="food"> 음식</label>
-                <label class="checkbox-option"><input type="checkbox" name="important_factors" value="weather"> 날씨</label>
-                <label class="checkbox-option"><input type="checkbox" name="important_factors" value="schedule"> 일정 편의</label>
-                <label class="checkbox-option"><input type="checkbox" name="important_factors" value="culture"> 현지 문화</label>
+                {{ form.important_factors }}
             </div>
         </div>
 
@@ -183,70 +259,153 @@
             <h2 class="section-title">여행 계획 요소</h2>
             <div class="form-group">
                 <label class="form-label">출발 지역</label>
-                <select name="departure_region" class="form-select">
-                    <option value="">지역을 선택하세요</option>
-                    <option value="서울">서울</option>
-                    <option value="경기">경기</option>
-                    <option value="부산">부산</option>
-                    <option value="광주">광주</option>
-                    <option value="대전">대전</option>
-                    <option value="기타">기타</option>
-                </select>
+                {{ form.departure_region }}
             </div>
             <div class="form-group">
                 <label class="form-label">여행 목적</label>
-                <div class="radio-group">
-                    <label class="radio-option"><input type="radio" name="purpose" value="힐링"> 힐링</label>
-                    <label class="radio-option"><input type="radio" name="purpose" value="가족"> 가족 여행</label>
-                    <label class="radio-option"><input type="radio" name="purpose" value="커플"> 커플 여행</label>
-                    <label class="radio-option"><input type="radio" name="purpose" value="친구"> 친구와 여행</label>
-                </div>
+                {{ form.purpose }}
             </div>
             <div class="form-group">
-                <label class="form-label">성수기 여부</label>
-                <div class="radio-group">
-                    <label class="radio-option"><input type="radio" name="season_peak" value="성수기"> 성수기</label>
-                    <label class="radio-option"><input type="radio" name="season_peak" value="비성수기"> 비성수기</label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">선호 교통수단</label>
-                <div class="checkbox-group">
-                    <label class="checkbox-option"><input type="checkbox" name="transport" value="비행기"> 비행기</label>
-                    <label class="checkbox-option"><input type="checkbox" name="transport" value="KTX"> KTX</label>
-                    <label class="checkbox-option"><input type="checkbox" name="transport" value="렌터카"> 렌터카</label>
-                    <label class="checkbox-option"><input type="checkbox" name="transport" value="버스"> 버스</label>
-                </div>
+                <label class="form-label">반려동물 동반 여부</label>
+                {{ form.pet_friendly }}
             </div>
         </div>
 
         <div class="form-section">
-            <h2 class="section-title">기타 정보</h2>
-            <div class="form-group">
-                <label class="form-label">반려동물 동반 여부</label>
-                <div class="radio-group">
-                    <label class="radio-option"><input type="radio" name="pet_friendly" value="yes"> 예</label>
-                    <label class="radio-option"><input type="radio" name="pet_friendly" value="no"> 아니오</label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">사람 구성</label>
-                <input type="text" name="people_composition" class="form-input" placeholder="예: 성인 2명, 아동 1명">
-            </div>
+            <h2 class="section-title">숙소 정보</h2>
             <div class="form-group">
                 <label class="form-label">숙소 요청사항</label>
-                <input type="text" name="lodging_request" class="form-input" placeholder="예: 반려동물 가능, 전망 좋은 방">
+                {{ form.lodging_request }}
             </div>
             <div class="form-group">
                 <label class="form-label">기타 요청사항</label>
-                <textarea name="comments" class="form-input" rows="4" placeholder="특별히 원하는 사항이 있다면 입력해주세요."></textarea>
+                {{ form.notes }}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2 class="section-title">참여자 정보</h2>
+            {{ participant_formset.management_form }}
+            <div class="participant-formset">
+                {% for form in participant_formset %}
+                <div class="participant-form">
+                    <div class="form-group">
+                        <label class="form-label">성별</label>
+                        {{ form.gender }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">인원수</label>
+                        {{ form.num_people }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">구분</label>
+                        {{ form.age_type }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">고령자 여부</label>
+                        {{ form.is_elderly }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">가족 여부</label>
+                        {{ form.is_family }}
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="submit-button">AI에게 질문하기</button>
+            <button type="submit" class="submit-button">다음 단계로</button>
             <a href="{% url 'travel_input:schedule_list' %}" class="cancel-button">취소</a>
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function addParticipantForm() {
+    const formset = document.querySelector('.participant-formset');
+    const forms = formset.querySelectorAll('.participant-form');
+    const totalForms = document.getElementById('id_participant_set-TOTAL_FORMS');
+    
+    // 마지막 폼 복사
+    const newForm = forms[0].cloneNode(true);
+    
+    // 폼 번호 업데이트
+    const formNum = forms.length;
+    newForm.innerHTML = newForm.innerHTML.replace(/-0-/g, `-${formNum}-`);
+    
+    // 입력값 초기화
+    newForm.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+        input.value = '';
+    });
+    newForm.querySelectorAll('select').forEach(select => {
+        select.selectedIndex = 0;
+    });
+    newForm.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    // 폼 추가
+    formset.appendChild(newForm);
+    totalForms.value = formNum + 1;
+}
+
+function addFamilyMembers() {
+    const formset = document.querySelector('.participant-formset');
+    const forms = formset.querySelectorAll('.participant-form');
+    const totalForms = document.getElementById('id_participant_set-TOTAL_FORMS');
+    
+    // 가족 구성원 수 입력 받기
+    const numMembers = prompt('가족 구성원 수를 입력하세요', '2');
+    if (!numMembers || isNaN(numMembers)) return;
+    
+    // 가족 구성원 추가
+    for (let i = 0; i < numMembers; i++) {
+        const newForm = forms[0].cloneNode(true);
+        const formNum = forms.length + i;
+        
+        // 폼 번호 업데이트
+        newForm.innerHTML = newForm.innerHTML.replace(/-0-/g, `-${formNum}-`);
+        
+        // 입력값 초기화
+        newForm.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+            input.value = '';
+        });
+        newForm.querySelectorAll('select').forEach(select => {
+            if (select.name.includes('age_type')) {
+                select.value = '가족';
+            } else {
+                select.selectedIndex = 0;
+            }
+        });
+        newForm.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        
+        // 폼 추가
+        formset.appendChild(newForm);
+    }
+    
+    totalForms.value = parseInt(totalForms.value) + parseInt(numMembers);
+}
+
+// 여행 목적이 '가족'일 때 가족 구성원 추가 버튼 표시
+document.addEventListener('DOMContentLoaded', function() {
+    const purposeSelect = document.querySelector('select[name="purpose"]');
+    const familyButton = document.querySelector('.add-family-button');
+    
+    function toggleFamilyButton() {
+        if (purposeSelect.value === '가족') {
+            familyButton.style.display = 'block';
+        } else {
+            familyButton.style.display = 'none';
+        }
+    }
+    
+    purposeSelect.addEventListener('change', toggleFamilyButton);
+    toggleFamilyButton(); // 초기 상태 설정
+});
+</script>
 {% endblock %}
