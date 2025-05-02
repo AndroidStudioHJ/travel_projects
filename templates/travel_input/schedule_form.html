@@ -159,50 +159,143 @@
     }
     
     .participant-form {
-        display: flex;
-        gap: 20px;
-        align-items: flex-start;
-        margin-bottom: 15px;
-        padding: 15px;
         background: #f8f9fa;
-        border-radius: 8px;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: opacity 0.3s ease;
+    }
+    
+    .participant-form.to-delete {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+    
+    .participant-form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .participant-group-title {
+        font-size: 1.1rem;
+        color: #495057;
+        margin: 0;
+    }
+    
+    .participant-form-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    
+    .radio-group {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .radio-group input[type="radio"] {
+        margin-right: 5px;
     }
     
     .delete-form {
         display: flex;
         align-items: center;
-        gap: 5px;
     }
     
-    .add-family-button {
-        background: #ff6b6b;
-        color: white;
+    .delete-label {
+        color: #dc3545;
+        background: none;
         border: none;
-        padding: 10px 20px;
-        border-radius: 20px;
         cursor: pointer;
-        font-size: 1rem;
-        transition: background-color 0.3s;
-        margin-right: 10px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        transition: all 0.3s;
+        font-size: 0.9rem;
     }
     
-    .add-family-button:hover {
-        background: #ff5252;
+    .delete-label:hover {
+        background-color: #dc3545;
+        color: white;
     }
-
+    
+    .delete-form input[type="checkbox"] {
+        display: none;
+    }
+    
+    .age-range-group select {
+        max-width: 200px;
+    }
+    
+    .participant-actions {
+        display: flex;
+        justify-content: center;
+    }
+    
     .add-participant-button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         background: #28a745;
         color: white;
         border: none;
         padding: 10px 20px;
         border-radius: 20px;
-        cursor: pointer;
         font-size: 1rem;
+        cursor: pointer;
         transition: background-color 0.3s;
     }
     
     .add-participant-button:hover {
         background: #218838;
+    }
+    
+    .mb-3 {
+        margin-bottom: 1rem;
+    }
+    
+    .mt-3 {
+        margin-top: 1rem;
+    }
+    
+    .family-check {
+        display: flex;
+        align-items: center;
+        margin: 0 15px;
+    }
+    
+    .family-check label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 15px;
+        transition: all 0.3s;
+        color: #6c757d;
+    }
+    
+    .family-check input[type="checkbox"] {
+        margin-right: 5px;
+    }
+    
+    .family-check input[type="checkbox"]:checked + i {
+        color: #28a745;
+    }
+    
+    .family-check label:hover {
+        background-color: #e9ecef;
+    }
+    
+    .family-check i {
+        transition: color 0.3s;
     }
 </style>
 {% endblock %}
@@ -292,42 +385,67 @@
 
         <div class="form-section">
             <h2 class="section-title">참여자 정보</h2>
+            <div class="info-message mb-3">
+                * 참여자 그룹별로 입력해주세요. (예: 성인 2명, 아동 1명)
+            </div>
             {{ participant_formset.management_form }}
             <div class="participant-formset">
                 {% for form in participant_formset %}
-                <div class="participant-form">
-                    <div class="form-group">
-                        <label class="form-label" for="{{ form.gender.id_for_label }}">성별</label>
-                        {{ form.gender }}
+                <div class="participant-form{% if form.DELETE.value %} to-delete{% endif %}">
+                    <div class="participant-form-header">
+                        <h3 class="participant-group-title">참여자 그룹 #{{ forloop.counter }}</h3>
+                        <div class="form-check family-check">
+                            <label class="form-check-label" for="{{ form.is_family.id_for_label }}">
+                                {{ form.is_family }}
+                                <i class="fas fa-users"></i> 가족
+                            </label>
+                        </div>
+                        <div class="form-check elderly-check">
+                            <label class="form-check-label" for="{{ form.is_elderly.id_for_label }}">
+                                {{ form.is_elderly }}
+                                <i class="fas fa-user-clock"></i> 노인
+                            </label>
+                        </div>
+                        <div class="delete-form">
+                            <button type="button" class="delete-label">
+                                <i class="fas fa-times"></i> 삭제
+                            </button>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label" for="{{ form.num_people.id_for_label }}">인원수</label>
-                        {{ form.num_people }}
+                    <div class="participant-form-content">
+                        <div class="form-group">
+                            <label class="form-label">인원수</label>
+                            <div class="input-group" style="width: 120px;">
+                                {{ form.num_people }}
+                                <span class="input-group-text">명</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">성별</label>
+                            <div class="radio-group">
+                                {{ form.gender }}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">구분</label>
+                            <div class="radio-group">
+                                {{ form.age_type }}
+                            </div>
+                        </div>
+                        <div class="form-group age-range-group">
+                            <label class="form-label">연령대</label>
+                            {{ form.age_range }}
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label" for="{{ form.age_type.id_for_label }}">구분</label>
-                        {{ form.age_type }}
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="{{ form.age_range.id_for_label }}">연령대</label>
-                        {{ form.age_range }}
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="{{ form.is_elderly.id_for_label }}">고령자 여부</label>
-                        {{ form.is_elderly }}
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="{{ form.is_family.id_for_label }}">가족 여부</label>
-                        {{ form.is_family }}
-                    </div>
-                    <div class="delete-form">
-                        {{ form.DELETE }}
-                        <label for="{{ form.DELETE.id_for_label }}">삭제</label>
-                    </div>
+                    {{ form.DELETE.as_hidden }}
                 </div>
                 {% endfor %}
             </div>
-            <button type="button" class="add-participant-button">참여자 추가</button>
+            <div class="participant-actions mt-3">
+                <button type="button" class="add-participant-button">
+                    <i class="fas fa-plus"></i> 참여자 그룹 추가
+                </button>
+            </div>
         </div>
 
         <div class="form-actions">
@@ -343,31 +461,147 @@
 document.addEventListener('DOMContentLoaded', function() {
     const addButton = document.querySelector('.add-participant-button');
     const formset = document.querySelector('.participant-formset');
-    const totalForms = document.querySelector('#id_participants-TOTAL_FORMS');
-    const emptyForm = document.querySelector('.participant-form').cloneNode(true);
+    const totalForms = document.querySelector('[name="participants-TOTAL_FORMS"]');
     
-    addButton.addEventListener('click', function() {
-        const newForm = emptyForm.cloneNode(true);
-        const formNum = parseInt(totalForms.value);
+    function initializeDeleteButtons() {
+        document.querySelectorAll('.delete-label').forEach(label => {
+            label.addEventListener('click', function(e) {
+                e.preventDefault();
+                const form = this.closest('.participant-form');
+                if (form) {
+                    // 폼 요소 삭제
+                    form.remove();
+                    
+                    // 남은 폼들의 인덱스 재정렬
+                    const forms = formset.querySelectorAll('.participant-form');
+                    forms.forEach((form, index) => {
+                        // 그룹 번호 업데이트
+                        const titleElement = form.querySelector('.participant-group-title');
+                        if (titleElement) {
+                            titleElement.textContent = `참여자 그룹 #${index + 1}`;
+                        }
+                        
+                        // 폼 필드들의 인덱스 업데이트
+                        form.querySelectorAll('input, select, label').forEach(element => {
+                            ['name', 'id', 'for'].forEach(attr => {
+                                if (element[attr]) {
+                                    element[attr] = element[attr].replace(/participants-\d+-/, `participants-${index}-`);
+                                }
+                            });
+                        });
+                    });
+                    
+                    // TOTAL_FORMS 값 업데이트
+                    totalForms.value = forms.length;
+                }
+            });
+        });
+    }
+    
+    if (addButton && formset && totalForms) {
+        const emptyForm = formset.querySelector('.participant-form').cloneNode(true);
         
-        // 새로운 폼의 ID와 name 속성 업데이트
-        newForm.querySelectorAll('input, select').forEach(function(input) {
-            if (input.name) {
-                input.name = input.name.replace('-0-', '-' + formNum + '-');
-                input.id = input.id.replace('-0-', '-' + formNum + '-');
+        // 연령대 필드 동적 업데이트
+        function updateAgeRangeOptions(ageTypeRadios, ageRangeSelect) {
+            const ageRangesByType = {
+                '영유아': ['0-2세', '3-7세'],
+                '아동': ['3-7세', '8-13세'],
+                '청소년': ['14-19세'],
+                '성인': ['20대', '30대', '40대', '50대', '60대', '70대 이상']
+            };
+            
+            ageTypeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const selectedType = this.value;
+                    const validRanges = ageRangesByType[selectedType] || [];
+                    
+                    // 기존 옵션 제거
+                    while (ageRangeSelect.firstChild) {
+                        ageRangeSelect.removeChild(ageRangeSelect.firstChild);
+                    }
+                    
+                    // 새 옵션 추가
+                    validRanges.forEach(range => {
+                        const option = document.createElement('option');
+                        option.value = range;
+                        option.textContent = range;
+                        ageRangeSelect.appendChild(option);
+                    });
+                    
+                    // 첫 번째 옵션 선택
+                    if (ageRangeSelect.options.length > 0) {
+                        ageRangeSelect.selectedIndex = 0;
+                    }
+                });
+            });
+        }
+        
+        // 초기 폼에 대해 연령대 필드 업데이트 설정
+        const initialForms = formset.querySelectorAll('.participant-form');
+        initialForms.forEach(form => {
+            const ageTypeRadios = form.querySelectorAll('input[name$="-age_type"]');
+            const ageRangeSelect = form.querySelector('select[name$="-age_range"]');
+            if (ageTypeRadios && ageRangeSelect) {
+                updateAgeRangeOptions(ageTypeRadios, ageRangeSelect);
             }
         });
         
-        // 새로운 폼의 라벨 for 속성 업데이트
-        newForm.querySelectorAll('label').forEach(function(label) {
-            if (label.htmlFor) {
-                label.htmlFor = label.htmlFor.replace('-0-', '-' + formNum + '-');
-            }
-        });
+        // 초기 삭제 버튼 설정
+        initializeDeleteButtons();
         
-        formset.appendChild(newForm);
-        totalForms.value = formNum + 1;
-    });
+        addButton.addEventListener('click', function() {
+            const formCount = formset.querySelectorAll('.participant-form').length;
+            const newForm = emptyForm.cloneNode(true);
+            
+            // 폼 번호 업데이트
+            newForm.querySelectorAll('input, select, label').forEach(function(element) {
+                ['name', 'id', 'for'].forEach(attr => {
+                    if (element[attr]) {
+                        element[attr] = element[attr].replace(/participants-(\d+)-/, 'participants-' + formCount + '-');
+                    }
+                });
+            });
+            
+            // 그룹 번호 업데이트
+            const titleElement = newForm.querySelector('.participant-group-title');
+            if (titleElement) {
+                titleElement.textContent = `참여자 그룹 #${formCount + 1}`;
+            }
+            
+            // 입력값 초기화
+            newForm.querySelectorAll('input[type="number"]').forEach(input => {
+                input.value = '1';
+            });
+            newForm.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.checked = false;
+            });
+            newForm.querySelectorAll('select').forEach(select => {
+                select.selectedIndex = 0;
+            });
+            newForm.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // 새 폼에 대해 연령대 필드 업데이트 설정
+            const ageTypeRadios = newForm.querySelectorAll('input[name$="-age_type"]');
+            const ageRangeSelect = newForm.querySelector('select[name$="-age_range"]');
+            if (ageTypeRadios && ageRangeSelect) {
+                updateAgeRangeOptions(ageTypeRadios, ageRangeSelect);
+            }
+            
+            formset.appendChild(newForm);
+            totalForms.value = formCount + 1;
+            
+            // 새로 추가된 폼의 삭제 버튼 초기화
+            initializeDeleteButtons();
+        });
+    } else {
+        console.error('Required elements not found:', {
+            addButton: !!addButton,
+            formset: !!formset,
+            totalForms: !!totalForms
+        });
+    }
 });
 </script>
 {% endblock %}

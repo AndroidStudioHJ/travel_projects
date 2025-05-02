@@ -7,59 +7,37 @@ from .models import Schedule, TravelStyle, ImportantFactor, Transport, TRAVEL_ST
 ParticipantFormSet = inlineformset_factory(
     Schedule, 
     Participant,
-    fields=('gender', 'num_people', 'age_type', 'age_range', 'is_elderly', 'is_family'),
+    fields=('gender', 'num_people', 'age_type', 'age_range', 'is_family', 'is_elderly'),
     extra=1,
     can_delete=True,
-    labels={
-        'gender': '성별',
-        'num_people': '인원수',
-        'age_type': '구분',
-        'age_range': '연령대',
-        'is_elderly': '고령자 여부',
-        'is_family': '가족 여부'
-    },
     widgets={
-        'gender': forms.Select(attrs={
-            'class': 'form-select',
-            'style': 'width: 100%;'
+        'gender': forms.RadioSelect(attrs={
+            'class': 'form-check-input'
         }, choices=[
-            ('', '성별을 선택하세요'),
             ('남자', '남자'),
             ('여자', '여자')
         ]),
         'num_people': forms.NumberInput(attrs={
-            'placeholder': '명',
-            'min': '1',
-            'value': '1',
             'class': 'form-control',
-            'style': 'width: 100%;'
+            'min': '1',
+            'max': '10',
+            'value': '1'
         }),
-        'age_type': forms.Select(attrs={
-            'class': 'form-select',
-            'style': 'width: 100%;'
+        'age_type': forms.RadioSelect(attrs={
+            'class': 'form-check-input'
         }, choices=[
-            ('', '구분을 선택하세요'),
             ('성인', '성인'),
-            ('아동', '아동')
+            ('청소년', '청소년'),
+            ('아동', '아동'),
+            ('영유아', '영유아')
         ]),
         'age_range': forms.Select(attrs={
-            'class': 'form-select',
-            'style': 'width: 100%;'
-        }, choices=[
-            ('', '연령대를 선택하세요'),
-            ('10대', '10대'),
-            ('20대', '20대'),
-            ('30대', '30대'),
-            ('40대', '40대'),
-            ('50대', '50대'),
-            ('60대', '60대'),
-            ('70대', '70대'),
-            ('80대', '80대'),
-        ]),
-        'is_elderly': forms.CheckboxInput(attrs={
-            'class': 'form-check-input'
+            'class': 'form-select'
         }),
         'is_family': forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        'is_elderly': forms.CheckboxInput(attrs={
             'class': 'form-check-input'
         })
     }
