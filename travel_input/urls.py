@@ -10,6 +10,7 @@ from .views import (
     send_message, ai_budget_view, ai_recommend_view, ai_summarize_view,
     get_participants, get_schedules, export_all_data
 )
+from .views.api import get_participants, get_schedules, export_all_data  # export_all_data import 확인
 
 app_name = 'travel_input'
 

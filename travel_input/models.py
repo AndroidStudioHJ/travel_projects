@@ -3,6 +3,9 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_GET
 
 # 여행 스타일 선택지
 TRAVEL_STYLE_CHOICES = [
@@ -257,4 +260,39 @@ class City(models.Model):
 
     def __str__(self):
         return self.name
+
+
+@require_GET
+@login_required
+def get_schedules(request, export=False):
+    schedules = Schedule.objects.filter(user=request.user)
+    data = []
+    for schedule in schedules:
+        # 참여자 정보 문자열로 합치기
+        participants_str = "; ".join(
+            f"id:{p.id}, gender:{p.gender}, num_people:{p.num_people}, age_type:{p.age_type}, age_range:{p.age_range}, is_elderly:{p.is_elderly}, is_family:{p.is_family}"
+            for p in schedule.participants.all()
+        )
+        # travel_styles, important_factors, transports 문자열로 합치기
+        travel_styles_str = ", ".join([style.style for style in schedule.travel_styles.all()])
+        important_factors_str = ", ".join([factor.factor for factor in schedule.important_factors.all()])
+        transports_str = ", ".join([transport.type for transport in schedule.transports.all()])
+
+        # 모든 필드를 한 문자열로 합치기
+        all_fields = (
+            f"id:{schedule.id}, "
+            f"title:{schedule.title}, "
+            f"destination:{schedule.destination}, "
+            f"start_date:{schedule.start_date}, "
+            f"end_date:{schedule.end_date}, "
+            f"budget:{schedule.budget}, "
+            f"user:{schedule.user.username}, "
+            f"travel_styles:[{travel_styles_str}], "
+            f"important_factors:[{important_factors_str}], "
+            f"transports:[{transports_str}], "
+            f"participants:[{participants_str}]"
+        )
+        data.append({"all_fields": all_fields})
+
+    return JsonResponse({'schedules': data}, json_dumps_params={'ensure_ascii': False, 'indent': 2})
 
