@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% block title %}함께하는 여행{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .group-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .page-title {
+        color: #007acc;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2rem;
+    }
+
+    .group-section {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        color: #333;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .group-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .group-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        transition: transform 0.3s ease;
+    }
+
+    .group-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .group-name {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .group-info {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+
+    .member-list {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+
+    .member-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #007acc;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+    }
+
+    .create-group {
+        background: #007acc;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 30px;
+    }
+
+    .create-group:hover {
+        background: #005f99;
+    }
+
+    .group-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .action-button {
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        flex: 1;
+    }
+
+    .join-button {
+        background: #007acc;
+        color: white;
+        border: none;
+    }
+
+    .join-button:hover {
+        background: #005f99;
+    }
+
+    .view-button {
+        background: transparent;
+        color: #007acc;
+        border: 1px solid #007acc;
+    }
+
+    .view-button:hover {
+        background: #f0f0f0;
+    }
+
+    .chat-section {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+    }
+
+    .chat-messages {
+        max-height: 300px;
+        overflow-y: auto;
+        margin-bottom: 15px;
+    }
+
+    .message {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 8px;
+        background: #f0f0f0;
+    }
+
+    .message-sender {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .message-time {
+        font-size: 0.8rem;
+        color: #666;
+    }
+
+    .chat-input {
+        display: flex;
+        gap: 10px;
+    }
+
+    .chat-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+
+    .send-button {
+        background: #007acc;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .send-button:hover {
+        background: #005f99;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="group-container">
+    <h1 class="page-title">함께하는 여행</h1>
+    
+    <a href="#" class="create-group">+ 새 그룹 만들기</a>
+
+    <div class="group-section">
+        <h2 class="section-title">👥 내 여행 그룹</h2>
+        <div class="group-list">
+            <div class="group-card">
+                <div class="group-name">제주도 여행팸</div>
+                <div class="group-info">2025.04.15 - 2025.04.18</div>
+                <div class="member-list">
+                    <div class="member-avatar">김</div>
+                    <div class="member-avatar">이</div>
+                    <div class="member-avatar">박</div>
+                    <div class="member-avatar">+2</div>
+                </div>
+                <div class="group-actions">
+                    <a href="#" class="action-button view-button">일정 보기</a>
+                    <a href="#" class="action-button join-button">채팅방 입장</a>
+                </div>
+            </div>
+
+            <div class="group-card">
+                <div class="group-name">부산 맛집 투어</div>
+                <div class="group-info">2025.05.01 - 2025.05.03</div>
+                <div class="member-list">
+                    <div class="member-avatar">최</div>
+                    <div class="member-avatar">정</div>
+                    <div class="member-avatar">+3</div>
+                </div>
+                <div class="group-actions">
+                    <a href="#" class="action-button view-button">일정 보기</a>
+                    <a href="#" class="action-button join-button">채팅방 입장</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="group-section">
+        <h2 class="section-title">💬 그룹 채팅</h2>
+        <div class="chat-section">
+            <div class="chat-messages">
+                <div class="message">
+                    <div class="message-sender">김여행</div>
+                    <div class="message-content">제주도 숙소 예약했어요!</div>
+                    <div class="message-time">오후 2:30</div>
+                </div>
+                <div class="message">
+                    <div class="message-sender">이투어</div>
+                    <div class="message-content">좋네요! 근처 맛집도 알아봤는데 공유할게요.</div>
+                    <div class="message-time">오후 2:35</div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="메시지를 입력하세요...">
+                <button class="send-button">전송</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

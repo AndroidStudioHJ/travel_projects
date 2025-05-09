@@ -1,0 +1,277 @@
+<!-- templates/accounts/register.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 - 모두투어</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Pretendard', sans-serif;
+            background-image: url('/static/images/대한민국지도_DALL-E.webp');
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-container {
+            width: 80%;
+            max-width: 450px;
+            padding: 40px;
+            background: rgba(189, 235, 255, 0);
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            text-shadow: 1px 1px 8px rgb(211, 211, 211);
+        }
+
+        h2 {
+            color: #002d49;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: rgb(99, 99, 99);
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            background-color: rgb(234, 248, 255);
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23002d49' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+
+        .phone-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .phone-group select {
+            width: 140px;
+            flex-shrink: 0;
+        }
+
+        .phone-group input {
+            flex: 1;
+        }
+
+        .form-divider {
+            margin: 25px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-section-title {
+            color: #002d49;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 4px rgba(255, 255, 255, 0.5);
+        }
+
+        input:focus {
+            border-color: #0c1364;
+            outline: none;
+        }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #0c1364;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .register-btn:hover {
+            background-color: #141d80;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .login-link a {
+            color: #0c1364;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .home-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 15px;
+            background-color: #0c1364;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+
+        .home-link:hover {
+            background-color: #141d80;
+        }
+
+        footer {
+            display: flex;
+            justify-content: center;
+            background-color: #424e5a;
+            color: white;
+            text-align: center;
+            padding: 5px;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                width: 90%;
+                padding: 30px;
+                margin: 10px;
+            }
+
+            h2 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'accounts:home' %}" class="home-link">← 홈으로</a>
+    
+    <div class="register-container">
+        <h2>회원가입</h2>
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">아이디</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="text-danger">
+                        {% for error in form.username.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-divider"></div>
+            <div class="form-section-title">개인정보</div>
+
+            <div class="form-group">
+                <label for="gender">성별</label>
+                <select name="gender" id="gender" required>
+                    <option value="">성별을 선택하세요</option>
+                    <option value="M">남성</option>
+                    <option value="F">여성</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">휴대폰 정보</label>
+                <div class="phone-group">
+                    <select name="phone_type" id="phone_type" required>
+                        <option value="">기종 선택</option>
+                        <option value="iphone">아이폰</option>
+                        <option value="galaxy">갤럭시</option>
+                        <option value="pixel">픽셀</option>
+                        <option value="other">기타</option>
+                    </select>
+                    <input type="tel" name="phone_number" id="phone_number" 
+                           placeholder="휴대폰 번호 (-없이 입력)" 
+                           pattern="[0-9]{11}"
+                           required>
+                </div>
+            </div>
+
+            <div class="form-divider"></div>
+            <div class="form-section-title">보안정보</div>
+
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}">비밀번호</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                    <div class="text-danger">
+                        {% for error in form.password1.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}">비밀번호 확인</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                    <div class="text-danger">
+                        {% for error in form.password2.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="register-btn">회원가입</button>
+        </form>
+
+        <div class="login-link">
+            <p>이미 계정이 있으신가요? <a href="{% url 'accounts:login' %}">로그인</a></p>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 여행 - All Rights Reserved</p>
+    </footer>
+</body>
+</html>

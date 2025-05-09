@@ -1,0 +1,26 @@
+/* static/style.css */
+
+/* Hero 이미지 스타일링 */
+.hero-image {
+    width: 100%;        /* 화면 전체 너비로 이미지 크기 조정 */
+    max-width: 800px;   /* 최대 너비 제한 */
+    height: auto;       /* 비율에 맞춰 높이 자동 조정 */
+    display: block;     /* 이미지 아래 여백 제거 */
+    margin: 0 auto;     /* 가운데 정렬 */
+}
+
+/* 버튼 스타일링 */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 20px;
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}

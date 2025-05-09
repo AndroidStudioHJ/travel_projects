@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}즐겨찾기 일정{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: auto; padding: 2rem; background-color: #005f99; border-radius: 12px;">
+
+  <h2 style="color: white; text-align: center;">즐겨찾기 일정 목록</h2>
+
+  {% if schedules %}
+    <ul style="list-style: none; padding-left: 0;">
+      {% for schedule in schedules %}
+        <li style="margin-bottom: 1.5rem; padding: 1rem; background: #ffffff; border-radius: 10px;">
+          <a href="{% url 'travel_input:schedule_detail' schedule.id %}"
+             style="font-size: 1.1rem; font-weight: bold; text-decoration: none; color: #007acc;">
+            📌 {{ schedule.title }}
+          </a><br>
+
+          <!-- 날짜 및 D-Day 표시 -->
+          <small style="color: #555;">
+            {{ schedule.start_date }} ~ {{ schedule.end_date }}
+            {% if schedule.days_left >= 0 %}
+              <span style="color: green;">🕗 D-{{ schedule.days_left }}</span>
+            {% else %}
+              <span style="color: gray;">종료됨</span>
+            {% endif %}
+          </small><br><br>
+
+          <!-- ✅ 즐겨찾기 해제 버튼 -->
+          <form action="{% url 'travel_input:toggle_favorite' schedule.id %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; color: crimson; font-size: 0.9rem; cursor: pointer;">
+              즐겨찾기 해제
+            </button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p style="color: white; text-align: center;">즐겨찾기한 일정이 아직 없습니다.</p>
+  {% endif %}
+
+</div>
+{% endblock %}

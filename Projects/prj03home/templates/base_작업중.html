@@ -1,0 +1,194 @@
+{% load static %}
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    {% block extra_head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}모두투어 - 국내 여행 정보{% endblock %}</title>
+    <link rel="icon" href="/images/modetour_icon1.ico" type="image/x-icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/ubuntu/0.0.1/ubuntu.css" rel="stylesheet">
+    {% endblock %}
+    {% block extra_css %}
+    <style>
+        /* 전체 배경 설정 */
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f4f6fc;
+            margin: 0;
+            padding: 0;  /* 상단 네비바 높이만큼만 패딩 */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            overflow-x: hidden;  /* 가로 스크롤 방지 */ 
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('{% static "images/풍경사진_낮.jfif" %}');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative; 
+        }
+
+        body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+        z-index: -1;
+        }
+
+        .content {
+            flex: 1;
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding-top: 60px;
+            box-sizing: border-box;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;  /* 네비게이션 링크 간격 증가 */
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 8px 12px;   /* 패딩 증가로 클릭 영역 확대 */
+        }
+
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background-color: #007acc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 40px;  /* 좌우 패딩 증가 */
+            height: 40px;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;  /* 버튼 사이 간격 줄임 */
+        }
+
+        .nav-user span {
+            font-size: 0.9rem;  /* 폰트 크기 줄임 */
+            color: #ffd700;     /* 골드 색상 적용 */
+            font-weight: 600;   /* 글자 두께 증가 */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);  /* 텍스트 그림자 추가 */
+        }
+
+        .logout-btn {
+            background-color: transparent;
+            color: white;
+            padding: 5px 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: white;
+            color: #007acc;
+        }
+
+        footer {
+            flex-shrink: 0;  /* footer 크기 고정 */
+            background-color: #007acc;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        /* 로그인/회원가입 버튼 스타일 */
+        .login-btn {
+            background-color: transparent;
+            color: white;
+            padding: 5px 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .login-btn:hover {
+            background-color: white;
+            color: #007acc;
+        }
+    </style>
+    {% endblock %}
+</head>
+
+<body>
+    <!-- 네비게이션 바 -->
+    <div class="nav-bar">
+        <div class="nav-links">
+            <a href="{% url 'home' %}">홈</a>
+            <a href="{% url 'travel_input:schedule_list' %}">일정</a>
+            <a href="{% url 'travel_input:lodging' %}">숙박</a>
+            <a href="{% url 'travel_input:culture' %}">문화</a>
+            <a href="{% url 'travel_input:group_travel_list' %}">단체여행</a>
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="nav-user">
+            <span>{{ user.username }}님</span>
+            <form action="{% url 'accounts:logout' %}" method="post" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">로그아웃</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="nav-user">
+            <a href="{% url 'accounts:login' %}" class="login-btn">로그인</a>
+            <a href="{% url 'accounts:register' %}" class="login-btn">회원가입</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 콘텐츠 영역 -->
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- 푸터 -->
+    <footer>
+        <p style="margin: 0;">© 2025 모두투어 - All Rights Reserved</p>
+    </footer>
+
+    {% block extra_js %}
+    <script>
+    </script>
+    {% endblock %}
+</body>
+
+</html>

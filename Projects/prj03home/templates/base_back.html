@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}모두투어 - 국내 여행 정보{% endblock %}</title>
+    <link rel="icon" href="{% static 'images/modetour_icon1.ico' %}">
+    <!-- Pretendard font -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/pretendard/1.2.1/static/pretendard.css" rel="stylesheet">
+    <!-- Main CSS (merged styles) -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_head %}{% endblock %}
+    {% block extra_css %}
+    <style>
+        /* Reset and base */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f4f6fc;
+            overflow-x: hidden;
+        }
+        /* Navigation bar */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #007acc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            height: 60px;
+            z-index: 1000;
+        }
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-user .login-btn,
+        .nav-user .logout-btn {
+            background: transparent;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+        }
+        .nav-user .login-btn:hover,
+        .nav-user .logout-btn:hover {
+            background: #fff;
+            color: #007acc;
+        }
+        /* Content wrapper */
+        .content {
+            padding: 80px 20px 20px; /* space for nav-bar */
+            max-width: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        /* Footer */
+        footer {
+            background: #007acc;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 0.9rem;
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-links">
+            <a href="{% url 'home' %}">홈</a>
+            <a href="{% url 'travel_input:schedule_list' %}">일정</a>
+            <a href="{% url 'travel_input:lodging' %}">숙박</a>
+            <a href="{% url 'travel_input:culture' %}">문화</a>
+            <a href="{% url 'travel_input:group_travel_list' %}">단체여행</a>
+        </div>
+        <div class="nav-user">
+            {% if user.is_authenticated %}
+                <span>{{ user.username }}님</span>
+                <form action="{% url 'accounts:logout' %}" method="post" style="margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">로그아웃</button>
+                </form>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="login-btn">로그인</a>
+                <a href="{% url 'accounts:register' %}" class="login-btn">회원가입</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+    <footer>
+        © 2025 모두투어 - All Rights Reserved
+    </footer>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
