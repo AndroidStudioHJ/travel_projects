@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% block title %}📅 나의 여행 일정{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<style>
+  .list-container {
+    max-width: 1200px;
+    margin: 50px auto;
+    background: #f9f9f9;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  h1 {
+    text-align: center;
+    color: #007acc;
+    margin-bottom: 30px;
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s ease;
+  }
+
+  .btn-create {
+    background-color: #007acc;
+    color: white;
+  }
+
+  .btn-create:hover {
+    background-color: #005f99;
+  }
+
+  .btn-delete-all {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .btn-delete-all:hover {
+    background-color: #c82333;
+  }
+
+  .schedule-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .schedule-item {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .schedule-title {
+    font-size: 1.2rem;
+    color: #333;
+    text-decoration: none;
+  }
+
+  .schedule-title:hover {
+    color: #007acc;
+  }
+
+  .schedule-dates {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .schedule-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .action-link {
+    color: #007acc;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+
+  .action-link:hover {
+    text-decoration: underline;
+  }
+
+  .delete-link {
+    color: #dc3545 !important;
+  }
+
+  .empty-message {
+    text-align: center;
+    color: #666;
+    padding: 30px;
+    background: white;
+    border-radius: 8px;
+  }
+
+  .calendar-container {
+    max-width: 1200px;
+    margin: 30px auto 40px auto;
+    background: white;
+    padding: 32px 24px 32px 24px;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+
+  #calendar {
+    min-height: 700px;
+    font-size: 1.2rem;
+  }
+
+  .fc-toolbar-title {
+    font-size: 2rem !important;
+    font-weight: 700;
+    color: #007acc;
+  }
+
+  .fc-daygrid-day-number {
+    font-size: 1.1rem;
+  }
+
+  .fc-event {
+    font-size: 1.05rem;
+    padding: 4px 6px;
+    border-radius: 6px;
+  }
+
+  .fc {
+    background: #f8fafc;
+    border-radius: 12px;
+  }
+</style>
+{% endblock %}
+
+{# schedules를 JSON으로 안전하게 전달 #}
+{{ schedules|json_script:"schedule-data" }}
+
+{% block extra_js %}
+{{ block.super }}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar');
+  var scheduleData = JSON.parse(document.getElementById('schedule-data').textContent);
+  var events = scheduleData.map(function(schedule) {
+    return {
+      title: schedule.title,
+      start: schedule.start_date,
+      end: schedule.end_date,
+      url: '/travel/schedule/' + schedule.id + '/'
+    }
+  });
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    locale: 'ko',
+    height: 'auto',
+    events: events,
+    eventClick: function(info) {
+      info.jsEvent.preventDefault();
+      window.location.href = info.event.url;
+    }
+  });
+  calendar.render();
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="list-container">
+  <h1>📅 나의 여행 일정</h1>
+  <div style="background:yellow;color:red;font-size:2rem;">캘린더 위치</div>
+  <div class="calendar-container">
+    <div id="calendar"></div>
+  </div>
+  <div class="action-buttons">
+    <a href="{% url 'create_schedule' %}" class="btn btn-create">➕ 새 일정 만들기</a>
+    <a href="{% url 'delete_all_schedules' %}" class="btn btn-delete-all">🗑️ 전체 삭제</a>
+  </div>
+
+  <ul class="schedule-list">
+    {% for schedule in schedules %}
+      <li class="schedule-item">
+        <div class="schedule-header">
+          <a href="{% url 'schedule_detail' schedule.id %}" class="schedule-title">
+            {{ schedule.title }}
+          </a>
+          <span class="schedule-dates">
+            {{ schedule.start_date }} ~ {{ schedule.end_date }}
+          </span>
+        </div>
+        <div class="schedule-actions">
+          <a href="{% url 'update_schedule' schedule.id %}" class="action-link">수정</a>
+          <a href="{% url 'delete_schedule' schedule.id %}" class="action-link delete-link">삭제</a>
+        </div>
+      </li>
+    {% empty %}
+      <li class="empty-message">일정이 없습니다. 새로운 일정을 만들어보세요!</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
