@@ -1,5 +1,5 @@
 from django import forms
-from .models import Schedule
+from .models import Schedule, Destination
 
 TRAVEL_STYLE_CHOICES = [
     ('nature', '자연경관'),
@@ -85,6 +85,7 @@ class ScheduleForm(forms.ModelForm):
                 ('가을', '가을'),
                 ('겨울', '겨울'),
             ]),
+            'destination': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):

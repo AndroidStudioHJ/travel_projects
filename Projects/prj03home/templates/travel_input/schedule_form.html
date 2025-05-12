@@ -39,6 +39,26 @@
     font-size: 1.1rem;
     color: #333;
   }
+  .checkbox-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+  }
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .checkbox-item input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    padding: 0;
+  }
+  .checkbox-item label {
+    margin: 0;
+    font-weight: normal;
+  }
   input, select, textarea {
     width: 100%;
     padding: 12px 14px;
@@ -51,33 +71,6 @@
     border-color: #007acc;
     outline: none;
     box-shadow: 0 0 5px rgba(0, 122, 204, 0.3);
-  }
-  .checkbox-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px;
-    margin-top: 10px;
-  }
-  .checkbox-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(145deg, #f0f8ff, #e0eefc);
-    border: 1px solid #b6d7f0;
-    border-radius: 14px;
-    padding: 12px 16px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  }
-  .checkbox-option:hover {
-    background: #d1e9ff;
-  }
-  .checkbox-option input[type="checkbox"] {
-    accent-color: #007acc;
-    transform: scale(1.2);
   }
   .form-actions {
     margin-top: 40px;
@@ -185,6 +178,7 @@
     font-size: 0.9rem;
     color: #666;
     margin-top: 5px;
+  }
 </style>
 {% endblock %}
 
@@ -195,12 +189,23 @@
     {% csrf_token %}
 
     {% for field in form %}
-      {% if field.name in 'travel_style important_factors' %}
+      {% if field.field.widget.input_type == "checkbox" %}
+        <div class="form-group" style="margin-bottom: 25px;">
+          <label for="{{ field.id_for_label }}" style="display: flex; align-items: center; gap: 8px; font-weight: 500;">
+            <span style="margin-right: 6px;">{{ field.label }}</span>
+            {{ field }}
+          </label>
+          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% elif field.name in 'travel_style important_factors' %}
         <div class="form-group">
           <label class="form-label">{{ field.label }}</label>
-          <div class="checkbox-group">
+          <div class="checkbox-wrapper" style="display: flex; flex-wrap: wrap; gap: 15px;">
             {% for checkbox in field %}
-              <label class="checkbox-option">{{ checkbox.tag }} {{ checkbox.choice_label }}</label>
+              <label class="checkbox-item" style="display: flex; align-items: center; gap: 6px;">
+                <span style="margin-right: 4px;">{{ checkbox.choice_label }}</span>
+                {{ checkbox.tag }}
+              </label>
             {% endfor %}
           </div>
           {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}

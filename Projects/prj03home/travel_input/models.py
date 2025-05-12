@@ -18,18 +18,16 @@ class Category(models.Model):
 
 
 class Destination(models.Model):
-    name = models.CharField(max_length=100)
-    country = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
+    name = models.CharField(max_length=100, unique=True, verbose_name="여행지명")
 
     def __str__(self):
-        return f"{self.name}, {self.country}"
+        return self.name
 
 
 class Schedule(models.Model):
     # 기본 정보
     title = models.CharField(max_length=200, verbose_name='일정 제목')
-    destination = models.CharField(max_length=200, verbose_name='여행지')
+    destination = models.ForeignKey(Destination, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="여행지")
     start_date = models.DateField(verbose_name='시작일')
     end_date = models.DateField(null=True, blank=True, verbose_name='종료일')
     budget = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True, verbose_name='예산')

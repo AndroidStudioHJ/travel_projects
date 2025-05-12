@@ -186,7 +186,15 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
-    var scheduleData = JSON.parse(document.getElementById('schedule-data').textContent);
+    var scheduleDataEl = document.getElementById('schedule-data');
+    var scheduleData = [];
+    if (scheduleDataEl && scheduleDataEl.textContent.trim()) {
+        try {
+            scheduleData = JSON.parse(scheduleDataEl.textContent);
+        } catch (e) {
+            scheduleData = [];
+        }
+    }
     var events = scheduleData.map(function(schedule) {
         return {
             title: schedule.title,
