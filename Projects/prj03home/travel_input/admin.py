@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Schedule
+from .models import Schedule, Destination
+
+@admin.register(Destination)
+class DestinationAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):

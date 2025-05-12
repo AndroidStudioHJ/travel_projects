@@ -5,9 +5,11 @@ from django.http import JsonResponse
 from datetime import date, timedelta, datetime
 import random
 from faker import Faker
+import openai
+from django.conf import settings
 
 from travel_input.forms import ScheduleForm
-from travel_input.models import Schedule
+from travel_input.models import Schedule, Destination
 
 STYLE_LABELS = {
     'nature': '자연경관',
@@ -29,13 +31,54 @@ FACTOR_LABELS = {
 @login_required
 def schedule_list(request):
     schedules = Schedule.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'travel_input/schedule_list.html', {'schedules': schedules})
+    # 달력에 넘길 데이터 생성
+    schedules_calendar = [
+        {
+            "id": s.id,
+            "title": s.title,
+            "start_date": s.start_date.isoformat() if s.start_date else None,
+            "end_date": s.end_date.isoformat() if s.end_date else None,
+        }
+        for s in schedules
+        if s.start_date and s.end_date and s.title  # 필수값만
+    ]
+    return render(
+        request,
+        'travel_input/schedule_list.html',
+        {
+            'schedules': schedules,
+            'schedules_calendar': schedules_calendar,
+        }
+    )
 
 
 @login_required
 def schedule_detail(request, pk):
     schedule = get_object_or_404(Schedule, pk=pk, user=request.user)
-    return render(request, 'travel_input/schedule_detail.html', {'schedule': schedule})
+    ai_answer = None
+
+    if request.method == 'POST':
+        question = request.POST.get('question', '').strip()
+        if question:
+            # OpenAI API 호출 (예시, 실제로는 환경변수 등에서 키 관리)
+            openai.api_key = settings.OPENAI_API_KEY
+            client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+            prompt = f"일정 정보: {schedule.title}, {schedule.start_date}~{schedule.end_date}, {schedule.notes}\n질문: {question}"
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "당신은 여행 일정 전문가입니다."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=300,
+                temperature=0.7,
+            )
+            ai_answer = response.choices[0].message.content
+
+    return render(request, 'travel_input/schedule_detail.html', {
+        'schedule': schedule,
+        'ai_answer': ai_answer,
+    })
 
 
 @login_required
@@ -127,35 +170,36 @@ def generate_ai_style_schedules(request):
     if request.method == 'POST':
         fake = Faker('ko_KR')
         destinations = ['산속', '제주', '부산', '서울', '강릉', '전주', '속초']
-        tags = ['혼자', '가족', '힐링', '연인', '역사', '자연']
-        people_compositions = ['본인', '본인,반려동물', '부모,자녀', '친구', '연인', '가족']
-        lodgings = ['산속', '바닷가 근처', '도심 호텔', '조용한 곳']
-        styles = ['nature', 'city', 'culture', 'activity', 'relax']
-        factors = ['stay', 'food', 'weather', 'schedule', 'culture']
-
-        def get_random_list_str(options, min_count=1, max_count=3):
-            return ','.join(random.sample(options, k=random.randint(min_count, max_count)))
 
         count = int(request.POST.get('count', 100))
 
         for _ in range(count):
             start = date.today() + timedelta(days=random.randint(1, 30))
             end = start + timedelta(days=random.randint(2, 5))
+            dest_name = random.choice(destinations)
+            dest_obj, _ = Destination.objects.get_or_create(name=dest_name)
+
             Schedule.objects.create(
                 user=request.user,
                 title=fake.catch_phrase(),
-                destination=random.choice(destinations),
+                destination=dest_obj,
                 start_date=start,
                 end_date=end,
-                notes=fake.sentence(),
-                num_people=random.randint(1, 6),
                 budget=random.randint(300000, 5000000),
-                tag=random.choice(tags),
-                lodging_request=random.choice(lodgings),
-                people_composition=random.choice(people_compositions),
-                pet_friendly=random.choice([True, False]),
-                travel_style=get_random_list_str(styles),
-                important_factors=get_random_list_str(factors)
+                notes=fake.sentence(),
+                participant_info=fake.name(),
+                age_group=random.choice(['10대', '20대', '30대', '40대', '50대', '60대 이상']),
+                group_type=random.choice(['가족', '친구', '커플', '혼자', '단체']),
+                place_info=fake.address(),
+                preferred_activities=fake.word(),
+                event_interest=random.choice([True, False]),
+                transport_info=fake.word(),
+                mobility_needs=fake.word(),
+                meal_preference=fake.word(),
+                language_support=random.choice([True, False]),
+                season=random.choice(['봄', '여름', '가을', '겨울']),
+                repeat_visitor=random.choice([True, False]),
+                travel_insurance=random.choice([True, False]),
             )
 
         messages.success(request, f"✅ AI 스타일 더미 일정 {count}개 생성 완료!")

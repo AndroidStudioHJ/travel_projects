@@ -113,3 +113,5 @@ LOGOUT_REDIRECT_URL = '/'
 
 # 🆔 기본 PK 필드 타입
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+OPENAI_API_KEY = "sk-abc1234yourkey5678"
