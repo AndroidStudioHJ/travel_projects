@@ -174,64 +174,185 @@
 {% endblock %}
 
 {% block content %}
-<div class="enhanced-schedule-container">
-  <div class="hero-schedule">
-    <h1 class="schedule-title">{{ schedule.title }}</h1>
-    <p class="schedule-dates">{{ schedule.start_date|date:"Y.m.d" }} ~ {{ schedule.end_date|date:"Y.m.d" }}</p>
-  </div>
+<div class="container">
+    <div class="schedule-detail">
+        <h1 class="text-center mb-4">{{ schedule.title }}</h1>
+        
+        <!-- 기본 정보 -->
+        <div class="info-section">
+            <h2><i class="fas fa-info-circle"></i>기본 정보</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><i class="fas fa-map-marker-alt"></i>여행지</h3>
+                    <p>{{ schedule.destination }}</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-calendar"></i>여행 기간</h3>
+                    <p>{{ schedule.start_date }} ~ {{ schedule.end_date }}</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-won-sign"></i>예산</h3>
+                    <p>₩{{ schedule.budget|default:"0"|intcomma }}</p>
+                </div>
+            </div>
+        </div>
 
-  <div class="enhanced-info-grid">
-    <div class="info-card"><h3><i class="fas fa-map-marker-alt"></i>여행지</h3><p>{{ schedule.destination }}</p></div>
-    <div class="info-card"><h3><i class="fas fa-tags"></i>태그</h3><p>{{ schedule.tag }}</p></div>
-    <div class="info-card"><h3><i class="fas fa-users"></i>인원수</h3><p>{{ schedule.num_people }}명</p></div>
-    <div class="info-card"><h3><i class="fas fa-wallet"></i>예산</h3><p>{{ schedule.budget|intcomma }}원</p></div>
-    <div class="info-card"><h3><i class="fas fa-users-cog"></i>구성</h3><p>{{ schedule.people_composition }}</p></div>
-    <div class="info-card"><h3><i class="fas fa-bed"></i>숙소 요청</h3><p>{{ schedule.lodging_request }}</p></div>
-    <div class="info-card"><h3><i class="fas fa-paw"></i>반려동물</h3><p>{% if schedule.pet_friendly %}예{% else %}아니오{% endif %}</p></div>
-  </div>
+        <!-- 참가자 정보 -->
+        <div class="info-section">
+            <h2><i class="fas fa-users"></i>참가자 정보</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><i class="fas fa-user-friends"></i>참가자</h3>
+                    <p>{{ schedule.participant_info }}</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-birthday-cake"></i>연령대</h3>
+                    <p>{{ schedule.age_group }}</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-users"></i>여행 동행 형태</h3>
+                    <p>{{ schedule.group_type }}</p>
+                </div>
+            </div>
+        </div>
 
-  {% if travel_styles %}
-  <div class="section-title">여행 스타일</div>
-  <div class="badge-list">
-    {% for style in travel_styles %}
-      <span>{{ style }}</span>
-    {% endfor %}
-  </div>
-  {% endif %}
+        <!-- 장소 정보 -->
+        <div class="info-section">
+            <h2><i class="fas fa-map-marked-alt"></i>장소 정보</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><i class="fas fa-map-pin"></i>방문 장소</h3>
+                    <p>{{ schedule.place_info }}</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-hiking"></i>선호 활동</h3>
+                    <p>{{ schedule.preferred_activities }}</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-calendar-check"></i>이벤트/축제 관심</h3>
+                    <p>{% if schedule.event_interest %}관심 있음{% else %}관심 없음{% endif %}</p>
+                </div>
+            </div>
+        </div>
 
-  {% if important_factors %}
-  <div class="section-title">중요 요소</div>
-  <div class="badge-list">
-    {% for factor in important_factors %}
-      <span>{{ factor }}</span>
-    {% endfor %}
-  </div>
-  {% endif %}
+        <!-- 교통 정보 -->
+        <div class="info-section">
+            <h2><i class="fas fa-plane"></i>교통 정보</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><i class="fas fa-route"></i>교통 정보</h3>
+                    <p>{{ schedule.transport_info }}</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-wheelchair"></i>이동 관련 요구</h3>
+                    <p>{{ schedule.mobility_needs }}</p>
+                </div>
+            </div>
+        </div>
 
-  {% if schedule.notes %}
-  <div class="ai-response-container">
-    <strong>AI 여행 추천</strong><br>
-    {{ schedule.notes }}
-  </div>
-  {% endif %}
+        <!-- 추가 상세 정보 -->
+        <div class="info-section">
+            <h2><i class="fas fa-plus-circle"></i>추가 상세 정보</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><i class="fas fa-utensils"></i>음식 선호</h3>
+                    <p>{{ schedule.meal_preference }}</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-language"></i>언어 지원</h3>
+                    <p>{% if schedule.language_support %}필요{% else %}불필요{% endif %}</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-leaf"></i>희망 계절</h3>
+                    <p>{{ schedule.season }}</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-redo"></i>재방문 여부</h3>
+                    <p>{% if schedule.repeat_visitor %}재방문{% else %}첫 방문{% endif %}</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-shield-alt"></i>여행자 보험</h3>
+                    <p>{% if schedule.travel_insurance %}가입 예정{% else %}미가입{% endif %}</p>
+                </div>
+            </div>
+        </div>
 
-  <div class="section-title">메타 정보</div>
-  <ul class="meta-list">
-    <li><i class="fas fa-user"></i>작성자: {{ schedule.user.username }}</li>
-    <li><i class="fas fa-calendar-plus"></i>작성일: {{ schedule.created_at|date:"Y.m.d" }}</li>
-    <li><i class="fas fa-calendar-check"></i>수정일: {{ schedule.updated_at|date:"Y.m.d" }}</li>
-  </ul>
-
-  <div class="action-buttons">
-    <a href="{% url 'travel_input:schedule_update' schedule.pk %}" class="action-button edit-button"><i class="fas fa-edit"></i>수정</a>
-    <a href="{% url 'travel_input:schedule_delete' schedule.pk %}" class="action-button delete-button"><i class="fas fa-trash-alt"></i>삭제</a>
-    <a href="{% url 'travel_input:schedule_list' %}" class="action-button back-button"><i class="fas fa-list"></i>목록</a>
-    <form method="post" action="{% url 'travel_input:toggle_favorite' schedule.pk %}" class="favorite-form">
-      {% csrf_token %}
-      <button type="submit" class="action-button favorite-button">
-        <i class="fas fa-star"></i>{% if schedule.is_favorite %}해제{% else %}즐겨찾기{% endif %}
-      </button>
-    </form>
-  </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'travel_input:schedule_update' schedule.pk %}" class="btn btn-primary">수정</a>
+            <a href="{% url 'travel_input:schedule_delete' schedule.pk %}" class="btn btn-danger">삭제</a>
+            <a href="{% url 'travel_input:schedule_list' %}" class="btn btn-secondary">목록으로</a>
+        </div>
+    </div>
 </div>
+
+<style>
+    .schedule-detail {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .info-section {
+        margin-bottom: 40px;
+    }
+
+    .info-section h2 {
+        color: #007acc;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .info-card h3 {
+        color: #333;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-card p {
+        color: #666;
+        line-height: 1.6;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        margin: 0 5px;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background: #007acc;
+        color: white;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+</style>
 {% endblock %}

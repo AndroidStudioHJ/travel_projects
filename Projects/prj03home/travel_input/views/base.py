@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from ..forms import TravelSurveyForm
+from travel_input.forms import TravelSurveyForm
 import pandas as pd
 import os
 from django.conf import settings
@@ -12,18 +12,13 @@ def home(request):
 
 
 def travel_survey(request):
-    culture = {
-        'name': '한국의 전통 문화',
-        'description': '한국의 문화와 역사, 전통을 살펴보세요.',
-        'important_places': ['경복궁', '창덕궁', '한옥마을']
-    }
     if request.method == 'POST':
         form = TravelSurveyForm(request.POST)
         if form.is_valid():
             return render(request, 'travel_input/thank_you.html')
     else:
         form = TravelSurveyForm()
-    return render(request, 'travel_input/travel_list.html', {'form': form, 'culture': culture})
+    return render(request, 'travel_input/travel_list.html', {'form': form})
 
 
 def culture(request):
@@ -88,34 +83,7 @@ def smart_schedule(request):
 
 
 def recommendations(request):
-    csv_path = os.path.join(settings.BASE_DIR, '전체관광지_최종분류.csv')
-    try:
-        df = pd.read_csv(csv_path)
-        region = request.GET.get('region')
-        category = request.GET.get('category')
-        filtered = df
-        if region:
-            filtered = filtered[filtered['광역지역'].str.contains(region, na=False)]
-        if category:
-            filtered = filtered[filtered['분류'].str.contains(category, na=False)]
-        place_list = filtered.head(10).to_dict('records')
-        for place in place_list:
-            desc = place.get('설명', '')
-            if desc:
-                place['설명_3줄요약'] = summarize_text_with_openai(desc)
-            else:
-                place['설명_3줄요약'] = ''
-        if len(filtered) >= 3:
-            random_recommend = filtered.sample(3).to_dict('records')
-        else:
-            random_recommend = filtered.to_dict('records')
-    except Exception as e:
-        place_list = []
-        random_recommend = []
-    return render(request, 'travel_input/recommendations.html', {
-        'place_list': place_list,
-        'random_recommend': random_recommend,
-    })
+    return render(request, 'travel_input/recommendations.html')
 
 
 @login_required

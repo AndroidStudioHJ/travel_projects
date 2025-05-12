@@ -218,29 +218,7 @@
         <div class="nav-links">
             <a href="{% url 'home' %}">홈</a>
             <a href="{% url 'travel_input:schedule_list' %}">일정</a>
-            <a href="{% url 'travel_input:lodging' %}">숙박</a>
-            <div class="dropdown">
-                <a href="{% url 'travel_input:culture' %}">문화</a>
-                <div class="dropdown-content">
-                    <div class="row">
-                        {% for city in cities|slice:":3" %}
-                        <a href="{% url 'travel_input:culture' %}?city={{ city.slug }}">{{ city.name }}</a>
-                        {% endfor %}
-                    </div>
-                    <div class="row">
-                        {% for city in cities|slice:"3:6" %}
-                        <a href="{% url 'travel_input:culture' %}?city={{ city.slug }}">{{ city.name }}</a>
-                        {% endfor %}
-                    </div>
-                    <div class="row">
-                        {% for city in cities|slice:"6:9" %}
-                        <a href="{% url 'travel_input:culture' %}?city={{ city.slug }}">{{ city.name }}</a>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            <a href="{% url 'travel_input:group_travel_list' %}">단체여행</a>
-            <a href="{% url 'travel_input:generate_dummy' %}">더미 생성</a> <!-- ✅ 추가 -->
+            <a href="{% url 'travel_input:generate_dummy' %}">더미 생성</a>
         </div>
 
         {% if user.is_authenticated %}
