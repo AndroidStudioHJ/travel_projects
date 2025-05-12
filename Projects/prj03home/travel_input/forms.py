@@ -42,60 +42,51 @@ class TravelSurveyForm(forms.Form):
     )
 
 class ScheduleForm(forms.ModelForm):
-    travel_style = forms.MultipleChoiceField(
-        choices=TRAVEL_STYLE_CHOICES,
-        widget=forms.CheckboxSelectMultiple,
-        label="선호하는 여행 스타일 (복수 선택 가능)",
-        required=False
-    )
-    important_factors = forms.MultipleChoiceField(
-        choices=IMPORTANT_CHOICES,
-        widget=forms.CheckboxSelectMultiple,
-        label="여행 시 중요 요소 (복수 선택 가능)",
-        required=False
-    )
-    num_people = forms.IntegerField(
-        min_value=1,
-        max_value=20,
-        initial=1,
-        label="여행 인원수"
-    )
-    budget = forms.DecimalField(
-        min_value=0,
-        max_digits=10,
-        decimal_places=0,
-        label="예산 (원)"
-    )
-    lodging_request = forms.CharField(
-        required=False,
-        label="숙소 요청",
-        widget=forms.TextInput(attrs={"placeholder": "예: 바닷가 근처, 조용한 곳"})
-    )
-    people_composition = forms.CharField(
-        required=False,
-        label="구성",
-        widget=forms.TextInput(attrs={"placeholder": "예: 가족, 친구, 연인"})
-    )
-    pet_friendly = forms.BooleanField(
-        required=False,
-        label="반려동물 동반 여부"
-    )
-
     class Meta:
         model = Schedule
         fields = [
             'title', 'destination', 'start_date', 'end_date',
-            'num_people', 'budget', 'tag',
-            'lodging_request', 'people_composition', 'pet_friendly',
-            'travel_style', 'important_factors'
+            'budget', 'notes', 'participant_info', 'age_group', 'group_type',
+            'place_info', 'preferred_activities', 'event_interest',
+            'transport_info', 'mobility_needs',
+            'meal_preference', 'language_support', 'season',
+            'repeat_visitor', 'travel_insurance'
         ]
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'participant_info': forms.Textarea(attrs={'rows': 3, 'placeholder': '참가자 이름과 나이를 입력하세요 (예: 홍길동(30), 김철수(25))'}),
+            'place_info': forms.Textarea(attrs={'rows': 3, 'placeholder': '방문할 장소와 날짜를 입력하세요 (예: 남산타워(2024-03-20), 경복궁(2024-03-21))'}),
+            'transport_info': forms.Textarea(attrs={'rows': 3, 'placeholder': '교통편, 출발지, 도착지, 시간을 입력하세요 (예: KTX, 서울역, 부산역, 2024-03-20 09:00)'}),
+            'preferred_activities': forms.Textarea(attrs={'rows': 3, 'placeholder': '예: 온천, 쇼핑, 등산, 박물관 등'}),
+            'meal_preference': forms.Textarea(attrs={'rows': 3, 'placeholder': '예: 한식, 채식, 미식 여행 등'}),
+            'mobility_needs': forms.Textarea(attrs={'rows': 3, 'placeholder': '예: 휠체어 접근성, 편안한 이동 동선 등'}),
+            'age_group': forms.Select(choices=[
+                ('', '선택하세요'),
+                ('10대', '10대'),
+                ('20대', '20대'),
+                ('30대', '30대'),
+                ('40대', '40대'),
+                ('50대', '50대'),
+                ('60대 이상', '60대 이상'),
+            ]),
+            'group_type': forms.Select(choices=[
+                ('', '선택하세요'),
+                ('혼자', '혼자'),
+                ('가족', '가족'),
+                ('친구', '친구'),
+                ('커플', '커플'),
+                ('단체', '단체'),
+            ]),
+            'season': forms.Select(choices=[
+                ('', '선택하세요'),
+                ('봄', '봄'),
+                ('여름', '여름'),
+                ('가을', '가을'),
+                ('겨울', '겨울'),
+            ]),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['destination'].empty_label = "여행지를 선택하세요"
-        self.fields['tag'].label = "태그 (예: 가족, 힐링, 친구)"
-        self.fields['tag'].widget.attrs.update({'placeholder': '예: 캠핑, 가족, 커플'})

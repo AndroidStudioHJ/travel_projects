@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import random
 from faker import Faker
 
@@ -28,20 +28,8 @@ FACTOR_LABELS = {
 
 @login_required
 def schedule_list(request):
-    query = request.GET.get('q', '')
-    schedules = Schedule.objects.filter(user=request.user)
-    if query:
-        schedules = schedules.filter(title__icontains=query)
-
-    schedules_for_cards = list(schedules)
-    schedules_for_calendar = list(schedules.values('id', 'title', 'start_date', 'end_date'))
-
-    return render(request, 'travel_input/schedule_list.html', {
-        'schedules': schedules_for_cards,
-        'schedules_calendar': schedules_for_calendar,
-        'search_query': query,
-        'destinations': Schedule.objects.values_list('destination', flat=True).distinct()
-    })
+    schedules = Schedule.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'travel_input/schedule_list.html', {'schedules': schedules})
 
 
 @login_required
@@ -58,7 +46,7 @@ def schedule_create(request):
             schedule = form.save(commit=False)
             schedule.user = request.user
             schedule.save()
-            return redirect('travel_input:schedule_list')
+            return redirect('travel_input:schedule_detail', pk=schedule.pk)
     else:
         form = ScheduleForm()
     return render(request, 'travel_input/schedule_form.html', {'form': form})
@@ -70,8 +58,8 @@ def schedule_update(request, pk):
     if request.method == 'POST':
         form = ScheduleForm(request.POST, instance=schedule)
         if form.is_valid():
-            form.save()
-            return redirect('travel_input:schedule_detail', pk=pk)
+            schedule = form.save()
+            return redirect('travel_input:schedule_detail', pk=schedule.pk)
     else:
         form = ScheduleForm(instance=schedule)
     return render(request, 'travel_input/schedule_form.html', {'form': form})
@@ -82,6 +70,7 @@ def schedule_delete(request, pk):
     schedule = get_object_or_404(Schedule, pk=pk, user=request.user)
     if request.method == 'POST':
         schedule.delete()
+        messages.success(request, '일정이 삭제되었습니다.')
         return redirect('travel_input:schedule_list')
     return render(request, 'travel_input/schedule_confirm_delete.html', {'schedule': schedule})
 

@@ -27,29 +27,118 @@ class Destination(models.Model):
 
 
 class Schedule(models.Model):
+    # 기본 정보
     title = models.CharField(max_length=200, verbose_name='일정 제목')
     destination = models.CharField(max_length=200, verbose_name='여행지')
     start_date = models.DateField(verbose_name='시작일')
     end_date = models.DateField(null=True, blank=True, verbose_name='종료일')
     budget = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True, verbose_name='예산')
     notes = models.TextField(max_length=5000, null=True, blank=True, verbose_name='메모')
-    tag = models.CharField(max_length=50, blank=True, verbose_name='태그')
-    is_favorite = models.BooleanField(default=False, verbose_name='즐겨찾기')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='schedules', verbose_name='사용자')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # ✅ 상세 여행 정보
-    people_composition = models.CharField(max_length=100, blank=True, verbose_name='인원 구성')
-    lodging_request = models.CharField(max_length=200, blank=True, verbose_name='숙소 요청 사항')
-    pet_friendly = models.BooleanField(null=True, verbose_name='반려동물 동반')
-    num_people = models.IntegerField(default=1, verbose_name='여행 인원')
-    transport = models.CharField(max_length=50, blank=True, verbose_name='교통편')
-    purpose = models.TextField(blank=True, verbose_name='여행 목적')
+    # 참가자 정보
+    participant_info = models.TextField(
+        verbose_name='참가자', 
+        help_text='참가자 이름과 나이를 입력하세요 (예: 홍길동(30), 김철수(25))',
+        null=True,
+        blank=True,
+        default=''
+    )
 
-    # ✅ 새롭게 추가된 선호 필드
-    travel_style = models.CharField(max_length=255, blank=True, verbose_name='여행 스타일', help_text="쉼표로 구분된 값")
-    important_factors = models.CharField(max_length=255, blank=True, verbose_name='중요 요소', help_text="쉼표로 구분된 값")
+    # 장소 정보
+    place_info = models.TextField(
+        verbose_name='방문 장소', 
+        help_text='방문할 장소와 날짜를 입력하세요 (예: 남산타워(2024-03-20), 경복궁(2024-03-21))',
+        null=True,
+        blank=True,
+        default=''
+    )
+
+    # 교통 정보
+    transport_info = models.TextField(
+        verbose_name='교통 정보', 
+        help_text='교통편, 출발지, 도착지, 시간을 입력하세요 (예: KTX, 서울역, 부산역, 2024-03-20 09:00)',
+        null=True,
+        blank=True,
+        default=''
+    )
+
+    # 추가 상세 정보
+    age_group = models.CharField(
+        max_length=50,
+        verbose_name='연령대',
+        help_text='예: 20대, 30대, 60대 이상 등',
+        null=True,
+        blank=True,
+        default=''
+    )
+
+    group_type = models.CharField(
+        max_length=50,
+        verbose_name='여행 동행 형태',
+        help_text='가족, 친구, 커플, 혼자 등',
+        null=True,
+        blank=True,
+        default=''
+    )
+
+    preferred_activities = models.TextField(
+        verbose_name='선호 활동',
+        help_text='예: 온천, 쇼핑, 등산, 박물관 등',
+        null=True,
+        blank=True,
+        default=''
+    )
+
+    meal_preference = models.TextField(
+        verbose_name='음식 선호',
+        help_text='예: 한식, 채식, 미식 여행 등',
+        null=True,
+        blank=True,
+        default=''
+    )
+
+    language_support = models.BooleanField(
+        verbose_name='언어 지원 필요',
+        help_text='영어 가능 가이드 요청 등',
+        default=False
+    )
+
+    season = models.CharField(
+        max_length=50,
+        verbose_name='희망 계절',
+        help_text='봄, 여름, 가을, 겨울 등',
+        null=True,
+        blank=True,
+        default=''
+    )
+
+    repeat_visitor = models.BooleanField(
+        verbose_name='재방문 여부',
+        help_text='해당 지역 방문 경험 (처음/재방문)',
+        default=False
+    )
+
+    mobility_needs = models.TextField(
+        verbose_name='이동 관련 요구',
+        help_text='예: 휠체어 접근성, 편안한 이동 동선 등',
+        null=True,
+        blank=True,
+        default=''
+    )
+
+    event_interest = models.BooleanField(
+        verbose_name='현지 이벤트/축제 관심',
+        default=False
+    )
+
+    travel_insurance = models.BooleanField(
+        verbose_name='여행자 보험 가입',
+        help_text='여행자 보험 가입 여부 또는 희망 여부',
+        default=False
+    )
 
     class Meta:
         ordering = ['-created_at', '-start_date']

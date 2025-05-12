@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
+        initialView: 'timeGridWeek',
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
@@ -204,13 +204,16 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         locale: 'ko',
         height: 'auto',
+        slotMinTime: '00:00:00',
+        slotMaxTime: '24:00:00',
+        slotDuration: '01:00:00',
+        allDaySlot: true,
         events: events,
         eventClick: function(info) {
             info.jsEvent.preventDefault();
             window.location.href = info.event.url;
         },
         eventContent: function(arg) {
-            // 일정 제목을 두 줄로 강제 줄바꿈
             var title = arg.event.title;
             var lines = title.split(/\s+/g).reduce(function(acc, word, idx) {
                 if (idx % 2 === 0) acc.push([word]);

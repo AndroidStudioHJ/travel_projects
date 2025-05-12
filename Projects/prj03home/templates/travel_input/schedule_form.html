@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}AI 여행 상담{% endblock %}
 
 {% block extra_css %}
@@ -115,6 +117,74 @@
     color: #666;
     font-size: 0.9rem;
   }
+  .form-section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .form-section h3 {
+    color: #007acc;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .form-section h3 i {
+    font-size: 1.3rem;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+  }
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group input[type="date"],
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  .form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+  }
+  .checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: #f8f9fa;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .checkbox-option:hover {
+    background: #e9ecef;
+  }
+  .checkbox-option input[type="checkbox"] {
+    margin: 0;
+  }
+  .help-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
 </style>
 {% endblock %}
 
