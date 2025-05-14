@@ -4,13 +4,15 @@ from django.http import JsonResponse
 import json
 import os
 from openai import OpenAI
-from ..models import Schedule, Budget
+from ..models import Schedule
 from .utils import summarize_text_with_openai
 
 @csrf_exempt
 @login_required
 def ai_budget_view(request):
     if request.method == 'POST':
+        from ..models import Budget  # ✅ 지연 import로 오류 방지
+
         data = json.loads(request.body)
         total_budget = data.get('total_budget', 0)
         categories = ['숙박', '식비', '교통', '관광']
@@ -23,10 +25,10 @@ def ai_budget_view(request):
         한국 여행 예산을 다음 네 가지 카테고리로 합리적으로 분배해줘.
         - 총 예산: {total_budget:,}원
         - 카테고리: 숙박, 식비, 교통, 관광
-        
+
         각 카테고리별로 얼마씩 배정할지 JSON 형식으로 알려줘.
         예시: {{"숙박": 100000, "식비": 80000, "교통": 60000, "관광": 60000}}
-        
+
         다음 사항을 고려해줘:
         1. 숙박은 전체 예산의 30-40% 정도로 배정
         2. 식비는 전체 예산의 20-30% 정도로 배정
@@ -45,7 +47,7 @@ def ai_budget_view(request):
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.2,
-                response_format={ "type": "json_object" }
+                response_format={"type": "json_object"}
             )
             
             content = response.choices[0].message.content
@@ -59,13 +61,13 @@ def ai_budget_view(request):
             total_allocated = sum(result.values())
             if total_allocated != total_budget:
                 diff = total_budget - total_allocated
-                result['숙박'] += diff
-            
+                result['숙박'] += diff  # 보정
+
             schedule = Schedule.objects.filter(user=request.user).order_by('-created_at').first()
             if not schedule:
                 schedule = Schedule.objects.create(
                     title='예산 계획',
-                    destination='',
+                    destination=None,
                     start_date=None,
                     end_date=None,
                     budget=total_budget,
@@ -92,6 +94,7 @@ def ai_budget_view(request):
             
     return JsonResponse({'error': 'POST 요청만 지원합니다.'}, status=405)
 
+
 @csrf_exempt
 @login_required
 def ai_recommend_view(request):
@@ -107,6 +110,7 @@ def ai_recommend_view(request):
         })
     return JsonResponse({'error': 'POST 요청만 지원합니다.'}, status=405)
 
+
 @csrf_exempt
 def ai_summarize_view(request):
     if request.method == 'POST':
@@ -119,4 +123,4 @@ def ai_summarize_view(request):
             return JsonResponse({'summary': summary})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
-    return JsonResponse({'error': 'POST 요청만 지원합니다.'}, status=405) 
+    return JsonResponse({'error': 'POST 요청만 지원합니다.'}, status=405)

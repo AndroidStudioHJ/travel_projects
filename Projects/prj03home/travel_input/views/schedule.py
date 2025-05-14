@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from datetime import date, timedelta, datetime
 import random
 from faker import Faker
-import openai
+from openai import OpenAI
 from django.conf import settings
 
 from travel_input.forms import ScheduleForm
@@ -31,7 +31,6 @@ FACTOR_LABELS = {
 @login_required
 def schedule_list(request):
     schedules = Schedule.objects.filter(user=request.user).order_by('-created_at')
-    # 달력에 넘길 데이터 생성
     schedules_calendar = [
         {
             "id": s.id,
@@ -39,17 +38,12 @@ def schedule_list(request):
             "start_date": s.start_date.isoformat() if s.start_date else None,
             "end_date": s.end_date.isoformat() if s.end_date else None,
         }
-        for s in schedules
-        if s.start_date and s.end_date and s.title  # 필수값만
+        for s in schedules if s.start_date and s.end_date and s.title
     ]
-    return render(
-        request,
-        'travel_input/schedule_list.html',
-        {
-            'schedules': schedules,
-            'schedules_calendar': schedules_calendar,
-        }
-    )
+    return render(request, 'travel_input/schedule_list.html', {
+        'schedules': schedules,
+        'schedules_calendar': schedules_calendar,
+    })
 
 
 @login_required
@@ -60,20 +54,28 @@ def schedule_detail(request, pk):
     if request.method == 'POST':
         question = request.POST.get('question', '').strip()
         if question:
-            # OpenAI API 호출 (예시, 실제로는 환경변수 등에서 키 관리)
-            openai.api_key = settings.OPENAI_API_KEY
-            client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
-            prompt = f"일정 정보: {schedule.title}, {schedule.start_date}~{schedule.end_date}, {schedule.notes}\n질문: {question}"
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "당신은 여행 일정 전문가입니다."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=300,
-                temperature=0.7,
-            )
-            ai_answer = response.choices[0].message.content
+            try:
+                client = OpenAI(api_key=settings.OPENAI_API_KEY)
+                prompt = f"""일정 정보:
+- 제목: {schedule.title}
+- 날짜: {schedule.start_date} ~ {schedule.end_date}
+- 목적지: {schedule.destination}
+- 비고: {schedule.notes}
+
+질문: {question}
+"""
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "당신은 여행 일정 전문가입니다. 사용자의 여행 정보에 맞는 조언을 해주세요."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=500,
+                    temperature=0.7,
+                )
+                ai_answer = response.choices[0].message.content.strip()
+            except Exception as e:
+                ai_answer = f"AI 응답 오류: {str(e)}"
 
     return render(request, 'travel_input/schedule_detail.html', {
         'schedule': schedule,
@@ -170,7 +172,6 @@ def generate_ai_style_schedules(request):
     if request.method == 'POST':
         fake = Faker('ko_KR')
         destinations = ['산속', '제주', '부산', '서울', '강릉', '전주', '속초']
-
         count = int(request.POST.get('count', 100))
 
         for _ in range(count):

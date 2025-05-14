@@ -27,7 +27,7 @@ urlpatterns = [
     path('schedule/generate-ai/', generate_ai_style_schedules, name='generate_ai_style_schedules'),
 
     # 즐겨찾기 기능
-    path('schedule/<int:schedule_id>/favorite/', toggle_favorite, name='toggle_favorite'),
+    path('schedule/<int:pk>/favorite/', toggle_favorite, name='toggle_favorite'),
     path('schedule/favorites/', favorite_schedules, name='favorite_list'),
 
     # FullCalendar 이벤트

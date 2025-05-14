@@ -1,6 +1,21 @@
 from django import forms
 from .models import Schedule, Destination
 
+# 여행 목적 선택지
+TRAVEL_PURPOSE_CHOICES = [
+    ('healing', '휴식'),
+    ('sightseeing', '관광'),
+    ('adventure', '모험'),
+    ('photo', '사진 촬영'),
+    ('family', '가족 여행'),
+    ('couple', '커플 여행'),
+    ('culture', '문화 체험'),
+    ('food', '먹거리 탐방'),
+    ('selfdev', '자기 개발'),
+    ('shopping', '쇼핑'),
+]
+
+# 여행 스타일 선택지
 TRAVEL_STYLE_CHOICES = [
     ('nature', '자연경관'),
     ('city', '도시 탐방'),
@@ -9,6 +24,7 @@ TRAVEL_STYLE_CHOICES = [
     ('relax', '휴식과 힐링'),
 ]
 
+# 여행 시 중요 요소
 IMPORTANT_CHOICES = [
     ('stay', '숙소'),
     ('food', '음식'),
@@ -17,77 +33,53 @@ IMPORTANT_CHOICES = [
     ('culture', '현지 문화'),
 ]
 
-class TravelSurveyForm(forms.Form):
+class ScheduleForm(forms.ModelForm):
+    # JSONField와 매핑될 체크박스 필드들
+    travel_purpose = forms.MultipleChoiceField(
+        choices=TRAVEL_PURPOSE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label="여행 목적 (복수 선택 가능)"
+    )
     travel_style = forms.MultipleChoiceField(
         choices=TRAVEL_STYLE_CHOICES,
         widget=forms.CheckboxSelectMultiple,
-        label="선호하는 여행 스타일 (복수 선택 가능)"
+        required=False,
+        label="여행 스타일 (복수 선택 가능)"
     )
     important_factors = forms.MultipleChoiceField(
         choices=IMPORTANT_CHOICES,
         widget=forms.CheckboxSelectMultiple,
-        label="여행 시 중요 요소 (복수 선택 가능)"
-    )
-    num_people = forms.IntegerField(
-        min_value=1,
-        max_value=20,
-        initial=1,
-        label="여행 인원수"
-    )
-    budget = forms.DecimalField(
-        min_value=0,
-        max_digits=10,
-        decimal_places=0,
-        label="예산 (원)"
+        required=False,
+        label="중요 요소 (복수 선택 가능)"
     )
 
-class ScheduleForm(forms.ModelForm):
     class Meta:
         model = Schedule
         fields = [
-            'title', 'destination', 'start_date', 'end_date',
-            'budget', 'notes', 'participant_info', 'age_group', 'group_type',
-            'place_info', 'preferred_activities', 'event_interest',
-            'transport_info', 'mobility_needs',
-            'meal_preference', 'language_support', 'season',
-            'repeat_visitor', 'travel_insurance'
+            'title',
+            'destination',
+            'start_date',
+            'end_date',
+            'travel_purpose',
+            'travel_style',
+            'important_factors',
         ]
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
-            'participant_info': forms.Textarea(attrs={'rows': 3, 'placeholder': '참가자 이름과 나이를 입력하세요 (예: 홍길동(30), 김철수(25))'}),
-            'place_info': forms.Textarea(attrs={'rows': 3, 'placeholder': '방문할 장소와 날짜를 입력하세요 (예: 남산타워(2024-03-20), 경복궁(2024-03-21))'}),
-            'transport_info': forms.Textarea(attrs={'rows': 3, 'placeholder': '교통편, 출발지, 도착지, 시간을 입력하세요 (예: KTX, 서울역, 부산역, 2024-03-20 09:00)'}),
-            'preferred_activities': forms.Textarea(attrs={'rows': 3, 'placeholder': '예: 온천, 쇼핑, 등산, 박물관 등'}),
-            'meal_preference': forms.Textarea(attrs={'rows': 3, 'placeholder': '예: 한식, 채식, 미식 여행 등'}),
-            'mobility_needs': forms.Textarea(attrs={'rows': 3, 'placeholder': '예: 휠체어 접근성, 편안한 이동 동선 등'}),
-            'age_group': forms.Select(choices=[
-                ('', '선택하세요'),
-                ('10대', '10대'),
-                ('20대', '20대'),
-                ('30대', '30대'),
-                ('40대', '40대'),
-                ('50대', '50대'),
-                ('60대 이상', '60대 이상'),
-            ]),
-            'group_type': forms.Select(choices=[
-                ('', '선택하세요'),
-                ('혼자', '혼자'),
-                ('가족', '가족'),
-                ('친구', '친구'),
-                ('커플', '커플'),
-                ('단체', '단체'),
-            ]),
-            'season': forms.Select(choices=[
-                ('', '선택하세요'),
-                ('봄', '봄'),
-                ('여름', '여름'),
-                ('가을', '가을'),
-                ('겨울', '겨울'),
-            ]),
             'destination': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['destination'].empty_label = "여행지를 선택하세요"
+
+    def clean_travel_purpose(self):
+        return self.cleaned_data.get('travel_purpose', [])
+
+    def clean_travel_style(self):
+        return self.cleaned_data.get('travel_style', [])
+
+    def clean_important_factors(self):
+        return self.cleaned_data.get('important_factors', [])

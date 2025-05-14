@@ -21,14 +21,6 @@
     color: #007acc;
     margin-bottom: 35px;
   }
-  .section-title {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #007acc;
-    border-bottom: 2px solid #007acc;
-    margin: 30px 0 20px;
-    padding-bottom: 8px;
-  }
   .form-group {
     margin-bottom: 25px;
   }
@@ -48,29 +40,22 @@
   .checkbox-item {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
+    white-space: nowrap;
   }
   .checkbox-item input[type="checkbox"] {
-    width: auto;
     margin: 0;
-    padding: 0;
   }
-  .checkbox-item label {
-    margin: 0;
-    font-weight: normal;
+  .checkbox-item span {
+    white-space: nowrap;
   }
-  input, select, textarea {
+  input, select {
     width: 100%;
     padding: 12px 14px;
     border: 1px solid #ccc;
     border-radius: 10px;
     font-size: 1rem;
     background: #fdfdfd;
-  }
-  input:focus, select:focus, textarea:focus {
-    border-color: #007acc;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 122, 204, 0.3);
   }
   .form-actions {
     margin-top: 40px;
@@ -88,95 +73,14 @@
     background-color: #007acc;
     color: white;
   }
-  .btn-primary:hover {
-    background-color: #0064b1;
-  }
   .btn-secondary {
     background-color: #6c757d;
     color: white;
     margin-left: 12px;
   }
-  .btn-secondary:hover {
-    background-color: #5a6268;
-  }
   .error {
     color: #dc3545;
     font-size: 0.9rem;
-    margin-top: 5px;
-  }
-  small, .info-message {
-    display: block;
-    margin-top: 5px;
-    color: #666;
-    font-size: 0.9rem;
-  }
-  .form-section {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-  .form-section h3 {
-    color: #007acc;
-    margin-bottom: 20px;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .form-section h3 i {
-    font-size: 1.3rem;
-  }
-  .form-group {
-    margin-bottom: 20px;
-  }
-  .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: #333;
-    font-weight: 500;
-  }
-  .form-group input[type="text"],
-  .form-group input[type="number"],
-  .form-group input[type="date"],
-  .form-group textarea,
-  .form-group select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 1rem;
-  }
-  .form-group textarea {
-    min-height: 100px;
-    resize: vertical;
-  }
-  .checkbox-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 10px;
-  }
-  .checkbox-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 15px;
-    background: #f8f9fa;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  .checkbox-option:hover {
-    background: #e9ecef;
-  }
-  .checkbox-option input[type="checkbox"] {
-    margin: 0;
-  }
-  .help-text {
-    font-size: 0.9rem;
-    color: #666;
     margin-top: 5px;
   }
 </style>
@@ -188,47 +92,74 @@
   <form method="post">
     {% csrf_token %}
 
-    {% for field in form %}
-      {% if field.field.widget.input_type == "checkbox" %}
-        <div class="form-group" style="margin-bottom: 25px;">
-          <label for="{{ field.id_for_label }}" style="display: flex; align-items: center; gap: 8px; font-weight: 500;">
-            <span style="margin-right: 6px;">{{ field.label }}</span>
-            {{ field }}
+    <!-- 일정 제목 -->
+    <div class="form-group">
+      <label class="form-label" for="{{ form.title.id_for_label }}">일정 제목</label>
+      {{ form.title }}
+      {% if form.title.errors %}<div class="error">{{ form.title.errors }}</div>{% endif %}
+    </div>
+
+    <!-- 여행지 -->
+    <div class="form-group">
+      <label class="form-label" for="{{ form.destination.id_for_label }}">여행지</label>
+      {{ form.destination }}
+      {% if form.destination.errors %}<div class="error">{{ form.destination.errors }}</div>{% endif %}
+    </div>
+
+    <!-- 시작일 -->
+    <div class="form-group">
+      <label class="form-label" for="{{ form.start_date.id_for_label }}">시작일</label>
+      {{ form.start_date }}
+      {% if form.start_date.errors %}<div class="error">{{ form.start_date.errors }}</div>{% endif %}
+    </div>
+
+    <!-- 종료일 -->
+    <div class="form-group">
+      <label class="form-label" for="{{ form.end_date.id_for_label }}">종료일</label>
+      {{ form.end_date }}
+      {% if form.end_date.errors %}<div class="error">{{ form.end_date.errors }}</div>{% endif %}
+    </div>
+
+    <!-- 여행 목적 -->
+    <div class="form-group">
+      <label class="form-label">{{ form.travel_purpose.label }}</label>
+      <div class="checkbox-wrapper">
+        {% for checkbox in form.travel_purpose %}
+          <label class="checkbox-item">
+            {{ checkbox.tag }} <span>{{ checkbox.choice_label }}</span>
           </label>
-          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
-        </div>
-      {% elif field.name in 'travel_style important_factors' %}
-        <div class="form-group">
-          <label class="form-label">{{ field.label }}</label>
-          <div class="checkbox-wrapper" style="display: flex; flex-wrap: wrap; gap: 15px;">
-            {% for checkbox in field %}
-              <label class="checkbox-item" style="display: flex; align-items: center; gap: 6px;">
-                <span style="margin-right: 4px;">{{ checkbox.choice_label }}</span>
-                {{ checkbox.tag }}
-              </label>
-            {% endfor %}
-          </div>
-          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
-        </div>
-      {% elif field.name in 'lodging_request people_composition pet_friendly' %}
-        <div class="form-group">
-          <label class="form-label">{{ field.label }}</label>
-          {{ field }}
-          {% if field.name == 'lodging_request' %}<small>예: 바닷가 근처, 조용한 곳</small>{% endif %}
-          {% if field.name == 'people_composition' %}<small>예: 가족, 친구, 연인</small>{% endif %}
-          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
-        </div>
-      {% else %}
-        <div class="form-group">
-          <label class="form-label">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
-        </div>
-      {% endif %}
-    {% endfor %}
+        {% endfor %}
+      </div>
+      {% if form.travel_purpose.errors %}<div class="error">{{ form.travel_purpose.errors }}</div>{% endif %}
+    </div>
 
-    {{ participant_formset.management_form }}
+    <!-- 여행 스타일 -->
+    <div class="form-group">
+      <label class="form-label">{{ form.travel_style.label }}</label>
+      <div class="checkbox-wrapper">
+        {% for checkbox in form.travel_style %}
+          <label class="checkbox-item">
+            {{ checkbox.tag }} <span>{{ checkbox.choice_label }}</span>
+          </label>
+        {% endfor %}
+      </div>
+      {% if form.travel_style.errors %}<div class="error">{{ form.travel_style.errors }}</div>{% endif %}
+    </div>
 
+    <!-- 중요 요소 -->
+    <div class="form-group">
+      <label class="form-label">{{ form.important_factors.label }}</label>
+      <div class="checkbox-wrapper">
+        {% for checkbox in form.important_factors %}
+          <label class="checkbox-item">
+            {{ checkbox.tag }} <span>{{ checkbox.choice_label }}</span>
+          </label>
+        {% endfor %}
+      </div>
+      {% if form.important_factors.errors %}<div class="error">{{ form.important_factors.errors }}</div>{% endif %}
+    </div>
+
+    <!-- 저장 버튼 -->
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">저장</button>
       <a href="{% url 'travel_input:schedule_list' %}" class="btn btn-secondary">취소</a>
