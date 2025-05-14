@@ -7,6 +7,7 @@ import random
 from faker import Faker
 import openai
 from django.conf import settings
+import markdown
 
 from travel_input.forms import ScheduleForm
 from travel_input.models import Schedule, Destination
@@ -55,29 +56,128 @@ def schedule_list(request):
 @login_required
 def schedule_detail(request, pk):
     schedule = get_object_or_404(Schedule, pk=pk, user=request.user)
-    ai_answer = None
+    
+    # 세션에서 AI 답변 가져오기
+    ai_answers = request.session.get('ai_answers', [])
+    
+    # 세션 초기화 요청이 있는 경우
+    if request.GET.get('clear_answers'):
+        request.session['ai_answers'] = []
+        return redirect('travel_input:schedule_detail', pk=pk)
 
     if request.method == 'POST':
         question = request.POST.get('question', '').strip()
         if question:
-            # OpenAI API 호출 (예시, 실제로는 환경변수 등에서 키 관리)
+            # OpenAI API 호출
             openai.api_key = settings.OPENAI_API_KEY
             client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
-            prompt = f"일정 정보: {schedule.title}, {schedule.start_date}~{schedule.end_date}, {schedule.notes}\n질문: {question}"
+            
+            # 일정의 모든 관련 정보를 포함
+            schedule_info = f"""
+일정 제목: {schedule.title}
+여행 기간: {schedule.start_date} ~ {schedule.end_date}
+여행지: {schedule.destination}
+참가자 정보: {schedule.participant_info}
+연령대: {schedule.age_group}
+여행 동행 형태: {schedule.group_type}
+방문 장소: {schedule.place_info}
+선호 활동: {schedule.preferred_activities}
+이벤트/축제 관심: {'있음' if schedule.event_interest else '없음'}
+교통 정보: {schedule.transport_info}
+이동 관련 요구: {schedule.mobility_needs}
+음식 선호: {schedule.meal_preference}
+언어 지원: {'필요' if schedule.language_support else '불필요'}
+희망 계절: {schedule.season}
+재방문 여부: {'재방문' if schedule.repeat_visitor else '첫 방문'}
+여행자 보험: {'가입 예정' if schedule.travel_insurance else '미가입'}
+추가 메모: {schedule.notes}
+"""
+            
+            prompt = f"""일정 정보:
+{schedule_info}
+
+질문: {question}
+
+답변 형식:
+1. 답변은 3-5개의 항목으로 구성해주세요.
+2. 각 항목은 마크다운 형식으로 작성해주세요:
+   ```markdown
+   ### [장소/활동 이름]
+   
+   **방문 정보**
+   - 방문 시간: [구체적인 시간대]
+   - 소요 시간: [정확한 시간]
+   - 추천 이유: [일정의 특성과 연관지어 설명]
+   
+   **참가자 정보**
+   - 연령대: [적합한 연령대]
+   - 동행 형태: [추천 동행 형태]
+   - 이동 관련: [이동 요구사항 반영]
+   
+   **음식 정보**
+   - 추천 음식점: [지역 특색 음식점]
+   - 대표 메뉴:
+     * [메뉴1] - [가격]
+     * [메뉴2] - [가격]
+   - 식사 시간: [추천 시간대]
+   - 팁: [예약, 인기 시간대 등]
+   
+   **추가 정보**
+   - 주의사항: [구체적인 팁이나 주의사항]
+   - 연락처: [있는 경우]
+   - 웹사이트: [있는 경우]
+   ```
+
+3. 각 추천은 반드시 다음 정보를 고려해서 작성해주세요:
+   - 여행 기간 ({schedule.start_date} ~ {schedule.end_date})
+   - 희망 계절 ({schedule.season})
+   - 선호 활동 ({schedule.preferred_activities})
+   - 이동 관련 요구 ({schedule.mobility_needs})
+   - 음식 선호 ({schedule.meal_preference})
+   - 언어 지원 필요 여부 ({'필요' if schedule.language_support else '불필요'})
+
+4. 마지막에 "더 궁금한 점이 있으시다면 언제든 물어보세요!"라는 문구로 마무리해주세요."""
+            
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "당신은 여행 일정 전문가입니다."},
+                    {"role": "system", "content": f"""당신은 여행 일정 전문가입니다. 
+다음 정보를 반드시 고려해서 답변해주세요:
+- 여행 기간: {schedule.start_date} ~ {schedule.end_date}
+- 참가자: {schedule.participant_info} ({schedule.age_group})
+- 동행 형태: {schedule.group_type}
+- 선호 활동: {schedule.preferred_activities}
+- 이동 관련 요구: {schedule.mobility_needs}
+- 음식 선호: {schedule.meal_preference}
+- 언어 지원: {'필요' if schedule.language_support else '불필요'}
+
+각 추천은 반드시 위 정보를 고려하여 개인화된 답변을 제공해주세요.
+특히 음식 관련 정보는 다음을 반드시 포함해주세요:
+1. 지역 특색 음식점 위주로 추천
+2. 전통 음식과 현대적 해석이 된 음식 모두 포함
+3. 식사 시간대별 추천 메뉴
+4. 예약이나 방문 시 주의사항
+5. 현지인들이 추천하는 숨은 맛집 정보
+
+답변은 반드시 마크다운 형식으로 작성해주세요."""},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=300,
+                max_tokens=1000,
                 temperature=0.7,
             )
             ai_answer = response.choices[0].message.content
+            # 마크다운을 HTML로 변환
+            ai_answer_html = markdown.markdown(ai_answer)
+            # 답변이 3개 이상이면 가장 오래된 답변 제거
+            if len(ai_answers) >= 3:
+                ai_answers.pop()
+            # 새로운 답변을 리스트 앞에 추가 (HTML로)
+            ai_answers.insert(0, ai_answer_html)
+            request.session['ai_answers'] = ai_answers
 
     return render(request, 'travel_input/schedule_detail.html', {
         'schedule': schedule,
-        'ai_answer': ai_answer,
+        'ai_answers': ai_answers,
     })
 
 
