@@ -30,6 +30,9 @@ class Schedule(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # ✅ 즐겨찾기 필드 추가
+    favorite = models.BooleanField(default=False, verbose_name='즐겨찾기 여부')
+
     # ✅ 카테고리 필드들 (체크박스용 JSON 저장)
     travel_purpose = models.JSONField(default=list, blank=True, verbose_name="여행 목적")
     travel_style = models.JSONField(default=list, blank=True, verbose_name="여행 스타일")

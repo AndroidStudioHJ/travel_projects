@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load humanize %}
+
 {% block title %}📋 {{ schedule.title }}{% endblock %}
 
 {% block extra_css %}
@@ -19,7 +21,7 @@
     margin-bottom: 30px;
   }
 
-  .schedule-info {
+  .section {
     background: white;
     padding: 20px;
     border-radius: 8px;
@@ -32,12 +34,6 @@
     border-bottom: 1px solid #eee;
   }
 
-  .info-item:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-  }
-
   .info-label {
     font-weight: bold;
     color: #555;
@@ -46,6 +42,10 @@
 
   .info-value {
     color: #333;
+  }
+
+  ul {
+    padding-left: 20px;
   }
 
   .action-buttons {
@@ -63,65 +63,80 @@
     transition: 0.3s ease;
   }
 
-  .btn-edit {
-    background-color: #007acc;
-    color: white;
-  }
-
-  .btn-edit:hover {
-    background-color: #005f99;
-  }
-
-  .btn-delete {
-    background-color: #dc3545;
-    color: white;
-  }
-
-  .btn-delete:hover {
-    background-color: #c82333;
-  }
-
-  .btn-back {
-    background-color: #6c757d;
-    color: white;
-  }
-
-  .btn-back:hover {
-    background-color: #5a6268;
-  }
+  .btn-edit { background-color: #007acc; color: white; }
+  .btn-edit:hover { background-color: #005f99; }
+  .btn-delete { background-color: #dc3545; color: white; }
+  .btn-delete:hover { background-color: #c82333; }
+  .btn-back { background-color: #6c757d; color: white; }
+  .btn-back:hover { background-color: #5a6268; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="detail-container">
   <h2>📋 {{ schedule.title }}</h2>
-  
-  <div class="schedule-info">
+
+  <div class="section">
     <div class="info-item">
       <div class="info-label">여행 기간</div>
       <div class="info-value">{{ schedule.start_date }} ~ {{ schedule.end_date }}</div>
     </div>
-    
+
     <div class="info-item">
       <div class="info-label">여행지</div>
       <div class="info-value">{{ schedule.destination }}</div>
     </div>
-    
+
     <div class="info-item">
       <div class="info-label">예산</div>
-      <div class="info-value">{{ schedule.budget }}원</div>
+      <div class="info-value">{{ schedule.budget|default:0|intcomma }}원</div>
     </div>
-    
+
+    {% if schedule.travel_purpose %}
+    <div class="info-item">
+      <div class="info-label">여행 목적</div>
+      <ul>
+        {% for item in schedule.travel_purpose %}
+          <li>{{ travel_purpose_labels[item] }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if schedule.travel_style %}
+    <div class="info-item">
+      <div class="info-label">여행 스타일</div>
+      <ul>
+        {% for item in schedule.travel_style %}
+          <li>{{ travel_style_labels[item] }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if schedule.important_factors %}
+    <div class="info-item">
+      <div class="info-label">중요 요소</div>
+      <ul>
+        {% for item in schedule.important_factors %}
+          <li>{{ important_factor_labels[item] }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if schedule.notes %}
     <div class="info-item">
       <div class="info-label">메모</div>
       <div class="info-value">{{ schedule.notes|linebreaks }}</div>
     </div>
+    {% endif %}
   </div>
 
   <div class="action-buttons">
-    <a href="{% url 'update_schedule' schedule.id %}" class="btn btn-edit">수정</a>
-    <a href="{% url 'delete_schedule' schedule.id %}" class="btn btn-delete">삭제</a>
-    <a href="{% url 'schedule' %}" class="btn btn-back">목록으로</a>
+    <a href="{% url 'travel_input:schedule_update' schedule.id %}" class="btn btn-edit">수정</a>
+    <a href="{% url 'travel_input:schedule_delete' schedule.id %}" class="btn btn-delete">삭제</a>
+    <a href="{% url 'travel_input:schedule_list' %}" class="btn btn-back">목록으로</a>
   </div>
 </div>
 {% endblock %}
