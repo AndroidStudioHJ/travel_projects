@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static humanize %}
+{% load markdown_extras %}
 {% block title %}{{ schedule.title }} - 일정 상세{% endblock %}
 
 {% block extra_css %}
@@ -239,6 +240,32 @@
     background: #6c757d;
     color: white;
   }
+  .ai-answer {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  line-height: 1.8;
+  }
+  .ai-answer h3 {
+  color: #2c3e50;
+  font-size: 1.5em;
+  margin-top: 1em;
+  }
+  .ai-answer ul, .ai-answer ol {
+    margin: 0.5em 0 0.5em 1.2em;
+    padding-left: 1.2em;
+  }
+  .ai-answer ul {
+  padding-left: 1.5em;
+  margin-bottom: 1em;
+  }
+  .ai-answer li {
+  margin-bottom: 0.4em;
+  }
+  .ai-answer p {
+    margin: 0.5em 0;
+  }
 </style>
 {% endblock %}
 
@@ -361,7 +388,7 @@
                         <a href="?clear_answers=1" class="btn btn-sm btn-outline-secondary" style="font-size: 0.8rem;">답변 초기화</a>
                     </div>
                     {% for answer in ai_answers %}
-                        <div class="ai-answer" style="margin-top:8px; padding: 8px; background: white; border-radius: 4px;">{{ answer|safe }}</div>
+                        <div class="ai-answer" style="margin-top:8px; padding: 8px; background: white; border-radius: 4px;">{{ answer|markdown_to_html|safe }}</div>
                     {% endfor %}
                 </div>
             {% endif %}
