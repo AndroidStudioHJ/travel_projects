@@ -29,6 +29,95 @@ FACTOR_LABELS = {
 }
 
 
+
+
+
+def format_text_to_markdown(text):
+    """
+    AI가 출력한 여행 추천 응답을 마크다운 형식으로 자동 변환 및 줄바꿈 보정
+    """
+
+    # 0. '**'로 감싼 구간을 마크다운 섹션 헤더로 변환
+    text = re.sub(r'\*\*\s*([^\*\n]+)\s*\*\*', r'\n\n### \1\n', text)
+
+    # 1. 중복 하이픈 '- -' 제거
+    text = re.sub(r'-\s+-', '- ', text)
+
+    # 2. 섹션 헤더 변환(혹시 남아있을 경우)
+    text = re.sub(r'(방문 정보|참가자 정보|음식 정보|추가 정보)', r'\n\n### \1\n', text)
+
+    # 3. 대표 메뉴 블록 들여쓰기 변환
+    def indent_menu_block(match):
+        header = match.group(1)
+        menus = match.group(2)
+        # 각 줄 앞에 '    - ' 붙이기 (공백 4칸 + 하이픈), 빈 줄/불릿/공백 줄은 제외
+        menus = '\n'.join(
+            '    - ' + line.strip(' -*') for line in menus.strip().split('\n') if line.strip(' -*')
+        )
+        return f'- {header}:\n{menus}\n'
+    text = re.sub(
+        r'(대표 메뉴):\s*\n((?:[^\n-][^\n]*\n?)+)(?=\n\S|\Z)',  # 대표 메뉴: ~ 다음 섹션/빈줄 전까지
+        indent_menu_block,
+        text,
+        flags=re.MULTILINE
+    )
+
+    # 4. 한 줄에 여러 항목 붙은 것 분리 (ex: - 항목1: 내용 - 항목2: 내용)
+    text = re.sub(r'- ([^-:\n]+?: .*?)(?= - [^-:\n]+?: )', r'- \1\n', text)
+
+    # 5. 불릿 없이 '항목: 내용' 여러 개 붙은 것 줄바꿈
+    text = re.sub(r'([^-:\n]+?: [^\n]+?)(?= [^-:\n]+?: )', r'\1\n', text)
+
+    # 6. 여러 줄바꿈 정리
+    text = re.sub(r'\n{3,}', '\n\n', text)
+
+    # 7. 앞뒤 공백 정리
+    text = text.strip()
+
+    # '대표 메뉴:' 아래에 붙는 항목들을 * 불릿으로 자동 처리
+    lines = text.strip().split('\n')
+    formatted_lines = []
+    in_menu = False
+
+    for line in lines:
+        line = line.strip()
+
+        if not line or line == '**':
+            continue
+
+        if '대표 메뉴:' in line:
+            formatted_lines.append('- 대표 메뉴:')
+            in_menu = True
+            continue
+
+        # 메뉴 항목 줄: 가격 포함된 경우 자동 * 추가
+        if in_menu and re.match(r'.+ - \d{1,3}(,\d{3})?원', line):
+            formatted_lines.append(f'* {line}')
+            continue
+
+        # 다음 섹션이면 메뉴 종료
+        if line.startswith('###') or line.startswith('- '):
+            in_menu = False
+
+        # 일반 항목
+        if line.startswith(('###', '- ', '* ')):
+            formatted_lines.append(line)
+        elif ':' in line:
+            formatted_lines.append(f"- {line}")
+        else:
+            formatted_lines.append(f"  {line}")
+
+    return text
+
+
+
+        
+
+
+
+
+
+
 def json_to_markdown(data):
     lines = [f"### {data.get('title', '여행 추천')}\n"]
 
@@ -163,41 +252,108 @@ def schedule_detail(request, pk):
 추가 메모: {schedule.notes}
 """
 
-            prompt = f"""다음 여행 정보와 질문에 기반해, 아래와 같은 JSON 형식으로 응답해 주세요.
-
-일정 정보:
+            prompt = f"""일정 정보:
 {schedule_info}
 
 질문: {question}
 
-다음 여행 정보를 기반으로 추천 일정을 작성해주세요. 
-출력은 반드시 마크다운 형식을 따르고, 아래 가이드를 지켜주세요:
+1일 계획 짜주세요
 
-1. 제목은 `### 여행 제목` 형식으로 출력  
-2. 항목은 `**방문 정보**`, `**참가자 정보**`, `**음식 정보**`, `**추가 정보**` 순서로 작성  
-3. 각 항목은 `- 항목명: 내용` 으로 줄바꿈하여 작성  
-4. 메뉴나 리스트는 `* 메뉴명 - 가격` 형식으로 작성  
-5. 모든 줄은 마크다운 파서에서 정확히 인식되도록 줄마다 줄바꿈  
-6. 절대 JSON 형식이나 설명 문장을 섞지 마세요. 출력은 마크다운만 하세요.  
-7. 마지막 줄은 `더 궁금한 점이 있으시다면 언제든 물어보세요!`로 마무리  
+답변 형식:
+1. 답변은 3-5개의 항목으로 구성해주세요.
+2. 각 항목은 반드시 아래와 같이 마크다운 문법과 줄바꿈을 지켜서 작성해주세요.
+3. 각 섹션(방문 정보, 참가자 정보, 음식 정보, 추가 정보) 사이에는 반드시 빈 줄(줄바꿈 2번)을 넣으세요.
+4. 각 정보는 한 줄에 하나씩만 작성하세요.
 
-단, 반드시 올바른 마크다운으로 출력하세요.
+예시:
+### 제주 봄 꽃 축제
+
+**방문 정보**
+- 방문 시간: 오후 2시
+- 소요 시간: 2-3시간
+- 추천 이유: 봄 특유의 아름다운 꽃 향기와 풍경을 감상하며 산책과 꽃구경을 즐길 수 있는 행사
+
+**음식 정보**
+- 추천 음식점: 한라식당
+- 대표 메뉴:
+  * 한라산 흑돼지 보쌈세트 - 30,000원
+  * 제주 흑돼지 불고기 - 15,000원
+- 식사 시간: 저녁
+- 팁: 현지인들이 자주 찾는 맛집으로 예약이 권장되며, 흑돼지 요리를 즐기기에 좋은 곳
+
+**추가 정보**
+- 주의사항: 꽃 축제 기간에는 인파가 많을 수 있으니 이동 및 장소 이용 시간을 고려하여 방문하는 것이 좋음
+- 숨은 맛집: 제주 특색 있는 제주도민들이 자주 찾는 "바당목장"에서 흑돼지 불고기를 맛볼 수 있음
+
+⚠️ 반드시 지켜야 할 출력 형식 규칙 (하나라도 어기면 틀린 응답입니다):
+
+1. 각 섹션은 마크다운 제목 형식으로 구분: `### 제목`, `**항목 제목**`
+2. 각 항목은 줄을 바꿔 `- 항목명: 내용` 형식으로 **한 줄에 하나만** 써야 합니다
+3. 리스트가 필요한 항목은 반드시 다음과 같이 작성해야 합니다:
+
+❌ 잘못된 예시 (금지):
+- 연령대: 20대 - 동행 형태: 혼자 - 이동 관련: 택시 이동 가능
+- 대표 메뉴: * 흑돼지 삼겹살 - 18,000원 * 해물뚝배기 - 15,000원
+
+✅ 올바른 예시 (반드시 지켜야 함):
+**참가자 정보**
+- 연령대: 20대  
+- 동행 형태: 혼자  
+- 이동 관련: 택시 이동 가능
+
+**음식 정보**
+- 추천 음식점: 흑돈가
+- 대표 메뉴:
+  * 흑돼지 삼겹살 - 18,000원
+  * 해물뚝배기 - 15,000원
+
+4. 반드시 마크다운 문법을 준수하세요 (줄바꿈, 리스트 기호 `-`, `*`)
+5. 절대로 한 줄에 2개 이상 항목을 붙이지 마세요
+
+응답 예시는 아래 형식을 따르며, 이 틀을 벗어나지 마세요.
+
+
+5. 마지막에 "더 궁금한 점이 있으시다면 언제든 물어보세요!"라는 문구로 마무리해주세요.
 """
-
 
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "당신은 여행 일정 추천 전문가입니다."},
+                    {"role": "system", "content": f"""당신은 여행 일정 전문가입니다. 
+다음 정보를 반드시 고려해서 답변해주세요:
+- 여행 기간: {schedule.start_date} ~ {schedule.end_date}
+- 참가자: {schedule.participant_info} ({schedule.age_group})
+- 동행 형태: {schedule.group_type}
+- 선호 활동: {schedule.preferred_activities}
+- 이동 관련 요구: {schedule.mobility_needs}
+- 음식 선호: {schedule.meal_preference}
+- 언어 지원: {'필요' if schedule.language_support else '불필요'}
+
+각 추천은 반드시 위 정보를 고려하여 개인화된 답변을 제공해주세요.
+특히 음식 관련 정보는 다음을 반드시 포함해주세요:
+1. 지역 특색 음식점 위주로 추천
+2. 전통 음식과 현대적 해석이 된 음식 모두 포함
+3. 식사 시간대별 추천 메뉴
+4. 예약이나 방문 시 주의사항
+5. 현지인들이 추천하는 숨은 맛집 정보 
+
+답변은 반드시 마크다운 형식으로 작성해주세요."""},
                     {"role": "user", "content": prompt}
                 ],
                 max_tokens=1000,
                 temperature=0.7,
             )
 
-            ai_answer = response.choices[0].message.content
-            ai_answer = format_all_sections(ai_answer)
-            ai_answer = fix_markdown_newlines(ai_answer)
+            # ai_answer = response.choices[0].message.content
+
+            # 여기에서 format_text_to_markdown 함수를 호출합니다.
+            # ai_answer = format_text_to_markdown(ai_answer)
+            ai_raw = response.choices[0].message.content.strip()
+            ai_answer = format_text_to_markdown(ai_raw)
+
+            # 기존의 format_section_lines, fix_markdown_newlines 는 제거하거나 주석처리합니다.
+            # ai_answer = format_section_lines(ai_answer)  
+            # ai_answer = fix_markdown_newlines(ai_answer)
 
             if len(ai_answers) >= 3:
                 ai_answers.pop()

@@ -3,402 +3,117 @@
 {% load markdown_extras %}
 {% block title %}{{ schedule.title }} - 일정 상세{% endblock %}
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 {% block extra_css %}
 {{ block.super }}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
-  :root {
-    --clr-primary: #0d47a1;
-    --clr-secondary: #1565c0;
-    --clr-accent: #90caf9;
-    --clr-light: #f5f5f5;
-    --clr-card-bg: #ffffff;
-  }
-
-  .enhanced-schedule-container {
-    max-width: 900px;
-    margin: 2rem auto;
-    padding: 1.5rem;
-    background: #fff;
-    border-radius: 1rem;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    font-family: 'Pretendard', sans-serif;
-  }
-
-  .hero-schedule {
-    text-align: center;
-    padding: 2rem 1rem;
-    background: linear-gradient(135deg, var(--clr-accent), #e3f2fd);
-    border-radius: 0.75rem;
-    margin-bottom: 2rem;
-    position: relative;
-  }
-
-  .schedule-title {
-    font-size: 2.5rem;
-    color: var(--clr-primary);
-    margin-bottom: 0.5rem;
-  }
-
-  .schedule-dates {
-    font-size: 1rem;
-    color: #555;
-  }
-
-  .enhanced-info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-
-  .info-card {
-    background: var(--clr-card-bg);
-    padding: 1rem;
-    border-radius: 0.75rem;
-    text-align: center;
-    border: 1px solid #eceff1;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
-  }
-
-  .info-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  }
-
-  .info-card h3 {
-    font-size: 1rem;
-    color: var(--clr-secondary);
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .info-card h3 i {
-    margin-right: 0.5rem;
-    color: var(--clr-primary);
-  }
-
-  .info-card p {
-    font-size: 0.95rem;
-    margin: 0;
-  }
-
-  .section-title {
-    font-size: 1.2rem;
-    color: var(--clr-primary);
-    border-left: 4px solid var(--clr-accent);
-    padding-left: 0.5rem;
-    margin: 2rem 0 0.5rem;
-  }
-
-  .badge-list {
+  .card-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 0.5rem 0 1rem;
-  }
-
-  .badge-list span {
-    background: var(--clr-secondary);
-    color: white;
-    padding: 0.35rem 0.9rem;
-    border-radius: 1rem;
-    font-size: 0.8rem;
-  }
-
-  .ai-response-container {
-    background: var(--clr-light);
-    padding: 1.2rem;
-    border-radius: 0.75rem;
-    border-left: 4px solid var(--clr-accent);
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-top: 2rem;
-    white-space: pre-line;
-  }
-
-  .meta-list {
-    list-style: none;
-    padding: 0;
-    margin: 1.5rem 0;
-  }
-
-  .meta-list li {
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-  }
-
-  .meta-list i {
-    margin-right: 0.5rem;
-    color: var(--clr-secondary);
-  }
-
-  .action-buttons {
-    display: flex;
     justify-content: center;
-    gap: 1rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
+    gap: 24px;
+    padding: 40px;
   }
 
-  .action-button {
-    padding: 0.6rem 1.2rem;
-    border-radius: 1rem;
-    font-size: 0.9rem;
-    text-decoration: none;
-    color: #fff;
-    transition: 0.3s;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .edit-button { background: #28a745; }
-  .delete-button { background: #dc3545; }
-  .back-button { background: #6c757d; }
-  .favorite-button { background: #ffc107; color: #333; }
-
-  .action-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-
-  form.favorite-form {
-    display: inline-block;
-  }
-
-  .schedule-detail {
-    max-width: 1200px;
-    margin: 0 auto;
+  .card-item {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #111;
     padding: 20px;
-  }
-
-  .info-section {
-    margin-bottom: 40px;
-  }
-
-  .info-section h2 {
-    color: #007acc;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-  }
-
-  .info-card {
-    background: white;
     border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 280px;
+    min-height: 180px;
+    transition: transform 0.3s;
   }
 
-  .info-card h3 {
-    color: #333;
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  .card-item:hover {
+    transform: translateY(-4px);
   }
 
-  .info-card p {
-    color: #666;
-    line-height: 1.6;
+  .card-item h3 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    color: #0d47a1;
   }
 
-  .btn {
-    padding: 10px 20px;
-    border-radius: 6px;
-    text-decoration: none;
-    margin: 0 5px;
-    font-weight: 500;
-  }
-
-  .btn-primary {
-    background: #007acc;
-    color: white;
-  }
-
-  .btn-danger {
-    background: #dc3545;
-    color: white;
-  }
-
-  .btn-secondary {
-    background: #6c757d;
-    color: white;
-  }
-  .ai-answer {
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  line-height: 1.8;
-  }
-  .ai-answer h3 {
-  color: #2c3e50;
-  font-size: 1.5em;
-  margin-top: 1em;
-  }
-  .ai-answer ul, .ai-answer ol {
-    margin: 0.5em 0 0.5em 1.2em;
-    padding-left: 1.2em;
-  }
-  .ai-answer ul {
-  padding-left: 1.5em;
-  margin-bottom: 1em;
-  }
-  .ai-answer li {
-  margin-bottom: 0.4em;
-  }
-  .ai-answer p {
-    margin: 0.5em 0;
+  .card-item p {
+    font-size: 1rem;
+    margin: 6px 0;
+    word-break: keep-all;
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="schedule-detail">
-        <h1 class="text-center mb-4">{{ schedule.title }}</h1>
-        
-        <!-- 기본 정보 -->
-        <div class="info-section">
-            <h2><i class="fas fa-info-circle"></i>기본 정보</h2>
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3><i class="fas fa-map-marker-alt"></i>여행지</h3>
-                    <p>{{ schedule.destination }}</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-calendar"></i>여행 기간</h3>
-                    <p>{{ schedule.start_date }} ~ {{ schedule.end_date }}</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-won-sign"></i>예산</h3>
-                    <p>₩{{ schedule.budget|default:"0"|intcomma }}</p>
-                </div>
-            </div>
-        </div>
+<h2 style="text-align: center; margin: 40px 0;">여행 일정 상세</h2>
 
-        <!-- 참가자 정보 -->
-        <div class="info-section">
-            <h2><i class="fas fa-users"></i>참가자 정보</h2>
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3><i class="fas fa-user-friends"></i>참가자</h3>
-                    <p>{{ schedule.participant_info }}</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-birthday-cake"></i>연령대</h3>
-                    <p>{{ schedule.age_group }}</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-users"></i>여행 동행 형태</h3>
-                    <p>{{ schedule.group_type }}</p>
-                </div>
-            </div>
-        </div>
+<div class="card-grid">
+  <div class="card-item">
+    <h3>기본 정보</h3>
+    <p>여행 제목: {{ schedule.title }}</p>
+    <p>여행 기간: {{ schedule.start_date }} ~ {{ schedule.end_date }}</p>
+    <p>예산: {{ schedule.budget|intcomma }}원</p>
+  </div>
 
-        <!-- 장소 정보 -->
-        <div class="info-section">
-            <h2><i class="fas fa-map-marked-alt"></i>장소 정보</h2>
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3><i class="fas fa-map-pin"></i>방문 장소</h3>
-                    <p>{{ schedule.place_info }}</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-hiking"></i>선호 활동</h3>
-                    <p>{{ schedule.preferred_activities }}</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-calendar-check"></i>이벤트/축제 관심</h3>
-                    <p>{% if schedule.event_interest %}관심 있음{% else %}관심 없음{% endif %}</p>
-                </div>
-            </div>
-        </div>
+  <div class="card-item">
+    <h3>참가자 정보</h3>
+    <p>인원수: {{ schedule.num_people }}</p>
+    <p>구성: {{ schedule.composition }}</p>
+    <p>반려동물 동반: {{ schedule.pet_friendly|yesno:"예,아니오" }}</p>
+  </div>
 
-        <!-- 교통 정보 -->
-        <div class="info-section">
-            <h2><i class="fas fa-plane"></i>교통 정보</h2>
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3><i class="fas fa-route"></i>교통 정보</h3>
-                    <p>{{ schedule.transport_info }}</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-wheelchair"></i>이동 관련 요구</h3>
-                    <p>{{ schedule.mobility_needs }}</p>
-                </div>
-            </div>
-        </div>
+  <div class="card-item">
+    <h3>장소 정보</h3>
+    <p>여행지: {{ schedule.destination }}</p>
+    <p>태그: {{ schedule.tag|default:"없음" }}</p>
+  </div>
 
-        <!-- 추가 상세 정보 -->
-        <div class="info-section">
-            <h2><i class="fas fa-plus-circle"></i>추가 상세 정보</h2>
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3><i class="fas fa-utensils"></i>음식 선호</h3>
-                    <p>{{ schedule.meal_preference }}</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-language"></i>언어 지원</h3>
-                    <p>{% if schedule.language_support %}필요{% else %}불필요{% endif %}</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-leaf"></i>희망 계절</h3>
-                    <p>{{ schedule.season }}</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-redo"></i>재방문 여부</h3>
-                    <p>{% if schedule.repeat_visitor %}재방문{% else %}첫 방문{% endif %}</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-shield-alt"></i>여행자 보험</h3>
-                    <p>{% if schedule.travel_insurance %}가입 예정{% else %}미가입{% endif %}</p>
-                </div>
-            </div>
-        </div>
+  <div class="card-item">
+    <h3>교통 & 숙소</h3>
+    <p>이동수단: {{ schedule.transport }}</p>
+    <p>숙소요청: {{ schedule.lodging_request }}</p>
+  </div>
 
-        <!-- AI 답변 칸 -->
-        <div class="section-title" style="margin-top:32px;">AI 답변</div>
-        <div class="section-content" style="background:#f8f8ff; border-radius:8px; padding:12px;">
-            <form method="post" action="">
-                {% csrf_token %}
-                <textarea name="question" rows="2" style="width:100%;" placeholder="AI에게 궁금한 점을 입력하세요 (예: 이 일정에 추천할만한 장소는?)"></textarea>
-                <button type="submit" class="btn btn-primary" style="margin-top:8px;">AI에게 물어보기</button>
-            </form>
-            {% if ai_answers %}
-                <div class="ai-answers" style="margin-top:16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong>AI 답변:</strong>
-                        <a href="?clear_answers=1" class="btn btn-sm btn-outline-secondary" style="font-size: 0.8rem;">답변 초기화</a>
-                    </div>
-                    {% for answer in ai_answers %}
-                        <div class="ai-answer" style="margin-top:8px; padding: 8px; background: white; border-radius: 4px;">{{ answer|markdown_to_html|safe }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
+  <div class="card-item">
+    <h3>기타</h3>
+    <p>스타일: {{ schedule.travel_style }}</p>
+    <p>중요요소: {{ schedule.important_factors|default:"없음" }}</p>
+    <p>코멘트: {{ schedule.notes|default:"" }}</p>
+  </div>
+</div>
 
-        <div class="text-center mt-4">
-            <a href="{% url 'travel_input:schedule_update' schedule.pk %}" class="btn btn-primary">수정</a>
-            <a href="{% url 'travel_input:schedule_delete' schedule.pk %}" class="btn btn-danger">삭제</a>
-            <a href="{% url 'travel_input:schedule_list' %}" class="btn btn-secondary">목록으로</a>
-        </div>
+{% if ai_answer %}
+<hr style="margin: 40px 0;">
+<h2 style="text-align:center; margin-bottom: 20px;">AI 추천 일정</h2>
+<div class="ai-answer">
+  <pre style="white-space: pre-wrap; background:#f8f8f8; padding: 20px; border-radius: 12px;">{{ ai_answer|safe }}</pre>
+</div>
+{% endif %}
+
+<!-- AI 질문 및 답변 -->
+<div class="section-title" style="margin-top:32px; text-align:center; font-weight:bold; font-size:1.2rem;">AI 답변</div>
+<div class="section-content" style="background:#f8f8ff; border-radius:8px; padding:12px; max-width: 900px; margin: 0 auto;">
+  <form method="post" action="">
+    {% csrf_token %}
+    <textarea name="question" rows="2" style="width:100%;" placeholder="AI에게 궁금한 점을 입력하세요 (예: 이 일정에 추천할만한 장소는?)"></textarea>
+    <button type="submit" class="btn btn-primary" style="margin-top:8px;">AI에게 물어보기</button>
+  </form>
+  {% if ai_answers %}
+  <div class="ai-answers" style="margin-top:16px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <strong>AI 답변:</strong>
+      <a href="?clear_answers=1" class="btn btn-sm btn-outline-secondary" style="font-size: 0.8rem;">답변 초기화</a>
     </div>
+    {% for answer in ai_answers %}
+    <div class="ai-answer" style="margin-top:8px; padding: 8px; background: white; border-radius: 4px;">{{ answer|markdown_to_html|safe }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<div class="text-center mt-4">
+  <a href="{% url 'travel_input:schedule_update' schedule.pk %}" class="btn btn-primary">수정</a>
+  <a href="{% url 'travel_input:schedule_delete' schedule.pk %}" class="btn btn-danger">삭제</a>
+  <a href="{% url 'travel_input:schedule_list' %}" class="btn btn-secondary">목록으로</a>
 </div>
 {% endblock %}
