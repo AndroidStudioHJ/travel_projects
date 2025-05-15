@@ -28,8 +28,8 @@ class Schedule(models.Model):
     # 기본 정보
     title = models.CharField(max_length=200, verbose_name='일정 제목')
     destination = models.ForeignKey(Destination, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="여행지")
-    start_date = models.DateField(verbose_name='시작일')
-    end_date = models.DateField(null=True, blank=True, verbose_name='종료일')
+    start_date = models.DateTimeField(verbose_name='시작일')
+    end_date = models.DateTimeField(null=True, blank=True, verbose_name='종료일')
     budget = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True, verbose_name='예산')
     notes = models.TextField(max_length=5000, null=True, blank=True, verbose_name='메모')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='schedules', verbose_name='사용자')
@@ -136,6 +136,13 @@ class Schedule(models.Model):
         verbose_name='여행자 보험 가입',
         help_text='여행자 보험 가입 여부 또는 희망 여부',
         default=False
+    )
+    
+    num_people = models.IntegerField(
+        verbose_name='인원수',
+        null=True,
+        blank=True,
+        help_text='총 여행 인원 수를 입력하세요'
     )
 
     class Meta:

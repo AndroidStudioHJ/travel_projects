@@ -50,7 +50,7 @@ class ScheduleForm(forms.ModelForm):
             'place_info', 'preferred_activities', 'event_interest',
             'transport_info', 'mobility_needs',
             'meal_preference', 'language_support', 'season',
-            'repeat_visitor', 'travel_insurance'
+            'repeat_visitor', 'travel_insurance', 'num_people', 
         ]
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
@@ -61,6 +61,9 @@ class ScheduleForm(forms.ModelForm):
             'preferred_activities': forms.Textarea(attrs={'rows': 3, 'placeholder': '예: 온천, 쇼핑, 등산, 박물관 등'}),
             'meal_preference': forms.Textarea(attrs={'rows': 3, 'placeholder': '예: 한식, 채식, 미식 여행 등'}),
             'mobility_needs': forms.Textarea(attrs={'rows': 3, 'placeholder': '예: 휠체어 접근성, 편안한 이동 동선 등'}),
+            'num_people': forms.NumberInput(attrs={'placeholder': '예: 3'}), 
+            'start_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'end_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'age_group': forms.Select(choices=[
                 ('', '선택하세요'),
                 ('10대', '10대'),

@@ -12,6 +12,8 @@ import re
 from travel_input.forms import ScheduleForm
 from travel_input.models import Schedule, Destination
 
+openai.api_key = settings.OPENAI_API_KEY
+
 STYLE_LABELS = {
     'nature': '자연경관',
     'city': '도시 탐방',

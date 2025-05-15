@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # 🏗️ 기본 경로 설정
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -114,4 +115,7 @@ LOGOUT_REDIRECT_URL = '/'
 # 🆔 기본 PK 필드 타입
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-OPENAI_API_KEY = "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"
+
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
