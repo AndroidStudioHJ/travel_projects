@@ -6,19 +6,38 @@ import os
 from django.conf import settings
 from .utils import summarize_text_with_openai
 
-
 def home(request):
     return render(request, 'travel_input/home.html')
+
+
+def normalize_result_data(result_dict):
+    normalized = {}
+    for k, v in result_dict.items():
+        if isinstance(v, (list, tuple)):
+            normalized[k] = ', '.join(str(i) for i in v)
+        elif isinstance(v, str) and ',' in v:
+            normalized[k] = ', '.join(item.strip() for item in v.split(','))
+        else:
+            normalized[k] = str(v)
+    return normalized
 
 
 def travel_survey(request):
     if request.method == 'POST':
         form = TravelSurveyForm(request.POST)
         if form.is_valid():
-            return render(request, 'travel_input/thank_you.html')
+            raw_data = form.cleaned_data
+            result = normalize_result_data(raw_data)
+            return render(request, 'travel_input/ai_thank_you.html', {
+                'form': form,
+                'result': result
+            })
     else:
         form = TravelSurveyForm()
-    return render(request, 'travel_input/travel_list.html', {'form': form})
+
+    return render(request, 'travel_input/travel_list.html', {
+        'form': form
+    })
 
 
 def culture(request):
@@ -32,8 +51,9 @@ def culture(request):
                 rec['설명_3줄요약'] = summarize_text_with_openai(desc)
             else:
                 rec['설명_3줄요약'] = ''
-    except Exception as e:
+    except Exception:
         recommendations = []
+
     culture_info = {
         'name': '한국의 전통 문화',
         'description': '한국의 전통적인 문화와 역사적 장소들을 소개합니다.',
@@ -42,7 +62,10 @@ def culture(request):
         'traditional_food': ['김치', '비빔밥', '불고기', '한정식'],
         'activities': ['한복체험', '전통공예', 'templestay', '전통음악공연']
     }
-    return render(request, 'travel_input/culture.html', {'culture': culture_info, 'recommendations': recommendations})
+    return render(request, 'travel_input/culture.html', {
+        'culture': culture_info,
+        'recommendations': recommendations
+    })
 
 
 def lodging(request):
@@ -75,7 +98,9 @@ def lodging(request):
             '추가 요금 사항 체크하기'
         ]
     }
-    return render(request, 'travel_input/lodging.html', {'lodging': lodging_info})
+    return render(request, 'travel_input/lodging.html', {
+        'lodging': lodging_info
+    })
 
 
 def smart_schedule(request):

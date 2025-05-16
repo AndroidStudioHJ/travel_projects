@@ -28,8 +28,8 @@ class Schedule(models.Model):
     # 기본 정보
     title = models.CharField(max_length=200, verbose_name='일정 제목')
     destination = models.ForeignKey(Destination, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="여행지")
-    start_date = models.DateTimeField(verbose_name='시작일')
-    end_date = models.DateTimeField(null=True, blank=True, verbose_name='종료일')
+    start_date = models.DateField(verbose_name='시작일')
+    end_date = models.DateField(null=True, blank=True, verbose_name='종료일')
     budget = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True, verbose_name='예산')
     notes = models.TextField(max_length=5000, null=True, blank=True, verbose_name='메모')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='schedules', verbose_name='사용자')
@@ -38,7 +38,7 @@ class Schedule(models.Model):
 
     # 참가자 정보
     participant_info = models.TextField(
-        verbose_name='참가자', 
+        verbose_name='참가자',
         help_text='참가자 이름과 나이를 입력하세요 (예: 홍길동(30), 김철수(25))',
         null=True,
         blank=True,
@@ -47,7 +47,7 @@ class Schedule(models.Model):
 
     # 장소 정보
     place_info = models.TextField(
-        verbose_name='방문 장소', 
+        verbose_name='방문 장소',
         help_text='방문할 장소와 날짜를 입력하세요 (예: 남산타워(2024-03-20), 경복궁(2024-03-21))',
         null=True,
         blank=True,
@@ -56,7 +56,7 @@ class Schedule(models.Model):
 
     # 교통 정보
     transport_info = models.TextField(
-        verbose_name='교통 정보', 
+        verbose_name='교통 정보',
         help_text='교통편, 출발지, 도착지, 시간을 입력하세요 (예: KTX, 서울역, 부산역, 2024-03-20 09:00)',
         null=True,
         blank=True,
@@ -137,13 +137,6 @@ class Schedule(models.Model):
         help_text='여행자 보험 가입 여부 또는 희망 여부',
         default=False
     )
-    
-    num_people = models.IntegerField(
-        verbose_name='인원수',
-        null=True,
-        blank=True,
-        help_text='총 여행 인원 수를 입력하세요'
-    )
 
     class Meta:
         ordering = ['-created_at', '-start_date']
@@ -152,6 +145,13 @@ class Schedule(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.destination} ({self.start_date})"
+
+    # ✅ 천 원 단위로 반올림된 예산 반환
+    @property
+    def budget_rounded(self):
+        if self.budget:
+            return round(self.budget, -3)
+        return 0
 
 
 class Budget(models.Model):

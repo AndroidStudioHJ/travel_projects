@@ -1,6 +1,7 @@
 from django import forms
 from .models import Schedule, Destination
 
+# 여행 스타일 선택
 TRAVEL_STYLE_CHOICES = [
     ('nature', '자연경관'),
     ('city', '도시 탐방'),
@@ -9,6 +10,7 @@ TRAVEL_STYLE_CHOICES = [
     ('relax', '휴식과 힐링'),
 ]
 
+# 중요 요소 선택
 IMPORTANT_CHOICES = [
     ('stay', '숙소'),
     ('food', '음식'),
@@ -17,6 +19,38 @@ IMPORTANT_CHOICES = [
     ('culture', '현지 문화'),
 ]
 
+# 1. AI 맞춤 질문 기반 폼
+class AITravelConsultForm(forms.Form):
+    destination = forms.CharField(
+        label="어디로 가고 싶으신가요?",
+        max_length=100
+    )
+    duration = forms.CharField(
+        label="여행 기간은 어떻게 되시나요? (예: 당일치기, 1박 2일 등)",
+        max_length=100
+    )
+    departure = forms.CharField(
+        label="어디에서 출발하시나요?",
+        max_length=100
+    )
+    companions = forms.CharField(
+        label="누구와 함께 여행하시나요?",
+        max_length=100
+    )
+    date = forms.CharField(
+        label="여행 예정일은 언제인가요?",
+        max_length=100
+    )
+    theme = forms.CharField(
+        label="가장 중요하게 생각하는 테마나 활동은 무엇인가요?",
+        max_length=200
+    )
+    style = forms.CharField(
+        label="여행은 여유롭게? 아니면 다양한 곳을 둘러보기?",
+        max_length=100
+    )
+
+# 2. 기존 설문 폼
 class TravelSurveyForm(forms.Form):
     travel_style = forms.MultipleChoiceField(
         choices=TRAVEL_STYLE_CHOICES,
@@ -41,6 +75,7 @@ class TravelSurveyForm(forms.Form):
         label="예산 (원)"
     )
 
+# 3. 기존 일정 생성 폼
 class ScheduleForm(forms.ModelForm):
     class Meta:
         model = Schedule
@@ -50,20 +85,22 @@ class ScheduleForm(forms.ModelForm):
             'place_info', 'preferred_activities', 'event_interest',
             'transport_info', 'mobility_needs',
             'meal_preference', 'language_support', 'season',
-            'repeat_visitor', 'travel_insurance', 'num_people', 
+            'repeat_visitor', 'travel_insurance'
         ]
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'budget': forms.NumberInput(attrs={
+                'placeholder': '예: 300000',
+                'step': '1000',
+                'min': 0,
+            }),
             'participant_info': forms.Textarea(attrs={'rows': 3, 'placeholder': '참가자 이름과 나이를 입력하세요 (예: 홍길동(30), 김철수(25))'}),
             'place_info': forms.Textarea(attrs={'rows': 3, 'placeholder': '방문할 장소와 날짜를 입력하세요 (예: 남산타워(2024-03-20), 경복궁(2024-03-21))'}),
             'transport_info': forms.Textarea(attrs={'rows': 3, 'placeholder': '교통편, 출발지, 도착지, 시간을 입력하세요 (예: KTX, 서울역, 부산역, 2024-03-20 09:00)'}),
             'preferred_activities': forms.Textarea(attrs={'rows': 3, 'placeholder': '예: 온천, 쇼핑, 등산, 박물관 등'}),
             'meal_preference': forms.Textarea(attrs={'rows': 3, 'placeholder': '예: 한식, 채식, 미식 여행 등'}),
             'mobility_needs': forms.Textarea(attrs={'rows': 3, 'placeholder': '예: 휠체어 접근성, 편안한 이동 동선 등'}),
-            'num_people': forms.NumberInput(attrs={'placeholder': '예: 3'}), 
-            'start_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'end_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'age_group': forms.Select(choices=[
                 ('', '선택하세요'),
                 ('10대', '10대'),
@@ -90,7 +127,16 @@ class ScheduleForm(forms.ModelForm):
             ]),
             'destination': forms.Select(attrs={'class': 'form-control'}),
         }
+        help_texts = {
+            'budget': '예산은 천 원 단위로 입력해주세요. 예: 300000 → 300,000원',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['destination'].empty_label = "여행지를 선택하세요"
+
+    def clean_budget(self):
+        budget = self.cleaned_data.get('budget')
+        if budget:
+            return round(budget, -3)  # 천 단위 반올림
+        return 0

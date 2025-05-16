@@ -8,13 +8,13 @@ class DestinationAdmin(admin.ModelAdmin):
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'destination', 'start_date', 'end_date', 'created_at', 'num_people')
+    list_display = ('title', 'destination', 'start_date', 'end_date', 'created_at')
     list_filter = ('start_date', 'end_date', 'group_type', 'season', 'repeat_visitor', 'event_interest', 'travel_insurance')
     search_fields = ('title', 'destination', 'participant_info', 'place_info', 'transport_info', 'preferred_activities', 'meal_preference')
     date_hierarchy = 'start_date'
     fieldsets = (
         ('기본 정보', {
-            'fields': ('title', 'destination', 'start_date', 'end_date', 'budget', 'notes', 'num_people')
+            'fields': ('title', 'destination', 'start_date', 'end_date', 'budget', 'notes')
         }),
         ('참가자 정보', {
             'fields': ('participant_info', 'age_group', 'group_type')

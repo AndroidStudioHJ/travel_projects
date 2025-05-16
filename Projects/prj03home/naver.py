@@ -14,7 +14,7 @@ encoded_keyword = urllib.parse.quote(keyword)
 
 
 # 검색 요청 URL
-url = f"https://openapi.naver.com/v1/search/blog?query={encoded_keyword}&display=10&start=1&sort=sim"
+url = url = f"https://openapi.naver.com/v1/search/blog?query={encoded_keyword}&display=10&start=1&sort=date"
 
 # 요청 헤더 설정
 headers = {

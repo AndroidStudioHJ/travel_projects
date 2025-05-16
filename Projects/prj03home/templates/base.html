@@ -1,258 +1,198 @@
 {% load static %}
-<!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
-    {% block extra_head %}
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}모두투어 - 국내 여행 정보{% endblock %}</title>
-    <link rel="icon" href="/images/modetour_icon1.ico" type="image/x-icon">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/ubuntu/0.0.1/ubuntu.css" rel="stylesheet"> 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    {% endblock %}
-    {% block extra_css %}
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap'); 
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-        :root {
-            --font-family: "Noto Sans KR", sans-serif;
-            --font-weight-light: 300;
-            --font-weight-regular: 400;
-            --font-weight-medium: 500;
-            --font-weight-bold: 700;
-            --font-weight-black: 900;
-        }
+  {% block extra_head %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}모두투어 - 국내 여행 정보{% endblock %}</title>
+  <link rel="icon" href="{% static 'images/modetour_icon1.ico' %}" type="image/x-icon">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/ubuntu/0.0.1/ubuntu.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  {% endblock %}
 
-        body {
-            font-family: var(--font-family);
-            font-weight: var(--font-weight-regular);
-            background-color: #f4f6fc;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            overflow-x: hidden;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('{% static "images/풍경사진_낮.jfif" %}');
-            position: relative;
-        }
+  {% block extra_css %}
+  <style>
+    :root {
+      --font-family: "Noto Sans KR", sans-serif;
+      --font-weight-regular: 400;
+    }
 
-        .nav-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 9999;
-            background-color: #007acc;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 40px;
-            height: 60px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            font-family: var(--font-family);
-            font-weight: var(--font-weight-medium);
-        }
+    body {
+      font-family: var(--font-family);
+      font-weight: var(--font-weight-regular);
+      background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+                  url('{% static "images/풍경사진_낮.jfif" %}') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.6s ease;
+      overflow-x: hidden;
+    }
 
-        .nav-links a {
-            font-family: var(--font-family);
-            font-weight: var(--font-weight-medium);
-            text-decoration: none;
-            color: white;
-            font-size: 1rem;
-            padding: 0 12px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            transition: all 0.3s ease;
-            letter-spacing: -0.02em;
-        }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
 
-        .nav-user span {
-            font-family: var(--font-family);
-            font-weight: var(--font-weight-medium);
-            font-size: 0.9rem;
-            color: #ffd700;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            letter-spacing: -0.02em;
-        }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+      z-index: -1;
+    }
 
-        .login-btn, .logout-btn {
-            font-family: var(--font-family);
-            font-weight: var(--font-weight-medium);
-            background-color: transparent;
-            color: white;
-            padding: 8px 16px;
-            font-size: 0.9rem;
-            border: 1px solid white;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            letter-spacing: -0.02em;
-        }
+    .nav-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 9999;
+      background-color: #007acc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+      height: 60px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-        .dropdown-content a {
-            font-family: var(--font-family);
-            font-weight: var(--font-weight-regular);
-            color: rgb(0, 0, 0);
-            padding: 8px 12px;
-            text-decoration: none;
-            display: block;
-            font-size: 0.9rem;
-            text-align: center;
-            white-space: nowrap;
-            transition: all 0.2s ease;
-            flex: 1;
-            margin: 0 5px;
-            letter-spacing: -0.02em;
-        }
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      height: 100%;
+    }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
-            z-index: -1;
-        }
+    .nav-links a {
+      text-decoration: none;
+      color: white;
+      font-size: 1rem;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
 
-        .content {
-            flex: 1;
-            width: 100%;
-            max-width: 1300px;
-            margin: 0 auto;
-            padding-top: 80px;
-            box-sizing: border-box;
-        }
+    .nav-links a:hover {
+      color: #ffd700;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
 
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-            height: 100%;
-        }
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
 
-        .nav-links a:hover {
-            color: #ffd700;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
+    .nav-user span {
+      font-size: 0.9rem;
+      color: #ffd700;
+    }
 
-        .nav-user {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            height: 100%;
-        }
+    .login-btn, .logout-btn {
+      background-color: transparent;
+      color: white;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      border: 1px solid white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
 
-        .dropdown {
-            position: relative;
-            display: flex;
-            align-items: center;
-            height: 100%;
-        }
+    .login-btn:hover, .logout-btn:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
 
-        .dropdown > a {
-            display: flex;
-            align-items: center;
-            height: 100%;
-            padding: 0 12px;
-        }
+    .content {
+      flex: 1;
+      width: 100%;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 100px 20px 40px;  /* padding-top 충분히 주기 */
+    }
 
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
+    footer {
+      flex-shrink: 0;
+      background-color: #007acc;
+      color: white;
+      text-align: center;
+      padding: 15px 0;
+      font-size: 0.9rem;
+      width: 100%;
+    }
 
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #ffffffe1;
-            min-width: 300px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            z-index: 1000;
-            border-radius: 4px;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 1px solid rgba(44, 11, 11, 0.1);
-            padding: 10px;
-        }
-
-        .dropdown-content .row {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 10px;
-        }
-
-        .dropdown-content a:hover {
-            background-color: rgba(0, 122, 204, 0.1);
-            color: #007acc;
-        }
-
-        footer {
-            font-family: var(--font-family);
-            font-weight: var(--font-weight-regular);
-            flex-shrink: 0;
-            background-color: #007acc;
-            color: white;
-            text-align: center;
-            padding: 15px 0;
-            font-size: 0.9rem;
-            width: 100%;
-            letter-spacing: -0.02em;
-        }
-    </style>
-    {% endblock %}
+    .toast {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 9999;
+      background: #007acc;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+  </style>
+  {% endblock %}
 </head>
 
 <body>
-    <div class="nav-bar">
-        <div class="nav-links">
-            <a href="{% url 'home' %}">홈</a>
-            <a href="{% url 'travel_input:schedule_list' %}">일정</a>
-            <a href="{% url 'travel_input:generate_dummy' %}">더미 생성</a>
-        </div>
-
-        {% if user.is_authenticated %}
-        <div class="nav-user">
-            <span>{{ user.username }}님</span>
-            <form action="{% url 'accounts:logout' %}" method="post" style="margin: 0;">
-                {% csrf_token %}
-                <button type="submit" class="logout-btn">로그아웃</button>
-            </form>
-        </div>
-        {% else %}
-        <div class="nav-user">
-            <a href="{% url 'accounts:login' %}" class="login-btn">로그인</a>
-            <a href="{% url 'accounts:register' %}" class="login-btn">회원가입</a>
-        </div>
-        {% endif %}
+  <div class="nav-bar">
+    <div class="nav-links">
+      <a href="{% url 'home' %}">홈</a>
+      <a href="{% url 'travel_input:schedule_list' %}">일정</a>
+      <a href="{% url 'travel_input:generate_dummy' %}">더미 생성</a>
+      <a href="{% url 'travel_input:travel_ai_consult' %}">AI 일정 추천</a>
+      <a href="{% url 'travel_input:travel_survey' %}">여행 설문</a>
     </div>
 
-    <div class="content">
-        {% block content %}
-        {% endblock %}
+    {% if user.is_authenticated %}
+    <div class="nav-user">
+      <span>{{ user.username }}님</span>
+      <form action="{% url 'accounts:logout' %}" method="post" style="margin: 0;">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">로그아웃</button>
+      </form>
     </div>
+    {% else %}
+    <div class="nav-user">
+      <a href="{% url 'accounts:login' %}" class="login-btn">로그인</a>
+      <a href="{% url 'accounts:register' %}" class="login-btn">회원가입</a>
+    </div>
+    {% endif %}
+  </div>
 
-    <footer>
-        <p style="margin: 0;">© 2025 모두투어 - All Rights Reserved</p>
-    </footer>
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+      <div class="toast">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
-    {% block extra_js %}
-    <script></script>
-    {% endblock %}
+  <div class="content">
+    {% block content %}{% endblock %}
+  </div>
+
+  <footer>
+    <p style="margin: 0;">© 2025 모두투어 - All Rights Reserved</p>
+  </footer>
+
+  {% block extra_js %}
+  <script></script>
+  {% endblock %}
 </body>
-
 </html>

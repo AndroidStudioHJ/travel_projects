@@ -3,33 +3,18 @@
 
 {% block extra_css %}
 <style>
-    .form-wrapper {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 30px;
-        justify-content: space-between;
-    }
-
     .form-section {
-        flex: 1 1 48%;
-        background: #fdfdfd;
-        border-left: 6px solid #007acc;
+        background: white;
         border-radius: 12px;
         padding: 25px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
-    .form-section.transport { border-left-color: #42a5f5; }
-    .form-section.place { border-left-color: #66bb6a; }
-    .form-section.participant { border-left-color: #ef5350; }
-    .form-section.extra { border-left-color: #ab47bc; }
-
     .form-section h3 {
-        font-size: 1.25rem;
+        color: #007acc;
         margin-bottom: 20px;
-        color: #333;
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 5px;
+        font-size: 1.2rem;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -40,23 +25,30 @@
     }
 
     .form-group label {
-        font-weight: 600;
         display: block;
-        margin-bottom: 6px;
-        color: #444;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
     }
 
-    .form-group input, .form-group select, .form-group textarea {
+    .form-group input[type="text"],
+    .form-group textarea,
+    .form-group select {
         width: 100%;
         padding: 10px;
-        font-size: 0.95rem;
-        border: 1px solid #ccc;
+        border: 1px solid #ddd;
         border-radius: 6px;
+        font-size: 1rem;
+    }
+
+    .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
     }
 
     .help-text {
-        font-size: 0.85rem;
-        color: #777;
+        font-size: 0.9rem;
+        color: #666;
         margin-top: 5px;
     }
 
@@ -67,31 +59,24 @@
         border: none;
         border-radius: 6px;
         font-size: 1.1rem;
-        margin-top: 40px;
-        transition: background 0.3s;
+        cursor: pointer;
+        transition: background 0.3s ease;
     }
 
     .submit-btn:hover {
         background: #005f99;
     }
-
-    @media (max-width: 768px) {
-        .form-section {
-            flex: 1 1 100%;
-        }
-    }
 </style>
 {% endblock %}
 
-
 {% block content %}
-<div class="form-wrapper">
+<div class="container">
     <h1 class="text-center mb-4">여행 일정 만들기 - 상세 정보</h1>
     <form method="post" class="schedule-form">
         {% csrf_token %}
         
         <!-- 참가자 정보 -->
-        <div class="form-section participant">
+        <div class="form-section">
             <h3><i class="fas fa-users"></i>참가자 정보</h3>
             <div class="form-group">
                 <label for="{{ form.participant_info.id_for_label }}">참가자</label>
@@ -111,7 +96,7 @@
         </div>
 
         <!-- 장소 정보 -->
-        <div class="form-section place">
+        <div class="form-section">
             <h3><i class="fas fa-map-marker-alt"></i>장소 정보</h3>
             <div class="form-group">
                 <label for="{{ form.place_info.id_for_label }}">방문 장소</label>
@@ -130,7 +115,7 @@
         </div>
 
         <!-- 교통 정보 -->
-        <div class="form-section transport">
+        <div class="form-section">
             <h3><i class="fas fa-plane"></i>교통 정보</h3>
             <div class="form-group">
                 <label for="{{ form.transport_info.id_for_label }}">교통 정보</label>
@@ -145,7 +130,7 @@
         </div>
 
         <!-- 추가 상세 정보 -->
-        <div class="form-section extra">
+        <div class="form-section">
             <h3><i class="fas fa-plus-circle"></i>추가 상세 정보</h3>
             <div class="form-group">
                 <label for="{{ form.meal_preference.id_for_label }}">음식 선호</label>
