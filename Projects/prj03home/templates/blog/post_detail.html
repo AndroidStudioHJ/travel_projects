@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">{{ post.title }}</h1>
+            <h6 class="card-subtitle mb-3 text-muted">
+                작성자: {{ post.author.username }} | 작성일: {{ post.created_at|date:"Y-m-d H:i" }}
+                {% if post.updated_at != post.created_at %}
+                | 수정일: {{ post.updated_at|date:"Y-m-d H:i" }}
+                {% endif %}
+            </h6>
+            <div class="card-text">
+                {{ post.content|linebreaks }}
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        {% if user.is_authenticated and user == post.author %}
+        <a href="{% url 'blog:post_edit' post.pk %}" class="btn btn-primary">수정</a>
+        <a href="{% url 'blog:post_delete' post.pk %}" class="btn btn-danger" 
+           onclick="return confirm('정말로 이 포스트를 삭제하시겠습니까?')">삭제</a>
+        {% endif %}
+        <a href="{% url 'blog:post_list' %}" class="btn btn-secondary">목록으로</a>
+    </div>
+</div>
+{% endblock %} 

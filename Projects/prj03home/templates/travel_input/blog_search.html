@@ -184,5 +184,17 @@
       <div class="message">검색 결과가 없습니다.</div>
     {% endif %}
   {% endif %}
+
+  {% if blog_results %}
+    <h3>관련 블로그 포스트</h3>
+    {% for post in blog_results %}
+        <div class="blog-post">
+            <h4>{{ post.title|safe }}</h4>
+            <p>블로그: {{ post.bloggername }}</p>
+            <p>{{ post.description|safe }}</p>
+            <a href="{{ post.link }}" target="_blank">자세히 보기</a>
+        </div>
+    {% endfor %}
+  {% endif %}
 </div>
 {% endblock %}

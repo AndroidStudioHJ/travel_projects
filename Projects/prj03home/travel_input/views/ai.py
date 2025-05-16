@@ -1,9 +1,17 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.conf import settings
 import json
+import requests
+import urllib.parse
+import sys
+import os
+
+# naver.py 모듈 추가
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+from naver import search_naver_blog
 
 from openai import OpenAI  # openai>=1.0.0 방식
 
@@ -14,26 +22,50 @@ from .utils import summarize_text_with_openai
 # OpenAI 클라이언트 초기화
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
+def extract_search_keywords(ai_response):
+    """
+    AI 응답에서 검색 키워드 추출
+    """
+    try:
+        keywords = []
+        for line in ai_response.split('\n'):
+            if '검색 키워드' in line or '키워드' in line:
+                parts = line.split(':')[-1].strip()
+                keywords.extend([k.strip() for k in parts.split(',')])
+        return keywords
+    except:
+        return []
+
 @login_required
 def travel_ai_consult(request):
     """
     AI 맞춤 여행 일정 상담 뷰
     """
     result = None
+    search_keyword = None
+    
     if request.method == "POST":
         form = AITravelConsultForm(request.POST)
         if form.is_valid():
             prompt = generate_prompt(form.cleaned_data)
-
             response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "user", "content": prompt}],
             )
             result = response.choices[0].message.content
+            keywords = extract_search_keywords(result)
+            if keywords:
+                search_keyword = keywords[0]
     else:
         form = AITravelConsultForm()
+        result = None  # GET에서는 무조건 None
+        search_keyword = None
 
-    return render(request, 'travel_input/ai_consult.html', {'form': form, 'result': result})
+    return render(request, 'travel_input/ai_consult.html', {
+        'form': form, 
+        'result': result,
+        'search_keyword': search_keyword
+    })
 
 
 def generate_prompt(data):
