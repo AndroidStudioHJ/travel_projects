@@ -4,3 +4,4 @@ info/
 __pycache__/
 *.py[codwz]
 *$py.class
+*:Zone.Identifier
