@@ -6,9 +6,13 @@ from datetime import date, timedelta, datetime
 import random
 from faker import Faker
 import openai
+import os
 
 from travel_input.forms import ScheduleForm
 from travel_input.models import Schedule, Destination
+
+# OpenAI API 키 설정
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 STYLE_LABELS = {
     'nature': '자연경관',
