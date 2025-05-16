@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static humanize get_item %}
+{% load static humanize %}
 
 {% block title %}{{ schedule.title }} - 일정 상세{% endblock %}
 
@@ -22,26 +22,26 @@
       </ul>
     </div>
 
-    <!-- 추가 정보: 카테고리 기반 -->
+    <!-- 추가 정보 -->
     <div class="info-section">
       <h2><i class="fas fa-info-circle"></i> 추가 정보</h2>
       <ul class="meta-list">
         <li>
           <i class="fas fa-bullseye"></i> 여행 목적:
-          {% for purpose in schedule.travel_purpose %}
-            {{ travel_purpose_labels|get_item:purpose }}{% if not forloop.last %}, {% endif %}
+          {% for purpose in schedule.travel_purpose.all %}
+            {{ purpose.name }}{% if not forloop.last %}, {% endif %}
           {% empty %}없음{% endfor %}
         </li>
         <li>
           <i class="fas fa-star"></i> 여행 스타일:
-          {% for style in schedule.travel_style %}
-            {{ travel_style_labels|get_item:style }}{% if not forloop.last %}, {% endif %}
+          {% for style in schedule.travel_style.all %}
+            {{ style.name }}{% if not forloop.last %}, {% endif %}
           {% empty %}없음{% endfor %}
         </li>
         <li>
           <i class="fas fa-heart"></i> 중요 요소:
-          {% for factor in schedule.important_factors %}
-            {{ important_factor_labels|get_item:factor }}{% if not forloop.last %}, {% endif %}
+          {% for factor in schedule.important_factors.all %}
+            {{ factor.name }}{% if not forloop.last %}, {% endif %}
           {% empty %}없음{% endfor %}
         </li>
       </ul>
@@ -50,11 +50,25 @@
     <!-- AI 생성 일정 -->
     <div class="section-title">AI 생성 여행 일정</div>
     {% if ai_answer %}
-      <div class="ai-answer">
-        {{ ai_answer|linebreaksbr }}
-      </div>
+      <div class="ai-answer">{{ ai_answer|linebreaksbr }}</div>
     {% else %}
       <p>AI 여행 일정이 없습니다.</p>
+    {% endif %}
+
+    <!-- 사용자 피드백 -->
+    <div class="section-title mt-5">AI 일정 개선 요청</div>
+    <form method="post" action="">
+      {% csrf_token %}
+      <input type="hidden" name="submit_feedback" value="1">
+      <textarea name="user_feedback" class="form-control" rows="3" placeholder="이 일정에 대한 개선 의견을 입력해 주세요.">{{ schedule.user_feedback }}</textarea>
+      <button type="submit" class="btn btn-outline-primary mt-2">AI에게 개선 요청</button>
+    </form>
+
+    {% if schedule.ai_feedback_response %}
+      <div class="ai-answer mt-3">
+        <strong>AI 개선 제안:</strong><br>
+        {{ schedule.ai_feedback_response|linebreaksbr }}
+      </div>
     {% endif %}
 
     <!-- 버튼 -->

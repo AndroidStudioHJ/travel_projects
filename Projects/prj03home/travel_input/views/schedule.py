@@ -11,20 +11,6 @@ from django.conf import settings
 from travel_input.forms import ScheduleForm
 from travel_input.models import Schedule, Destination
 
-TRAVEL_PURPOSE_LABELS = {
-    'healing': '휴식', 'sightseeing': '관광', 'adventure': '모험',
-    'photo': '사진 촬영', 'family': '가족 여행', 'couple': '커플 여행',
-    'culture': '문화 체험', 'food': '먹거리 탐방', 'selfdev': '자기 개발', 'shopping': '쇼핑'
-}
-TRAVEL_STYLE_LABELS = {
-    'nature': '자연경관', 'city': '도시 탐방', 'culture': '문화 체험',
-    'activity': '액티비티', 'relax': '휴식과 힐링'
-}
-IMPORTANT_FACTOR_LABELS = {
-    'stay': '숙소', 'food': '음식', 'weather': '날씨',
-    'schedule': '일정 편의성', 'culture': '현지 문화'
-}
-
 @login_required
 def schedule_create(request):
     if request.method == 'POST':
@@ -33,22 +19,31 @@ def schedule_create(request):
             schedule = form.save(commit=False)
             schedule.user = request.user
             schedule.save()
+            form.save_m2m()  # ✅ ManyToManyField 저장
 
-            purposes = ', '.join(schedule.travel_purpose or [])
-            styles = ', '.join(schedule.travel_style or [])
-            factors = ', '.join(schedule.important_factors or [])
+            # ✅ 카테고리별 프롬프트 조립
+            purposes = [p.name for p in schedule.travel_purpose.all()]
+            styles = [s.name for s in schedule.travel_style.all()]
+            factors = [f.name for f in schedule.important_factors.all()]
 
-            prompt = f"""당신은 여행 일정 전문가입니다. 다음 정보를 바탕으로 여행 계획을 날짜별로 구성해 주세요.
+            purpose_text = f"이 여행은 {', '.join(purposes)}을(를) 목적으로 합니다." if purposes else ""
+            style_text = f"여행 스타일은 {', '.join(styles)}을(를) 선호합니다." if styles else ""
+            factor_text = f"특히 {', '.join(factors)}에 중점을 두고 싶습니다." if factors else ""
+
+            # ✅ 프롬프트 최종 조립
+            prompt = f"""
+당신은 여행 일정 전문가입니다. 다음 정보를 바탕으로 여행 계획을 구성해 주세요.
 
 - 여행 제목: {schedule.title}
 - 여행지: {schedule.destination}
 - 여행 날짜: {schedule.start_date} ~ {schedule.end_date}
-- 여행 목적: {purposes or '없음'}
-- 여행 스타일: {styles or '없음'}
-- 중요 요소: {factors or '없음'}
+{purpose_text}
+{style_text}
+{factor_text}
 - 메모(특이사항): {schedule.notes or '없음'}
 
-각 날짜별로 추천 일정과 장소, 활동을 포함해 주세요."""
+각 날짜별로 추천 일정과 장소, 활동을 포함해 주세요.
+""".strip()
 
             try:
                 client = OpenAI(api_key=settings.OPENAI_API_KEY)
@@ -62,20 +57,22 @@ def schedule_create(request):
                     temperature=0.7,
                 )
                 ai_answer = response.choices[0].message.content.strip()
+                schedule.ai_response = ai_answer
+                schedule.save()
             except Exception as e:
                 ai_answer = f"AI 응답 오류: {str(e)}"
 
             return render(request, 'travel_input/schedule_detail.html', {
                 'schedule': schedule,
                 'ai_answer': ai_answer,
-                'travel_purpose_labels': TRAVEL_PURPOSE_LABELS,
-                'travel_style_labels': TRAVEL_STYLE_LABELS,
-                'important_factor_labels': IMPORTANT_FACTOR_LABELS
             })
+
     else:
         form = ScheduleForm()
 
     return render(request, 'travel_input/schedule_form.html', {'form': form})
+
+
 
 @login_required
 def schedule_list(request):
@@ -94,45 +91,76 @@ def schedule_list(request):
         'schedules_calendar': schedules_calendar,
     })
 
+
 @login_required
 def schedule_detail(request, pk):
     schedule = get_object_or_404(Schedule, pk=pk, user=request.user)
     ai_answer = None
 
     if request.method == 'POST':
-        question = request.POST.get('question', '').strip()
-        if question:
-            try:
-                client = OpenAI(api_key=settings.OPENAI_API_KEY)
-                prompt = f"""일정 정보:
+        if 'question' in request.POST:
+            question = request.POST.get('question', '').strip()
+            if question:
+                try:
+                    client = OpenAI(api_key=settings.OPENAI_API_KEY)
+                    prompt = f"""일정 정보:
 - 제목: {schedule.title}
 - 날짜: {schedule.start_date} ~ {schedule.end_date}
 - 목적지: {schedule.destination}
 - 비고: {schedule.notes}
 
-질문: {question}
-"""
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": "당신은 여행 일정 전문가입니다. 사용자의 여행 정보에 맞는 조언을 해주세요."},
-                        {"role": "user", "content": prompt}
-                    ],
-                    max_tokens=500,
-                    temperature=0.7,
-                )
-                ai_answer = response.choices[0].message.content.strip()
-            except Exception as e:
-                ai_answer = f"AI 응답 오류: {str(e)}"
+질문: {question}"""
+                    response = client.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=[
+                            {"role": "system", "content": "당신은 여행 일정 전문가입니다."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        max_tokens=500,
+                        temperature=0.7,
+                    )
+                    ai_answer = response.choices[0].message.content.strip()
+                except Exception as e:
+                    ai_answer = f"AI 응답 오류: {str(e)}"
+
+        elif 'submit_feedback' in request.POST:
+            feedback = request.POST.get('user_feedback', '').strip()
+            schedule.user_feedback = feedback
+            if feedback:
+                try:
+                    client = OpenAI(api_key=settings.OPENAI_API_KEY)
+                    prompt = f"""사용자의 여행 일정에 대한 피드백입니다.
+
+일정 제목: {schedule.title}
+여행 날짜: {schedule.start_date} ~ {schedule.end_date}
+여행지: {schedule.destination}
+사용자 피드백: {feedback}
+
+이 피드백을 바탕으로 일정을 어떻게 개선할 수 있을지 제안해 주세요."""
+                    response = client.chat.completions.create(
+                        model="gpt-4",
+                        messages=[
+                            {"role": "system", "content": "당신은 여행 일정 개선 전문가입니다."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        max_tokens=600,
+                        temperature=0.7,
+                    )
+                    schedule.ai_feedback_response = response.choices[0].message.content.strip()
+                except Exception as e:
+                    schedule.ai_feedback_response = f"AI 피드백 오류: {str(e)}"
+            schedule.save()
 
     return render(request, 'travel_input/schedule_detail.html', {
         'schedule': schedule,
-        'ai_answer': ai_answer,
-        'travel_purpose_labels': TRAVEL_PURPOSE_LABELS,
-        'travel_style_labels': TRAVEL_STYLE_LABELS,
-        'important_factor_labels': IMPORTANT_FACTOR_LABELS
+        'ai_answer': ai_answer or schedule.ai_response,
     })
 
+
+# 나머지 기존 함수들 (update, delete, etc.) 생략 없이 그대로 유지
+
+
+# 나머지 기능들은 기존 그대로 유지
 @login_required
 def schedule_update(request, pk):
     schedule = get_object_or_404(Schedule, pk=pk, user=request.user)
