@@ -11,6 +11,7 @@ from .views import (
     get_participants, get_schedules, export_all_data
 )
 from .views.api import get_participants, get_schedules, export_all_data  # export_all_data import 확인
+from .views.blog import blog_search  # blog_search를 blog.py에서 직접 import
 
 app_name = 'travel_input'
 
@@ -46,4 +47,6 @@ urlpatterns = [
     path('api/participants/export/', get_participants, {'export': True}, name='export_participants'),
     path('api/schedules/export/', get_schedules, {'export': True}, name='export_schedules'),
     path('api/export/all/', export_all_data, name='export_all_data'),
+    path('schedule/<int:schedule_id>/', views.schedule_detail, name='schedule_detail'),
+    path('blog/search/', blog_search, name='blog_search'),  # views.blog_search 대신 blog_search 직접 사용
 ]
