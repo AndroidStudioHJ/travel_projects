@@ -11,7 +11,8 @@ urlpatterns = [
     path('', accounts_views.home, name='home'),
     path('accounts/', include('accounts.urls')),
     path('travel/', include('travel_input.urls')),
-    path('map/', include('map.urls')), 
+    path('map/', include('map.urls')),
+    path('blog-search/', include('blog_search.urls')),  # 블로그 검색 URL 추가
 ]
 
 if settings.DEBUG:

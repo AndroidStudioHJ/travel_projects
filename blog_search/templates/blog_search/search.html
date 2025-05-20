@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">블로그 검색</h1>
+    
+    <!-- 검색 폼 -->
+    <form method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="검색어를 입력하세요">
+            <button type="submit" class="btn btn-primary">검색</button>
+        </div>
+    </form>
+
+    {% if results %}
+        <!-- 검색 결과 요약 -->
+        <div class="alert alert-info">
+            총 {{ results.total }}개의 결과 중
+            긍정적: {{ results.positive_count }}개,
+            부정적: {{ results.negative_count }}개,
+            중립적: {{ results.neutral_count }}개
+        </div>
+
+        <!-- 감정별 보기 버튼 -->
+        <div class="btn-group mb-4">
+            <a href="?q={{ query }}&view=positive" class="btn btn-outline-success {% if results.view_type == 'positive' %}active{% endif %}">
+                긍정적
+            </a>
+            <a href="?q={{ query }}&view=negative" class="btn btn-outline-danger {% if results.view_type == 'negative' %}active{% endif %}">
+                부정적
+            </a>
+            <a href="?q={{ query }}&view=neutral" class="btn btn-outline-secondary {% if results.view_type == 'neutral' %}active{% endif %}">
+                중립적
+            </a>
+            <a href="?q={{ query }}" class="btn btn-outline-primary {% if not results.view_type %}active{% endif %}">
+                전체보기
+            </a>
+        </div>
+
+        {% if results.view_type %}
+            <!-- 선택된 감정의 전체 결과 -->
+            <div class="row">
+                {% for post in results.all_posts %}
+                    {% if results.view_type == 'positive' and post in results.positive_posts %}
+                        {% include 'blog_search/_post_card.html' with post=post sentiment='positive' %}
+                    {% elif results.view_type == 'negative' and post in results.negative_posts %}
+                        {% include 'blog_search/_post_card.html' with post=post sentiment='negative' %}
+                    {% elif results.view_type == 'neutral' and post in results.neutral_posts %}
+                        {% include 'blog_search/_post_card.html' with post=post sentiment='neutral' %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- 기본 보기 (각 감정별 상위 5개) -->
+            <div class="row">
+                <div class="col-md-4">
+                    <h3 class="text-success">긍정적 리뷰</h3>
+                    {% for post in results.positive_list %}
+                        {% include 'blog_search/_post_card.html' with post=post sentiment='positive' %}
+                    {% empty %}
+                        <p class="text-muted">긍정적 리뷰가 없습니다.</p>
+                    {% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <h3 class="text-danger">부정적 리뷰</h3>
+                    {% for post in results.negative_list %}
+                        {% include 'blog_search/_post_card.html' with post=post sentiment='negative' %}
+                    {% empty %}
+                        <p class="text-muted">부정적 리뷰가 없습니다.</p>
+                    {% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <h3 class="text-secondary">중립적 리뷰</h3>
+                    {% for post in results.neutral_list %}
+                        {% include 'blog_search/_post_card.html' with post=post sentiment='neutral' %}
+                    {% empty %}
+                        <p class="text-muted">중립적 리뷰가 없습니다.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% elif query %}
+        <div class="alert alert-warning">
+            검색 결과가 없습니다.
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

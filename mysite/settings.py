@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     # 내 앱들
     'accounts.apps.AccountsConfig', 
     'travel_input.apps.TravelInputConfig', 
-    'map.apps.MapConfig', 
+    'map.apps.MapConfig',
+    'blog_search.apps.BlogSearchConfig',  # 블로그 검색 앱 추가
 ]
 
 MIDDLEWARE = [
