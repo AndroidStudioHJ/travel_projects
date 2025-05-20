@@ -1,0 +1,72 @@
+/* prj03S/static/css/recommend.css */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f9ff;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+h1 {
+    color: #007acc;
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 700;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+li {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 122, 204, 0.15);
+    padding: 20px;
+    width: 280px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: default;
+}
+
+li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 122, 204, 0.3);
+}
+
+li strong {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #004a99;
+}
+
+li p {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #555;
+    margin: 0;
+}
+
+p.no-recommend {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 600px) {
+    ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    li {
+        width: 90%;
+    }
+}

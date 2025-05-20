@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  {% block extra_head %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}모두투어 - 국내 여행 정보{% endblock %}</title>
+  <link rel="icon" href="{% static 'images/modetour_icon1.ico' %}" type="image/x-icon">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/ubuntu/0.0.1/ubuntu.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  {% endblock %}
+
+  {% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  {% endblock %}
+</head>
+
+<body>
+  <div class="nav-bar">
+    <div class="nav-links">
+      <a href="{% url 'home' %}">홈</a>
+      <a href="{% url 'travel_input:schedule_list' %}">일정</a>
+      <a href="{% url 'travel_input:generate_dummy' %}">더미 생성</a>
+      <a href="{% url 'travel_input:travel_ai_consult' %}">AI 일정 추천</a>
+      <a href="{% url 'travel_input:regional_specialties' %}">지역 특산물</a>
+      <a href="{% url 'travel_input:travel_survey' %}">여행 설문</a>
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="nav-user">
+      <span>{{ user.username }}님</span>
+      <form action="{% url 'accounts:logout' %}" method="post" style="margin: 0;">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">로그아웃</button>
+      </form>
+    </div>
+    {% else %}
+    <div class="nav-user">
+      <a href="{% url 'accounts:login' %}" class="login-btn">로그인</a>
+      <a href="{% url 'accounts:register' %}" class="login-btn">회원가입</a>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+      <div class="toast">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="content">
+    {% block content %}{% endblock %}
+  </div>
+
+  <footer>
+    <p style="margin: 0;">© 2025 모두투어 - All Rights Reserved</p>
+  </footer>
+
+  {% block extra_js %}
+  <script></script>
+  {% endblock %}
+</body>
+</html>

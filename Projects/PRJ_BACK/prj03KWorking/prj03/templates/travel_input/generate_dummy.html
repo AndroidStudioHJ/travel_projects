@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AI 스타일 더미 일정 생성{% endblock %}
+
+{% block content %}
+<div style="
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+">
+    <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 20px; color: #007acc;">
+        🤖 AI 스타일 더미 일정 자동 생성
+    </h2>
+
+    <p style="font-size: 1.05rem; color: #333; line-height: 1.6;">
+        생성할 더미 일정 수를 선택하고 실행하면,<br>
+        아래 항목 기반의 AI 여행 상담 스타일로 랜덤 일정을 생성합니다.
+    </p>
+
+    <div style="text-align: left; margin-top: 30px; font-size: 0.95rem; color: #444;">
+        <strong>📌 생성 항목 예시:</strong>
+        <ul style="line-height: 1.8; margin-left: 20px;">
+            <li><strong>일정 제목:</strong> 여행 테마에 맞는 문구</li>
+            <li><strong>여행지:</strong> 예: 산속, 제주, 부산, 서울 등</li>
+            <li><strong>시작일 / 종료일:</strong> 오늘 기준 1~30일 뒤부터 랜덤 설정</li>
+            <li><strong>인원수:</strong> 1~6명 랜덤</li>
+            <li><strong>예산:</strong> 300,000 ~ 5,000,000원</li>
+            <li><strong>태그:</strong> 혼자, 가족, 힐링, 연인, 역사, 자연</li>
+            <li><strong>구성:</strong> 본인, 본인+반려동물, 부모+자녀 등</li>
+            <li><strong>숙소 요청:</strong> 도심, 산속, 바닷가 근처 등</li>
+            <li><strong>반려동물 동반 여부:</strong> 예 / 아니오</li>
+            <li><strong>여행 스타일:</strong> 자연경관, 도시 탐방, 문화 체험, 액티비티, 힐링</li>
+            <li><strong>중요 요소:</strong> 음식, 날씨, 숙소, 일정 편의성, 문화</li>
+        </ul>
+    </div>
+
+    <form action="{% url 'travel_input:generate_ai_style_schedules' %}" method="post" style="margin-top: 30px;">
+        {% csrf_token %}
+        <label for="count" style="font-size: 1rem; margin-bottom: 10px; display: block; color: #555;">
+            생성할 일정 수:
+        </label>
+        <select name="count" id="count" style="padding: 10px; font-size: 1rem; border-radius: 6px;">
+            <option value="1">1개</option>
+            <option value="10">10개</option>
+            <option value="100" selected>100개</option>
+            <option value="1000">1000개</option>
+        </select>
+
+        <br><br>
+        <button type="submit" style="
+            padding: 14px 28px;
+            background-color: #007acc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        ">AI 더미 일정 생성 실행</button>
+    </form>
+
+    <div style="margin-top: 30px; font-size: 0.95rem; color: #777;">
+        ※ 생성된 일정은 <a href="{% url 'travel_input:schedule_list' %}" style="color: #007acc; text-decoration: underline;">일정 목록</a>에서 확인할 수 있습니다.
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}지역 특산물{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/regional_specialty.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="info-section">
+  <h2 style="color: white;">📍 대한민국 지역 특산물</h2>
+
+  <!-- 권역 그룹 선택 버튼 -->
+  <div class="filter-buttons">
+    <a href="{% url 'travel_input:regional_specialties' %}">
+      <button class="{% if not current_group and not current_region %}active{% endif %}">전체</button>
+    </a>
+    {% for group in all_groups %}
+    <a href="{% url 'travel_input:regional_specialties_by_group' group %}">
+      <button class="{% if current_group == group %}active{% endif %}">{{ group }}</button>
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- 특산물 카드 출력 -->
+  <div class="info-grid">
+    {% for region, items in specialties_by_region.items %}
+    <div class="info-card active" data-region="{{ region }}">
+      <h3>{{ region }}</h3>
+      <ul>
+        {% for item in items %}
+        <li><strong>{{ item }}</strong></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

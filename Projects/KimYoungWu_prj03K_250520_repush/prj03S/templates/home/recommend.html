@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>추천 여행지</title>
+    <link rel="stylesheet" href="{% static 'css/recommend.css' %}">
+</head>
+<body>
+    <h1>추천 여행지 목록</h1>
+
+    {% if recommendations %}
+        <ul>
+            {% for dest in recommendations %}
+                <li>
+                    <strong>{{ dest.name }}</strong>
+                    <p>{{ dest.description }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-recommend">추천할 여행지가 없습니다.</p>
+    {% endif %}
+</body>
+</html>

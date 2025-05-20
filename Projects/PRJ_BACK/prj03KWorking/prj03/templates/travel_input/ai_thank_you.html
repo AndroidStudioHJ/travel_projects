@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}AI 설문 완료{% endblock %}
+
+{% block content %}
+<div style="max-width: 720px; margin: 0 auto; padding: 40px; background: white; border-radius: 12px;">
+  <h2 style="text-align: center; color: #007acc;">✅ 설문이 성공적으로 제출되었습니다!</h2>
+
+  {% if result %}
+    <div style="margin-top: 30px;">
+      <h3>📊 입력한 설문 내용</h3>
+      <ul style="list-style-type: none; padding: 0;">
+        {% for key, value in result.items %}
+          <li style="margin-bottom: 10px;">
+            <strong>{{ key|capfirst }}:</strong> {{ value }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="{% url 'travel_input:home' %}" class="btn" style="background-color: #007acc; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+      홈으로 이동
+    </a>
+  </div>
+</div>
+{% endblock %}

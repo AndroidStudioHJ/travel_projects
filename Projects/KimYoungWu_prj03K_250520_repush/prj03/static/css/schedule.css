@@ -1,0 +1,175 @@
+.schedule-list-container {
+    display: flex;
+    flex-direction: column;
+    max-width: max-content;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.page-title {
+    color: #007acc;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+.search-form {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.search-input {
+    padding: 8px 10px;
+    width: 250px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.search-button {
+    padding: 8px 15px;
+    border: none;
+    background-color: #007acc;
+    color: white;
+    border-radius: 8px;
+    margin-left: 5px;
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.schedule-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.schedule-card.favorite {
+    border: 2px solid #ffcccb;
+    background-color: #fff8f8;
+}
+
+.schedule-title {
+    color: #333;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.schedule-info {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.budget-badge {
+    display: inline-block;
+    background: #e0f7fa;
+    color: #00796b;
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.schedule-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.action-button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    background-color: #f1f1f1;
+    color: #333;
+    transition: background 0.2s ease;
+}
+
+.action-button:hover {
+    background-color: #ddd;
+}
+
+.create-button {
+    display: inline-block;
+    background: #007acc;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 30px;
+    margin: 0 auto 30px auto;
+    width: 160px;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.create-button:hover {
+    background: #005f99;
+}
+
+.no-schedules {
+    text-align: center;
+    color: #666;
+    margin: 40px 0;
+}
+
+.favorite-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.3rem;
+    color: crimson;
+}
+
+.favorite-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0;
+    color: #007acc;
+}
+
+.favorite-button:hover {
+    text-decoration: underline;
+}
+
+.calendar-container {
+    max-width: 1200px;
+    margin: 30px auto 40px auto;
+    background: white;
+    padding: 32px 24px;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+#calendar {
+    min-height: 700px;
+    font-size: 1.2rem;
+}
+
+.fc-toolbar-title {
+    font-size: 2rem !important;
+    font-weight: 700;
+    color: #007acc;
+}
+
+.fc-daygrid-day-number {
+    font-size: 1.1rem;
+}
+
+.fc-event {
+    font-size: 1.05rem;
+    padding: 4px 6px;
+    border-radius: 6px;
+}
+
+.fc {
+    background: #f8fafc;
+    border-radius: 12px;
+}

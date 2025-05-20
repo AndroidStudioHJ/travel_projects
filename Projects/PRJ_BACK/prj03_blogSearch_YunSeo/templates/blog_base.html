@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    {% load static %}
+    <title>{% block title %}모두투어{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+    <header>
+        <h1>모두투어</h1>
+        <nav>
+            <a href="{% url 'home' %}">홈</a>
+            <!-- 다른 메뉴 링크들 -->
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2025 모두투어</p>
+    </footer>
+</body>
+</html>

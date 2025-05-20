@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AI 맞춤 여행 일정 상담{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 100px auto 40px; background: white; padding: 30px; border-radius: 8px;">
+  <h2 style="text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px;">
+    AI 맞춤 여행 일정 상담
+  </h2>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <label for="destination">여행지:</label>
+    <input type="text" name="destination" id="destination" style="width: 100%; padding: 8px; margin-bottom: 12px;">
+
+    <label for="duration">여행 기간:</label>
+    <select name="duration" id="duration" style="width: 100%; padding: 8px; margin-bottom: 12px;">
+      <option value="">-- 선택하세요 --</option>
+      <option value="당일치기">당일치기</option>
+      <option value="1박 2일">1박 2일</option>
+      <option value="2박 3일">2박 3일</option>
+      <option value="3박 4일 이상">3박 4일 이상</option>
+    </select>
+
+    <label for="departure">출발지:</label>
+    <input type="text" name="departure" id="departure" style="width: 100%; padding: 8px; margin-bottom: 12px;">
+
+    <label for="companions">동행자:</label>
+    <select name="companions" id="companions" style="width: 100%; padding: 8px; margin-bottom: 12px;">
+      <option value="">-- 선택하세요 --</option>
+      <option value="혼자">혼자</option>
+      <option value="연인">연인</option>
+      <option value="가족">가족</option>
+      <option value="친구">친구</option>
+      <option value="기타">기타</option>
+    </select>
+
+    <label for="date">예정일:</label>
+    <input type="date" name="date" id="date" style="width: 100%; padding: 8px; margin-bottom: 12px;">
+
+    <label for="theme">주요 테마/활동:</label>
+    <select name="theme" id="theme" style="width: 100%; padding: 8px; margin-bottom: 12px;">
+      <option value="">-- 선택하세요 --</option>
+      <option value="자연">자연</option>
+      <option value="맛집 탐방">맛집 탐방</option>
+      <option value="쇼핑">쇼핑</option>
+      <option value="문화/역사">문화/역사</option>
+      <option value="축제/공연">축제/공연</option>
+      <option value="휴식">휴식</option>
+    </select>
+
+    <label for="style">여행 스타일:</label>
+    <select name="style" id="style" style="width: 100%; padding: 8px; margin-bottom: 20px;">
+      <option value="">-- 선택하세요 --</option>
+      <option value="여유롭게">여유롭게</option>
+      <option value="빡세게">빡세게</option>
+      <option value="균형 잡힌">균형 잡힌</option>
+    </select>
+
+    <button type="submit" style="width: 100%; padding: 10px; background-color: #007acc; color: white; border: none; font-weight: bold;">
+      AI 일정 추천 받기
+    </button>
+  </form>
+
+  {% if result %}
+    <div style="margin-top: 30px; background: #f0f0f0; padding: 20px; border-radius: 8px; white-space: pre-wrap;">
+      <h3>AI 추천 일정 결과</h3>
+      {{ result }}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

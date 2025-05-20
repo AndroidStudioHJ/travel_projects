@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ destination.name }} 에 댓글 작성</h1>
+
+<form method="post">
+    {% csrf_token %}
+    <textarea name="content" rows="5" cols="50" placeholder="댓글 내용을 입력하세요."></textarea><br/>
+    <button type="submit">댓글 작성</button>
+</form>
+
+<a href="{% url 'recommend' %}">추천 여행지로 돌아가기</a>
+{% endblock %}

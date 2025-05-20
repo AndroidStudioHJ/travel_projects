@@ -1,0 +1,19 @@
+<!-- templates/registration/login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>로그인</title>
+</head>
+<body>
+  <h2>로그인</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">로그인</button>
+  </form>
+  {% if form.errors %}
+    <p style="color:red;">로그인 정보가 올바르지 않습니다.</p>
+  {% endif %}
+</body>
+</html>

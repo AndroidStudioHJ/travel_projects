@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load form_tags %}
+
+{% block extra_css %}
+<style>
+  .survey-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .survey-container * {
+    color: white !important;
+  }
+
+  .survey-container h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .survey-container label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  .survey-container input[type="text"],
+  .survey-container input[type="number"],
+  .survey-container select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background: white;
+    color: black !important;
+    margin-bottom: 15px;
+  }
+
+  .survey-container button {
+    background-color: #f28400;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+
+  .survey-container button:hover {
+    background-color: #c46c00;
+  }
+
+  .survey-result {
+    margin-top: 30px;
+    background: white;
+    color: black;
+    padding: 20px;
+    border-radius: 10px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="min-height: 90vh; display: flex; justify-content: center; align-items: center;">
+  <div class="survey-container">
+    <h2>📝 여행 스타일 설문</h2>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div>
+        <label>{{ form.travel_style.label }}</label>
+        {% for checkbox in form.travel_style %}
+          <label>{{ checkbox.tag }} {{ checkbox.choice_label }}</label>
+        {% endfor %}
+      </div>
+
+      <div>
+        <label>{{ form.important_factors.label }}</label>
+        {% for checkbox in form.important_factors %}
+          <label>{{ checkbox.tag }} {{ checkbox.choice_label }}</label>
+        {% endfor %}
+      </div>
+
+      <div>
+        <label>{{ form.num_people.label }}</label>
+        {{ form.num_people|add_class:"survey-input" }}
+      </div>
+
+      <div>
+        <label>{{ form.budget.label }}</label>
+        {{ form.budget|add_class:"survey-input" }}
+      </div>
+
+      <button type="submit">제출</button>
+    </form>
+
+    {% if result %}
+      <div class="survey-result">
+        <h3>✅ 제출 결과</h3>
+        <pre>{{ result }}</pre>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

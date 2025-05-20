@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}여행 설문{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 720px; margin: 0 auto; padding: 40px;">
+<h2 style="font-size: 28px; font-weight: bold; text-align: center; margin-bottom: 30px; color: white; text-shadow: 0 0 5px rgba(0,0,0,0.5);">
+  ✨ 여행 성향 테스트
+</h2>
+
+  <form method="post" style="background: #f8f8f8; padding: 30px; border-radius: 12px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div style="text-align: center; margin-top: 20px;">
+      <button type="submit" style="padding: 10px 24px; font-size: 16px; font-weight: bold; background-color: #007acc; color: white; border: none; border-radius: 8px;">
+        설문 제출하기
+      </button>
+    </div>
+  </form>
+
+  {% if result %}
+    <div style="margin-top: 30px;">
+      <h3>✅ 제출된 결과</h3>
+      <pre style="background: white; padding: 20px; border-radius: 8px;">{{ result }}</pre>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
