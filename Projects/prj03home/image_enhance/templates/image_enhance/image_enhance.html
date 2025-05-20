@@ -1,0 +1,395 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이미지 개선</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .image-box {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drop-zone {
+            border: 2px dashed #007acc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone:hover {
+            background-color: #f0f8ff;
+        }
+
+        .drop-zone.dragover {
+            background-color: #e6f3ff;
+            border-color: #005999;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 400px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .preview-image.show {
+            display: block;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .box-title {
+            font-size: 1.2em;
+            color: #007acc;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 10px;
+            color: #007acc;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .error-message {
+            display: none;
+            margin-top: 10px;
+            color: #dc3545;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .process-button {
+            background-color: #007acc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            display: block;
+            min-width: 200px;
+        }
+
+        .process-button:hover {
+            background-color: #005999;
+        }
+
+        .process-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>AI 이미지 개선</h2>
+        <div class="image-container">
+            <!-- 입력 이미지 영역 -->
+            <div class="image-box">
+                <div class="box-title">입력 이미지</div>
+                <div class="drop-zone" id="inputDropZone">
+                    <p>이미지를 여기에 드래그하거나 클릭하여 업로드하세요</p>
+                    <p style="font-size: 0.8em; color: #666; margin-top: 5px;">
+                        (최대 크기: 2048x2048 픽셀, 자동으로 리사이징될 수 있습니다)
+                    </p>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    <img id="inputPreview" class="preview-image" alt="입력 이미지 미리보기">
+                    <div id="inputLoading" class="loading">이미지 처리 중...</div>
+                    <div id="inputError" class="error-message"></div>
+                </div>
+            </div>
+
+            <!-- 출력 이미지 영역 -->
+            <div class="image-box">
+                <div class="box-title">개선된 이미지</div>
+                <div class="drop-zone" id="outputDropZone">
+                    <p>개선된 이미지가 여기에 표시됩니다</p>
+                    <img id="outputPreview" class="preview-image" alt="출력 이미지 미리보기">
+                    <div id="outputLoading" class="loading">이미지 처리 중...</div>
+                    <div id="outputError" class="error-message"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 모델 옵션 선택 드롭다운 -->
+        <div style="max-width:400px;margin:30px auto 0 auto;">
+            <label for="modelOption" style="font-weight:500;color:#007acc;">모델(옵션) 선택</label>
+            <select id="modelOption" style="width:100%;padding:10px;border-radius:6px;border:1px solid #ddd;font-size:1rem;margin-top:8px;margin-bottom:10px;"></select>
+            <div id="optionDesc" style="font-size:0.95em;color:#666;margin-top:4px;"></div>
+        </div>
+
+        <!-- 이미지 개선 시작 버튼 -->
+        <div class="button-container">
+            <button id="processButton" class="process-button" type="button" disabled>
+                <span id="spinner" style="display:none; vertical-align:middle;">
+                    <svg width="20" height="20" viewBox="0 0 50 50">
+                        <circle cx="25" cy="25" r="20" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-dasharray="31.4 31.4" transform="rotate(-90 25 25)">
+                            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
+                        </circle>
+                    </svg>
+                </span>
+                <span id="processButtonText">이미지 개선 시작</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const inputDropZone = document.getElementById('inputDropZone');
+        const fileInput = document.getElementById('fileInput');
+        const inputPreview = document.getElementById('inputPreview');
+        const outputPreview = document.getElementById('outputPreview');
+        const inputLoading = document.getElementById('inputLoading');
+        const outputLoading = document.getElementById('outputLoading');
+        const inputError = document.getElementById('inputError');
+        const outputError = document.getElementById('outputError');
+        const processButton = document.getElementById('processButton');
+        const modelOption = document.getElementById('modelOption');
+        const optionDesc = document.getElementById('optionDesc');
+        let currentImageData = null;
+        let droppedFile = null;
+        let availableOptions = [];
+        const spinner = document.getElementById('spinner');
+        const processButtonText = document.getElementById('processButtonText');
+
+        console.log('스크립트 로드됨');
+        console.log('processButton:', processButton);
+
+        // 드래그 앤 드롭 이벤트 처리
+        ['dragenter', 'dragleave', 'drop'].forEach(eventName => {
+            inputDropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        // dragover는 별도로 반드시 preventDefault!
+        inputDropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }, false);
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            inputDropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            inputDropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            inputDropZone.classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            inputDropZone.classList.remove('dragover');
+        }
+
+        // 파일 드롭 처리
+        inputDropZone.addEventListener('drop', (e) => {
+            console.log('drop 이벤트 발생', e);
+            e.preventDefault();
+            e.stopPropagation();
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            console.log('drop된 files:', files);
+            handleFiles(files);
+        }, false);
+
+        // 클릭으로 파일 선택
+        inputDropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            console.log('handleFiles 호출', files);
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    droppedFile = file; // 드롭된 파일을 전역 변수에 저장
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        currentImageData = e.target.result;
+                        inputPreview.src = currentImageData;
+                        inputPreview.classList.add('show');
+                        processButton.disabled = false;
+                        // 에러 메시지 초기화
+                        inputError.classList.remove('show');
+                        outputError.classList.remove('show');
+                        console.log('파일 읽기 완료, 버튼 활성화');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    console.log('이미지 파일이 아님:', file.type);
+                }
+            } else {
+                console.log('files 배열이 비어있음');
+            }
+        }
+
+        // 옵션 목록을 백엔드에서 받아와 드롭다운에 표시
+        function fetchOptions() {
+            fetch('/image-enhance/get-options/')
+                .then(res => res.json())
+                .then(data => {
+                    availableOptions = data.options || [];
+                    modelOption.innerHTML = '';
+                    if (availableOptions.length === 0) {
+                        modelOption.innerHTML = '<option value="">사용 가능한 모델 옵션이 없습니다</option>';
+                        optionDesc.textContent = '';
+                        return;
+                    }
+                    availableOptions.forEach((opt, idx) => {
+                        const optEl = document.createElement('option');
+                        optEl.value = opt.opt_name;
+                        optEl.textContent = opt.opt_name + (opt.desc && opt.desc !== opt.opt_name ? ' ('+opt.desc+')' : '');
+                        modelOption.appendChild(optEl);
+                    });
+                    // 첫 번째 옵션 설명 표시
+                    if (availableOptions[0]) {
+                        optionDesc.textContent = availableOptions[0].desc || availableOptions[0].opt_name;
+                    }
+                });
+        }
+        modelOption.addEventListener('change', function() {
+            const idx = modelOption.selectedIndex;
+            if (availableOptions[idx]) {
+                optionDesc.textContent = availableOptions[idx].desc || availableOptions[idx].opt_name;
+            } else {
+                optionDesc.textContent = '';
+            }
+        });
+        fetchOptions();
+
+        // 이미지 개선 시작 버튼 클릭 이벤트
+        processButton.addEventListener('click', () => {
+            console.log('processButton 클릭됨');
+            if (droppedFile) {
+                processImage();
+            } else {
+                console.log('droppedFile 없음, processImage 미호출');
+            }
+        });
+
+        function setButtonLoading(isLoading) {
+            if (isLoading) {
+                spinner.style.display = 'inline-block';
+                processButtonText.textContent = '처리 중...';
+                processButton.disabled = true;
+            } else {
+                spinner.style.display = 'none';
+                processButtonText.textContent = '이미지 개선 시작';
+                processButton.disabled = false;
+            }
+        }
+
+        function processImage() {
+            console.log('processImage 함수 진입');
+            const file = droppedFile;
+            if (!file) {
+                outputError.textContent = '이미지 파일이 없습니다.';
+                outputError.classList.add('show');
+                return;
+            }
+
+            inputLoading.classList.add('show');
+            outputLoading.classList.add('show');
+            inputError.classList.remove('show');
+            outputError.classList.remove('show');
+            setButtonLoading(true);
+
+            // 강제 리플로우로 UI 업데이트 보장
+            processButton.offsetHeight;
+
+            setTimeout(() => {
+                const formData = new FormData();
+                formData.append('image', file);
+                // 선택된 옵션명 추가
+                if (modelOption.value) {
+                    formData.append('opt_name', modelOption.value);
+                }
+                fetch('/image-enhance/process/', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        outputPreview.src = data.output_url;
+                        outputPreview.classList.add('show');
+                    } else {
+                        outputError.textContent = data.message;
+                        outputError.classList.add('show');
+                    }
+                })
+                .catch(error => {
+                    outputError.textContent = '이미지 처리 중 오류가 발생했습니다.';
+                    outputError.classList.add('show');
+                })
+                .finally(() => {
+                    inputLoading.classList.remove('show');
+                    outputLoading.classList.remove('show');
+                    setButtonLoading(false);
+                });
+            }, 50);
+        }
+    </script>
+</body>
+</html>

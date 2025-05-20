@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'travel_input.apps.TravelInputConfig',
     'map.apps.MapConfig',
+    'image_enhance',
 ]
 
 # 미들웨어 설정
