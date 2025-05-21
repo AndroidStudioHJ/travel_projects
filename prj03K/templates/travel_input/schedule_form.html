@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AI 여행 상담{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/schedule_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="schedule-form-container">
+  <h1 class="page-title">AI 여행 상담</h1>
+  <form method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+      {% if field.field.widget.input_type == "checkbox" %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}" class="checkbox-label">
+            <span>{{ field.label }}</span>
+            {{ field }}
+          </label>
+          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% elif field.name in 'travel_style important_factors' %}
+        <div class="form-group">
+          <label class="form-label">{{ field.label }}</label>
+          <div class="checkbox-wrapper">
+            {% for checkbox in field %}
+              <label class="checkbox-item">
+                <span>{{ checkbox.choice_label }}</span>
+                {{ checkbox.tag }}
+              </label>
+            {% endfor %}
+          </div>
+          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% elif field.name in 'lodging_request people_composition pet_friendly' %}
+        <div class="form-group">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.name == 'lodging_request' %}<small>예: 바닷가 근처, 조용한 곳</small>{% endif %}
+          {% if field.name == 'people_composition' %}<small>예: 가족, 친구, 연인</small>{% endif %}
+          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% else %}
+        <div class="form-group">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    {{ participant_formset.management_form }}
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">저장</button>
+      <a href="{% url 'travel_input:schedule_list' %}" class="btn btn-secondary">취소</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

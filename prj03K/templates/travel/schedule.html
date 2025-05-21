@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}나의 여행 일정{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/schedule.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="schedule-container">
+    <h1>📅 나의 여행 일정</h1>
+    <a href="{% url 'create_schedule' %}" class="create-btn">새 일정 만들기</a>
+
+    {% if schedules %}
+    <ul class="schedule-list">
+        {% for schedule in schedules %}
+            <li>
+                <a href="{% url 'schedule_detail' schedule.id %}">
+                    {{ schedule.title }} ({{ schedule.start_date }} ~ {{ schedule.end_date }})
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p class="empty-message">아직 일정이 없어요 😢<br>새로운 여행을 계획해보세요!</p>
+    {% endif %}
+</div>
+{% endblock %}

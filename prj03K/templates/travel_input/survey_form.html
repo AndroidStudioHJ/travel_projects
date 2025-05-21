@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load form_tags %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/survey_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div style="min-height: 90vh; display: flex; justify-content: center; align-items: center;">
+  <div class="survey-container">
+    <h2>📝 여행 스타일 설문</h2>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div>
+        <label>{{ form.travel_style.label }}</label>
+        {% for checkbox in form.travel_style %}
+          <label>{{ checkbox.tag }} {{ checkbox.choice_label }}</label>
+        {% endfor %}
+      </div>
+
+      <div>
+        <label>{{ form.important_factors.label }}</label>
+        {% for checkbox in form.important_factors %}
+          <label>{{ checkbox.tag }} {{ checkbox.choice_label }}</label>
+        {% endfor %}
+      </div>
+
+      <div>
+        <label>{{ form.num_people.label }}</label>
+        {{ form.num_people|add_class:"survey-input" }}
+      </div>
+
+      <div>
+        <label>{{ form.budget.label }}</label>
+        {{ form.budget|add_class:"survey-input" }}
+      </div>
+
+      <button type="submit">제출</button>
+    </form>
+
+    {% if result %}
+      <div class="survey-result">
+        <h3>✅ 제출 결과</h3>
+        <pre>{{ result }}</pre>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

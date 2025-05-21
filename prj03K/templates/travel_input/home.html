@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}여행 홈{% endblock %}
+
+{% block content %}
+<div style="max-width: 720px; margin: 0 auto; padding: 40px; background: white; border-radius: 12px;">
+  <h2 style="text-align: center; color: #007acc;">🎉 여행 메인 페이지에 오신 것을 환영합니다</h2>
+
+  <p style="text-align: center; margin-top: 30px;">
+    여행 일정을 계획하고 AI 추천을 받아보세요.
+  </p>
+
+  <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 20px;">
+    <a href="{% url 'travel_input:travel_survey' %}" style="padding: 15px 20px; background: #3498db; color: white; text-align: center; border-radius: 6px; text-decoration: none;">📋 AI 여행 설문 시작하기</a>
+    <a href="{% url 'travel_input:schedule_create' %}" style="padding: 15px 20px; background: #2ecc71; color: white; text-align: center; border-radius: 6px; text-decoration: none;">🗓️ 일정 직접 만들기</a>
+    <a href="{% url 'travel_input:smart_schedule' %}" style="padding: 15px 20px; background: #f39c12; color: white; text-align: center; border-radius: 6px; text-decoration: none;">🧠 스마트 일정 추천</a>
+    <a href="{% url 'travel_input:recommendations' %}" style="padding: 15px 20px; background: #9b59b6; color: white; text-align: center; border-radius: 6px; text-decoration: none;">📍 관광지 추천 보기</a>
+  </div>
+</div>
+{% endblock %}

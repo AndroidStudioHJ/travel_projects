@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}단체 여행 삭제{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/grouptravel_confirm_delete.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="delete-confirm-container">
+    <h2>단체 여행 삭제</h2>
+    <p>정말로 "{{ object.name }}" 단체 여행을 삭제하시겠습니까?</p>
+    <p class="warning">이 작업은 되돌릴 수 없습니다.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="button-group">
+            <button type="submit" class="delete-btn">삭제</button>
+            <a href="{% url 'travel_input:group_travel_detail' object.id %}" class="cancel-btn">취소</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

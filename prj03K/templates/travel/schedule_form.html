@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}✍️ 일정 수정{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/schedule_edit.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <h2>✍️ 일정 수정</h2>
+  <form method="post">
+    {% csrf_token %}
+    <p>
+      <label for="id_title">제목:</label>
+      {{ form.title }}
+    </p>
+    <p>
+      <label for="id_destination">여행지:</label>
+      {{ form.destination }}
+    </p>
+    <p>
+      <label for="id_start_date">시작일:</label>
+      {{ form.start_date }}
+    </p>
+    <p>
+      <label for="id_end_date">종료일:</label>
+      {{ form.end_date }}
+    </p>
+    <p>
+      <label for="id_notes">메모:</label>
+      {{ form.notes }}
+    </p>
+    <div class="form-actions">
+      <button type="submit">저장</button>
+      <a href="{% url 'schedule' %}" class="cancel-link">취소</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const destSelect = document.querySelector('#id_destination');
+  const notesField = document.querySelector('#id_notes');
+
+  destSelect.addEventListener('change', function () {
+    if (destSelect.options[destSelect.selectedIndex].text === "기타") {
+      notesField.placeholder = "기타 지역명을 입력해주세요!";
+      notesField.required = true;
+    } else {
+      notesField.placeholder = "";
+      notesField.required = false;
+    }
+  });
+</script>
+{% endblock %}

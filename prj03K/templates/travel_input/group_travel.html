@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}함께하는 여행{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/group_travel.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="group-travel-container">
+    <div class="group-bg-curve"></div>
+    <div class="group-hero">
+        <div class="group-hero-text">
+            <h1 class="group-title">함께하는 여행</h1>
+            <div class="group-quote">“여행의 즐거움은 함께할 때 배가 됩니다.”</div>
+            <div class="group-mission" id="group-mission"></div>
+        </div>
+        <div class="group-hero-illust"></div>
+    </div>
+    <div class="create-group">
+        <a href="{% url 'travel_input:group_travel_create' %}" class="create-button">새 그룹 만들기</a>
+    </div>
+    <div class="groups-section">
+        {% for group in groups %}
+        <div class="group-card">
+            <h3>{{ group.title }}</h3>
+            <p>{{ group.description }}</p>
+            <div class="group-info">
+                <span>{{ group.members.count }}명 참여 중</span>
+                <a href="{% url 'travel_input:group_travel_detail' group.pk %}">자세히 보기</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-alert">참여 중인 그룹이 없습니다. 새 그룹을 만들어보세요!</div>
+        {% endfor %}
+    </div>
+    <div class="chat-section">
+        <h2>그룹 채팅</h2>
+        <div class="chat-messages">
+            <div class="message">
+                <div class="message-sender">김철수</div>
+                <div class="message-content">제주도 숙소 예약했어요!</div>
+            </div>
+            <div class="message">
+                <div class="message-sender">이영희</div>
+                <div class="message-content">좋네요! 위치가 어디인가요?</div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" placeholder="메시지를 입력하세요...">
+            <button class="send-button">전송</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// 오늘의 단체여행 미션
+const missions = [
+    '오늘은 그룹원과 여행 일정 한 가지를 확정해보세요!',
+    '여행지에서 단체 사진 미션! 모두 함께 찰칵📸',
+    '여행 예산을 함께 정해보고 공유해보세요!',
+    '그룹 채팅에 오늘의 여행 TMI를 남겨보세요!',
+    '여행지에서 먹고 싶은 음식 투표하기!'
+];
+document.getElementById('group-mission').textContent = '오늘의 단체여행 미션: ' + missions[Math.floor(Math.random() * missions.length)];
+
+// 그룹 카드 애니메이션
+function showCardsOnScroll() {
+    const cards = document.querySelectorAll('.group-card');
+    const trigger = window.innerHeight * 0.92;
+    cards.forEach(card => {
+        const top = card.getBoundingClientRect().top;
+        if (top < trigger) card.classList.add('visible');
+    });
+}
+window.addEventListener('scroll', showCardsOnScroll);
+window.addEventListener('DOMContentLoaded', showCardsOnScroll);
+</script>
+{% endblock %}

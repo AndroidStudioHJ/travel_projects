@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/schedule_form_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-4">여행 일정 만들기 - 상세 정보</h1>
+    <form method="post" class="schedule-form">
+        {% csrf_token %}
+        
+        <!-- 참가자 정보 -->
+        <div class="form-section">
+            <h3><i class="fas fa-users"></i>참가자 정보</h3>
+            <div class="form-group">
+                <label for="{{ form.participant_info.id_for_label }}">참가자</label>
+                {{ form.participant_info }}
+                <div class="help-text">{{ form.participant_info.help_text }}</div>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.age_group.id_for_label }}">연령대</label>
+                {{ form.age_group }}
+                <div class="help-text">{{ form.age_group.help_text }}</div>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.group_type.id_for_label }}">여행 동행 형태</label>
+                {{ form.group_type }}
+                <div class="help-text">{{ form.group_type.help_text }}</div>
+            </div>
+        </div>
+
+        <!-- 장소 정보 -->
+        <div class="form-section">
+            <h3><i class="fas fa-map-marker-alt"></i>장소 정보</h3>
+            <div class="form-group">
+                <label for="{{ form.place_info.id_for_label }}">방문 장소</label>
+                {{ form.place_info }}
+                <div class="help-text">{{ form.place_info.help_text }}</div>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.preferred_activities.id_for_label }}">선호 활동</label>
+                {{ form.preferred_activities }}
+                <div class="help-text">{{ form.preferred_activities.help_text }}</div>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.event_interest.id_for_label }}">현지 이벤트/축제 관심</label>
+                {{ form.event_interest }}
+            </div>
+        </div>
+
+        <!-- 교통 정보 -->
+        <div class="form-section">
+            <h3><i class="fas fa-plane"></i>교통 정보</h3>
+            <div class="form-group">
+                <label for="{{ form.transport_info.id_for_label }}">교통 정보</label>
+                {{ form.transport_info }}
+                <div class="help-text">{{ form.transport_info.help_text }}</div>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.mobility_needs.id_for_label }}">이동 관련 요구</label>
+                {{ form.mobility_needs }}
+                <div class="help-text">{{ form.mobility_needs.help_text }}</div>
+            </div>
+        </div>
+
+        <!-- 추가 상세 정보 -->
+        <div class="form-section">
+            <h3><i class="fas fa-plus-circle"></i>추가 상세 정보</h3>
+            <div class="form-group">
+                <label for="{{ form.meal_preference.id_for_label }}">음식 선호</label>
+                {{ form.meal_preference }}
+                <div class="help-text">{{ form.meal_preference.help_text }}</div>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.language_support.id_for_label }}">언어 지원 필요</label>
+                {{ form.language_support }}
+                <div class="help-text">{{ form.language_support.help_text }}</div>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.season.id_for_label }}">희망 계절</label>
+                {{ form.season }}
+                <div class="help-text">{{ form.season.help_text }}</div>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.repeat_visitor.id_for_label }}">재방문 여부</label>
+                {{ form.repeat_visitor }}
+                <div class="help-text">{{ form.repeat_visitor.help_text }}</div>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.travel_insurance.id_for_label }}">여행자 보험 가입</label>
+                {{ form.travel_insurance }}
+                <div class="help-text">{{ form.travel_insurance.help_text }}</div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="submit-btn">일정 저장하기</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

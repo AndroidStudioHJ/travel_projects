@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}📅 나의 여행 일정{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{% static 'css/schedule_calendar.css' %}">
+{% endblock %}
+
+{{ schedules|json_script:"schedule-data" }}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="{% static 'js/schedule_calendar.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="list-container">
+  <h1>📅 나의 여행 일정</h1>
+
+  <div class="calendar-container">
+    <div id="calendar"></div>
+  </div>
+
+  <div class="action-buttons">
+    <a href="{% url 'create_schedule' %}" class="btn btn-create">➕ 새 일정 만들기</a>
+    <a href="{% url 'delete_all_schedules' %}" class="btn btn-delete-all">🗑️ 전체 삭제</a>
+  </div>
+
+  <ul class="schedule-list">
+    {% for schedule in schedules %}
+      <li class="schedule-item">
+        <div class="schedule-header">
+          <a href="{% url 'schedule_detail' schedule.id %}" class="schedule-title">
+            {{ schedule.title }}
+          </a>
+          <span class="schedule-dates">
+            {{ schedule.start_date }} ~ {{ schedule.end_date }}
+          </span>
+        </div>
+        <div class="schedule-actions">
+          <a href="{% url 'update_schedule' schedule.id %}" class="action-link">수정</a>
+          <a href="{% url 'delete_schedule' schedule.id %}" class="action-link delete-link">삭제</a>
+        </div>
+      </li>
+    {% empty %}
+      <li class="empty-message">일정이 없습니다. 새로운 일정을 만들어보세요!</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

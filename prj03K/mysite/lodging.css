@@ -1,0 +1,115 @@
+.lodging-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.page-title {
+    color: #333;
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 2.5rem;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.category-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+}
+
+.category-name {
+    color: #007bff;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.category-description {
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.options-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 15px;
+}
+
+.option-item {
+    color: #333;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.price-range {
+    color: #28a745;
+    font-weight: 500;
+    margin-top: 15px;
+}
+
+.popular-areas {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+}
+
+.section-title {
+    color: #333;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.areas-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.area-tag {
+    background: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.booking-tips {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.tips-list {
+    list-style: none;
+    padding: 0;
+}
+
+.tip-item {
+    color: #666;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+}
+
+.tip-item:before {
+    content: "✓";
+    color: #28a745;
+    margin-right: 10px;
+    font-weight: bold;
+}

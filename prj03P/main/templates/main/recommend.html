@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>반려동물 여행 추천 결과</title>
+    <link rel="stylesheet" href="{% static 'main/recommend.css' %}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐾 반려동물 여행 추천 결과 🐾</h1>
+            <p>입력하신 정보를 바탕으로 AI가 여행지를 추천해드립니다.</p>
+            <a href="{% url 'home' %}" class="home-button">🏠 홈으로 가기</a>
+        </header>
+
+        <section class="recommend-section">
+            <form method="post" novalidate onsubmit="showLoading()">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_pet_type">반려동물 종류:</label>
+                    {{ form.pet_type }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_activity_level">활동 수준:</label>
+                    {{ form.activity_level }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_season">여행 시기:</label>
+                    {{ form.season }}
+                </div>
+
+                <button type="submit" class="cta-button" id="submit-btn">🧭 추천받기</button>
+            </form>
+
+            <div id="loading" style="display:none; margin-top: 15px; font-weight: bold; color:#ff9800;">
+                추천 결과를 불러오는 중입니다... 잠시만 기다려주세요.
+            </div>
+
+            {% if recommendation %}
+                <div class="recommendation-box">
+                    <h2>🎉 추천 여행지</h2>
+                    <p id="recommendation-text">{{ recommendation }}</p>
+                    <button onclick="copyRecommendation()" class="cta-button" style="margin-top:10px;">복사하기 📋</button>
+                </div>
+
+                {% if food_recommendation %}
+                <div class="recommendation-box" style="margin-top:20px; background:#e0f7fa;">
+                    <h2>🍖 반려동물도 먹을 수 있는 추천 먹거리</h2>
+                    <p id="food-recommendation-text">{{ food_recommendation }}</p>
+                    <button onclick="copyFoodRecommendation()" class="cta-button" style="margin-top:10px;">복사하기 📋</button>
+                </div>
+                {% endif %}
+
+            {% elif error_message %}
+                <div class="recommendation-box" style="background: #ffecec; border-left: 6px solid #f44336;">
+                    <h2>❌ 오류 발생</h2>
+                    <p>{{ error_message }}</p>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+
+    <script>
+        function showLoading() {
+            document.getElementById('submit-btn').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function copyRecommendation() {
+            const text = document.getElementById('recommendation-text').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('추천 여행지가 복사되었습니다!');
+            });
+        }
+
+        function copyFoodRecommendation() {
+            const text = document.getElementById('food-recommendation-text').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('추천 먹거리가 복사되었습니다!');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}함께하는 여행{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/group_travel.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="group-container">
+    <h1 class="page-title">함께하는 여행</h1>
+    
+    <a href="#" class="create-group">+ 새 그룹 만들기</a>
+
+    <div class="group-section">
+        <h2 class="section-title">👥 내 여행 그룹</h2>
+        <div class="group-list">
+            <div class="group-card">
+                <div class="group-name">제주도 여행팸</div>
+                <div class="group-info">2025.04.15 - 2025.04.18</div>
+                <div class="member-list">
+                    <div class="member-avatar">김</div>
+                    <div class="member-avatar">이</div>
+                    <div class="member-avatar">박</div>
+                    <div class="member-avatar">+2</div>
+                </div>
+                <div class="group-actions">
+                    <a href="#" class="action-button view-button">일정 보기</a>
+                    <a href="#" class="action-button join-button">채팅방 입장</a>
+                </div>
+            </div>
+
+            <div class="group-card">
+                <div class="group-name">부산 맛집 투어</div>
+                <div class="group-info">2025.05.01 - 2025.05.03</div>
+                <div class="member-list">
+                    <div class="member-avatar">최</div>
+                    <div class="member-avatar">정</div>
+                    <div class="member-avatar">+3</div>
+                </div>
+                <div class="group-actions">
+                    <a href="#" class="action-button view-button">일정 보기</a>
+                    <a href="#" class="action-button join-button">채팅방 입장</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="group-section">
+        <h2 class="section-title">💬 그룹 채팅</h2>
+        <div class="chat-section">
+            <div class="chat-messages">
+                <div class="message">
+                    <div class="message-sender">김여행</div>
+                    <div class="message-content">제주도 숙소 예약했어요!</div>
+                    <div class="message-time">오후 2:30</div>
+                </div>
+                <div class="message">
+                    <div class="message-sender">이투어</div>
+                    <div class="message-content">좋네요! 근처 맛집도 알아봤는데 공유할게요.</div>
+                    <div class="message-time">오후 2:35</div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="메시지를 입력하세요...">
+                <button class="send-button">전송</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}맞춤형 장소 추천{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/recommendations.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="recommendations-container">
+    <h1 class="page-title">맞춤형 장소 추천</h1>
+    
+    <div class="search-section">
+        <form class="search-form">
+            <div class="form-group">
+                <label>여행 지역</label>
+                <select>
+                    <option>서울</option>
+                    <option>부산</option>
+                    <option>제주도</option>
+                    <option>강원도</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>관심사 선택</label>
+                <div class="preferences">
+                    <div class="preference-tag">맛집</div>
+                    <div class="preference-tag">관광지</div>
+                    <div class="preference-tag">문화/예술</div>
+                    <div class="preference-tag">자연/풍경</div>
+                    <div class="preference-tag">쇼핑</div>
+                    <div class="preference-tag">액티비티</div>
+                </div>
+            </div>
+
+            <button type="submit" class="search-button">장소 추천받기</button>
+        </form>
+    </div>
+
+    <div class="results-section">
+        {% comment %} 추천된 장소 반복 렌더링 예정 {% endcomment %}
+        <div class="place-card">
+            <img src="https://via.placeholder.com/300x200" alt="장소 이미지" class="place-image">
+            <div class="place-info">
+                <h3 class="place-title">경복궁</h3>
+                <div class="place-category">문화/예술</div>
+                <p class="place-description">조선시대의 대표적인 궁궐로, 아름다운 전통 건축과 정원을 감상할 수 있습니다.</p>
+                <div class="place-meta">
+                    <span>⭐ 4.5/5</span>
+                    <span>📍 종로구</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 다른 장소들도 동일하게 렌더링 -->
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/recommendations.js' %}"></script>
+{% endblock %}

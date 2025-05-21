@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}일정 삭제{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/schedule_confirm_delete.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="delete-confirm-container">
+    <h1 class="page-title">일정 삭제</h1>
+
+    <div class="confirm-box">
+        <div class="schedule-info">
+            <h2 class="schedule-title">{{ schedule.title }}</h2>
+            <p class="schedule-details">여행지: {{ schedule.destination }}</p>
+            <p class="schedule-details">기간: {{ schedule.start_date }} ~ {{ schedule.end_date }}</p>
+        </div>
+
+        <p class="warning-text">정말로 이 일정을 삭제하시겠습니까?<br>이 작업은 되돌릴 수 없습니다.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="action-buttons">
+                <button type="submit" class="delete-button">삭제</button>
+                <a href="{% url 'travel_input:schedule_detail' schedule.id %}" class="cancel-button">취소</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,195 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.schedule-list-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    min-height: calc(100vh - 60px);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.page-title {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.create-button {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.create-button:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.schedule-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.schedule-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.schedule-title {
+    color: #333;
+    font-size: 1.4rem;
+    margin: 0 0 20px 0;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.schedule-info {
+    margin-bottom: 25px;
+}
+
+.info-item {
+    display: flex;
+    margin-bottom: 12px;
+    color: #666;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.info-label {
+    width: 70px;
+    color: #888;
+    font-weight: 500;
+}
+
+.info-value {
+    flex: 1;
+    color: #444;
+}
+
+.card-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.action-button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.view-button {
+    background: #f8f9fa;
+    color: #495057;
+}
+
+.view-button:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.edit-button {
+    background: #28a745;
+    color: white;
+}
+
+.edit-button:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+
+.delete-button {
+    background: #dc3545;
+    color: white;
+}
+
+.delete-button:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 15px;
+    margin: 40px auto;
+    max-width: 600px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.empty-message {
+    color: #666;
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.delete-all-container {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.delete-all-button {
+    display: inline-block;
+    background: #dc3545;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.delete-all-button:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .schedule-grid {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+    }
+
+    .card-actions {
+        flex-direction: column;
+    }
+
+    .action-button {
+        width: 100%;
+    }
+}

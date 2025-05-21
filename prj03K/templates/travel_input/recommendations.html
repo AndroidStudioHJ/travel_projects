@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}맞춤형 장소 추천{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/recommendations.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="recommendations-container">
+    <h1 class="page-title">맞춤형 장소 추천</h1>
+    <!-- 필터 폼 -->
+    <form method="get" class="search-section" style="margin-bottom:32px;">
+        <div class="region-select">
+            <select name="region">
+                <option value="">전체 지역</option>
+                <option value="서울">서울</option>
+                <option value="부산">부산</option>
+                <option value="제주">제주</option>
+                <option value="경상북도">경상북도</option>
+                <option value="경상남도">경상남도</option>
+                <option value="전라북도">전라북도</option>
+                <option value="전라남도">전라남도</option>
+                <option value="강원">강원</option>
+                <option value="경기">경기</option>
+                <option value="충청">충청</option>
+            </select>
+        </div>
+        <div class="region-select">
+            <select name="category">
+                <option value="">전체 분류</option>
+                <option value="Festival">축제</option>
+                <option value="Accommodation">숙박</option>
+                <option value="Leisure">레저</option>
+                <option value="Place">명소</option>
+                <option value="Restaurant">맛집</option>
+                <option value="CulturalFacility">문화시설</option>
+                <option value="Shopping">쇼핑</option>
+            </select>
+        </div>
+        <button type="submit" style="background:#007acc;color:#fff;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-weight:600;">검색</button>
+    </form>
+    <!-- 랜덤 추천 -->
+    <div class="section-title">랜덤 추천 관광지</div>
+    <div class="recommend-row">
+        {% for rec in random_recommend %}
+        <div class="recommend-card">
+            <div class="recommend-title">{{ rec.관광지명 }}</div>
+            <div class="recommend-desc">{{ rec.설명|truncatewords:25 }}</div>
+            <a class="recommend-link" href="{{ rec.링크 }}" target="_blank">자세히 보기</a>
+            <span class="recommend-badge">{{ rec.분류 }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    <!-- 전체 리스트 -->
+    <div class="section-title">관광지 전체 리스트</div>
+    <div class="recommend-row">
+        {% for place in place_list %}
+        <div class="recommend-card">
+            <div class="recommend-title">{{ place.관광지명 }}</div>
+            <div class="recommend-desc">{{ place.설명|truncatewords:20 }}</div>
+            <a class="recommend-link" href="{{ place.링크 }}" target="_blank">자세히 보기</a>
+            <span class="recommend-badge">{{ place.분류 }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.interest-tag').forEach(tag => {
+        tag.addEventListener('click', () => {
+            tag.classList.toggle('active');
+        });
+    });
+    // AI 추천 버튼 이벤트
+    document.getElementById('ai-recommend-btn').addEventListener('click', function() {
+        this.disabled = true;
+        this.textContent = 'AI 추천 중...';
+        fetch('/travel/ai_recommend/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            },
+            body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('ai-recommend-result').innerHTML = '<span style="color:red">AI 추천 실패: ' + data.error + '</span>';
+            } else {
+                let html = '<b>AI 추천 장소</b><br>';
+                data['추천장소'].forEach(place => {
+                    html += '• ' + place + '<br>';
+                });
+                document.getElementById('ai-recommend-result').innerHTML = html;
+            }
+        })
+        .catch(err => {
+            document.getElementById('ai-recommend-result').innerHTML = '<span style="color:red">AI 추천 요청 중 오류 발생</span>';
+        })
+        .finally(() => {
+            this.disabled = false;
+            this.textContent = 'AI 장소 추천';
+        });
+    });
+</script>
+{% endblock %}

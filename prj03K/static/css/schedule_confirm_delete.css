@@ -1,0 +1,81 @@
+.delete-confirm-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.page-title {
+    color: #dc3545;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2rem;
+}
+
+.confirm-box {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.schedule-info {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.schedule-title {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.schedule-details {
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.warning-text {
+    color: #dc3545;
+    margin: 20px 0;
+    font-weight: 500;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.delete-button {
+    padding: 12px 25px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.delete-button:hover {
+    background: #c82333;
+}
+
+.cancel-button {
+    padding: 12px 25px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+}
+
+.cancel-button:hover {
+    background: #5a6268;
+}

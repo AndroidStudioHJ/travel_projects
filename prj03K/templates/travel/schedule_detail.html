@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}📋 {{ schedule.title }}{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/schedule_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+  <h2>📋 {{ schedule.title }}</h2>
+  
+  <div class="schedule-info">
+    <div class="info-item">
+      <div class="info-label">여행 기간</div>
+      <div class="info-value">{{ schedule.start_date }} ~ {{ schedule.end_date }}</div>
+    </div>
+    
+    <div class="info-item">
+      <div class="info-label">여행지</div>
+      <div class="info-value">{{ schedule.destination }}</div>
+    </div>
+    
+    <div class="info-item">
+      <div class="info-label">예산</div>
+      <div class="info-value">{{ schedule.budget }}원</div>
+    </div>
+    
+    <div class="info-item">
+      <div class="info-label">메모</div>
+      <div class="info-value">{{ schedule.notes|linebreaks }}</div>
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <a href="{% url 'update_schedule' schedule.id %}" class="btn btn-edit">수정</a>
+    <a href="{% url 'delete_schedule' schedule.id %}" class="btn btn-delete">삭제</a>
+    <a href="{% url 'schedule' %}" class="btn btn-back">목록으로</a>
+  </div>
+</div>
+{% endblock %}

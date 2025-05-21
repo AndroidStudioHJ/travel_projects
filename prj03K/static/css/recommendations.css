@@ -1,0 +1,132 @@
+.recommendations-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.page-title {
+    color: #007acc;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2rem;
+}
+
+.search-section {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.search-form {
+    display: grid;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group select,
+.form-group input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.preferences {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.preference-tag {
+    padding: 8px 16px;
+    background: #f0f0f0;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.preference-tag.active {
+    background: #007acc;
+    color: white;
+}
+
+.search-button {
+    background: #007acc;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.search-button:hover {
+    background: #005f99;
+}
+
+.results-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.place-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.place-card:hover {
+    transform: translateY(-5px);
+}
+
+.place-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.place-info {
+    padding: 15px;
+}
+
+.place-title {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.place-category {
+    color: #007acc;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.place-description {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.place-meta {
+    display: flex;
+    justify-content: space-between;
+    color: #999;
+    font-size: 0.9rem;
+}

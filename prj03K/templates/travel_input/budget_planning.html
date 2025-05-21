@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load get_item %}
+{% block title %}예산 계획{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/budget_planning.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="budget-container">
+    <h1 class="page-title">예산 계획</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="budget-form">
+            <div class="form-group">
+                <label class="form-label">총 예산</label>
+                <input type="number" class="form-input" name="total_budget" placeholder="예산을 입력하세요" value="{{ total_budget|default:0 }}">
+                <button type="button" id="ai-budget-btn" style="margin-top:10px;float:right;background:#ffd700;color:#222;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;">AI 자동 분배</button>
+            </div>
+        </div>
+        <div id="ai-result" style="display:none;"></div>
+
+        <div class="category-cards">
+            {% for cat in categories %}
+            <div class="category-card">
+                <h3 class="category-title">{{ cat }}</h3>
+                <input type="number" class="form-input" name="{{ cat }}" placeholder="금액 입력" value="{{ budgets|get_item:cat|default:0 }}">
+                <div class="progress-bar">
+                    <div class="progress" style="width: {{ percents|get_item:cat|default:0 }}%"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="summary-section">
+            <div class="summary-item">
+                <span>총 예산</span>
+                <span>{{ total_budget|floatformat:0 }}원</span>
+            </div>
+            <div class="summary-item">
+                <span>할당된 금액</span>
+                <span id="allocated-amount">{{ allocated|floatformat:0 }}원</span>
+            </div>
+            <div class="summary-item">
+                <span>남은 금액</span>
+                <span id="remaining-amount">{{ remaining|floatformat:0 }}원</span>
+            </div>
+        </div>
+
+        <button type="submit" class="save-button">저장하기</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function updateBudgetSummary() {
+        const totalBudget = parseInt(document.querySelector('input[name="total_budget"]').value) || 0;
+        let allocated = 0;
+        document.querySelectorAll('.category-card input').forEach(input => {
+            allocated += parseInt(input.value) || 0;
+        });
+        const remaining = Math.max(totalBudget - allocated, 0);
+        document.getElementById('allocated-amount').textContent = allocated.toLocaleString() + '원';
+        document.getElementById('remaining-amount').textContent = remaining.toLocaleString() + '원';
+    }
+    document.querySelectorAll('.category-card input, input[name="total_budget"]').forEach(input => {
+        input.addEventListener('input', function() {
+            // 프로그레스 바 업데이트
+            const card = this.closest('.category-card');
+            if (card) {
+                const progress = card.querySelector('.progress');
+                const value = this.value;
+                const totalBudget = document.querySelector('input[name="total_budget"]').value;
+                if (totalBudget > 0) {
+                    const percentage = (value / totalBudget) * 100;
+                    progress.style.width = Math.min(percentage, 100) + '%';
+                }
+            }
+            updateBudgetSummary();
+        });
+    });
+    // 페이지 로드 시 한 번 실행
+    updateBudgetSummary();
+
+    // AI 자동 분배 버튼 이벤트
+    document.getElementById('ai-budget-btn').addEventListener('click', function() {
+        const totalBudget = parseInt(document.querySelector('input[name="total_budget"]').value) || 0;
+        if (!totalBudget || totalBudget <= 0) {
+            alert('총 예산을 먼저 입력하세요.');
+            return;
+        }
+        this.disabled = true;
+        this.textContent = 'AI 분배 중...';
+        fetch('/travel/ai_budget/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({ total_budget: totalBudget })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                alert('AI 분배 실패: ' + data.error);
+                document.getElementById('ai-result').innerHTML = '<span style="color:red">AI 분배 실패: ' + data.error + '</span>';
+            } else {
+                let resultText = '';
+                // 총 예산 계산 (AI가 반환한 값의 합)
+                const aiTotalBudget = Object.values(data).reduce((a, b) => a + b, 0);
+                // 총 예산 input과 요약란도 갱신
+                document.querySelector('input[name="total_budget"]').value = aiTotalBudget;
+                document.querySelectorAll('.summary-item span:last-child')[0].textContent = aiTotalBudget.toLocaleString() + '원';
+                for (const cat in data) {
+                    const input = document.querySelector(`input[name="${cat}"]`);
+                    if (input) {
+                        input.value = data[cat];
+                        // 프로그레스바도 즉시 반영
+                        const card = input.closest('.category-card');
+                        if (card) {
+                            const progress = card.querySelector('.progress');
+                            const percentage = (data[cat] / aiTotalBudget) * 100;
+                            progress.style.width = Math.min(percentage, 100) + '%';
+                        }
+                    }
+                    resultText += `${cat}: ${data[cat].toLocaleString()}원<br>`;
+                }
+                document.getElementById('ai-result').innerHTML = resultText;
+                updateBudgetSummary();
+            }
+        })
+        .catch(err => {
+            alert('AI 분배 요청 중 오류 발생');
+        })
+        .finally(() => {
+            this.disabled = false;
+            this.textContent = 'AI 자동 분배';
+        });
+    });
+</script>
+{% endblock %}

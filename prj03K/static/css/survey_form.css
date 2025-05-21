@@ -1,0 +1,60 @@
+.survey-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.survey-container * {
+  color: white !important;
+}
+
+.survey-container h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.survey-container label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.survey-container input[type="text"],
+.survey-container input[type="number"],
+.survey-container select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: white;
+  color: black !important;
+  margin-bottom: 15px;
+}
+
+.survey-container button {
+  background-color: #f28400;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.survey-container button:hover {
+  background-color: #c46c00;
+}
+
+.survey-result {
+  margin-top: 30px;
+  background: white;
+  color: black;
+  padding: 20px;
+  border-radius: 10px;
+}

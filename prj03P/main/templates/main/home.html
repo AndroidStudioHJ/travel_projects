@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>반려동물 여행 추천</title>
+    <link rel="stylesheet" href="{% static 'main/home.css' %}" />
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐾 반려동물 여행 추천 서비스 🐾</h1>
+            <p>AI가 추천하는 여행지를 확인해보세요.</p>
+        </header>
+
+        <section class="cta-section">
+            <h2>반려동물 여행 AI 추천</h2>
+            <ul class="recommend-list">
+                <li>🌄 제주도 - 애견과 함께하는 자연 산책로</li>
+                <li>🏖️ 강릉 - 반려동물 전용 해변과 카페</li>
+                <li>🏕️ 가평 - 숲 속 글램핑 체험</li>
+                <li>🏰 춘천 - 반려동물 출입 가능한 맛집 투어</li>
+            </ul>
+            <a href="{% url 'recommend' %}" class="cta-button">더 많은 추천 보기</a>
+        </section>
+    </div>
+</body>
+</html>

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ group.name }} - 함께하는 여행{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'travel_input/css/group_travel_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="group-detail-container">
+    <div class="group-header">
+        <div class="group-title">{{ group.name }}</div>
+        <div class="group-actions">
+            {% if is_admin %}
+            <a href="{% url 'travel_input:group_travel_update' group.pk %}" class="btn btn-outline-primary">
+                <i class="fas fa-edit"></i> 수정
+            </a>
+            <a href="{% url 'travel_input:group_travel_delete' group.pk %}" class="btn btn-outline-danger">
+                <i class="fas fa-trash"></i> 삭제
+            </a>
+            {% endif %}
+            <a href="{% url 'travel_input:group_travel_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> 목록으로
+            </a>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="main-left">
+            <div class="info-card">
+                <div class="info-card-title">그룹 정보</div>
+                <div class="info-card-desc">{{ group.description }}</div>
+                <div class="info-card-meta">
+                    <span><i class="fas fa-users"></i> {{ group.members.count }}명 참여 중</span>
+                    <span>생성일: {{ group.created_at|date:"Y.m.d" }}</span>
+                </div>
+            </div>
+            <div class="chat-card">
+                <div class="chat-card-title">채팅</div>
+                <div class="chat-container" id="chat-container">
+                    {% for message in messages %}
+                    <div class="message {% if message.user == request.user %}sent{% else %}received{% endif %}">
+                        <div class="message-header">
+                            {{ message.user.username }}
+                        </div>
+                        <div class="message-content">
+                            {{ message.content }}
+                        </div>
+                        <div class="message-time">
+                            {{ message.created_at|date:"H:i" }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <form id="message-form" class="chat-input-row">
+                    <input type="text" id="message-input" placeholder="메시지를 입력하세요...">
+                    <button type="submit">
+                        <i class="fas fa-paper-plane"></i> 전송
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="main-right">
+            <div class="members-card">
+                <div class="members-card-title">참여자</div>
+                <ul class="members-list">
+                    {% for member in group.members.all %}
+                    <li class="member-item">
+                        {{ member.username }}
+                        {% if member == group.created_by %}
+                        <span class="badge">그룹장</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatContainer = document.getElementById('chat-container');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+
+        // 채팅창 스크롤을 항상 아래로
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const content = messageInput.value.trim();
+            if (content) {
+                fetch('{% url "travel_input:send_message" group.pk %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: `content=${encodeURIComponent(content)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        messageInput.value = '';
+                        location.reload();
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}스마트 일정 관리{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/smart_schedule.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="smart-schedule-container">
+    <h1 class="page-title">스마트 일정 관리</h1>
+    
+    <div class="features-list">
+        <div class="feature-item">
+            <h3>📅 날짜별 일정 관리</h3>
+            <p>체계적으로 여행 일정을 관리하고 수정할 수 있습니다. 일정표 형식으로 한눈에 보기 쉽게 정리됩니다.</p>
+        </div>
+        <div class="feature-item">
+            <h3>🤖 AI 추천 일정</h3>
+            <p>AI가 여행 스타일과 선호도를 분석하여 최적의 일정을 추천해드립니다.</p>
+        </div>
+        <div class="feature-item">
+            <h3>🔄 실시간 업데이트</h3>
+            <p>날씨, 영업시간, 혼잡도 등의 정보를 실시간으로 반영하여 일정을 최적화합니다.</p>
+        </div>
+        <div class="feature-item">
+            <h3>📱 모바일 동기화</h3>
+            <p>언제 어디서나 모바일에서 일정을 확인하고 수정할 수 있습니다.</p>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'travel:create_schedule' %}" class="action-button primary-button">새 일정 만들기</a>
+        <a href="{% url 'travel:schedule' %}" class="action-button secondary-button">내 일정 보기</a>
+    </div>
+</div>
+{% endblock %}

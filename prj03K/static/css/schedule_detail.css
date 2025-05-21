@@ -1,0 +1,123 @@
+:root {
+  --primary: #00aaff;
+  --bg-overlay: rgba(0, 0, 0, 0.3);
+  --card-bg: rgba(255, 255, 255, 0.25);
+  --text-bright: #fff;
+  --text-subtle: #e0e0e0;
+}
+
+body {
+  background: linear-gradient(var(--bg-overlay), var(--bg-overlay)),
+              url("/static/images/경복궁_야경.jpg") no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Pretendard', sans-serif;
+  color: var(--text-bright);
+}
+
+.schedule-detail {
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 2rem 2.5rem;
+  background: rgba(255,255,255,0.06);
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+}
+
+h1, h2 {
+  color: var(--text-bright);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.info-section {
+  margin-bottom: 3rem;
+}
+
+.info-section h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-left: 4px solid var(--primary);
+  padding-left: 0.6rem;
+  color: var(--primary);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  padding: 1.2rem 1.5rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease;
+  text-align: center;
+}
+
+.info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+}
+
+.info-card h3 {
+  font-size: 1rem;
+  color: var(--text-bright);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.info-card p {
+  font-size: 0.95rem;
+  color: var(--text-subtle);
+  margin: 0;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  margin: 0 6px;
+  display: inline-block;
+  transition: 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: #000;
+}
+
+.btn-danger {
+  background-color: #ff4d4d;
+  color: #fff;
+}
+
+.btn-secondary {
+  background-color: #cccccc;
+  color: #000;
+}
+
+.calendar-container {
+  background: white;
+  margin-top: 3rem;
+  border-radius: 16px;
+  padding: 30px;
+}

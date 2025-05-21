@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}문화 정보{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/culture.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="culture-container">
+    <div class="culture-header">
+        <h1 class="page-title">{{ culture.name }}</h1>
+        <p class="culture-description">{{ culture.description }}</p>
+    </div>
+
+    <div class="culture-grid">
+        <div class="culture-section">
+            <h2 class="section-title">
+                <i class="fas fa-landmark"></i>
+                주요 명소
+            </h2>
+            <ul class="culture-list">
+                {% for place in culture.important_places %}
+                <li class="culture-item">{{ place }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="culture-section">
+            <h2 class="section-title">
+                <i class="fas fa-calendar-alt"></i>
+                전통 축제
+            </h2>
+            <ul class="culture-list">
+                {% for festival in culture.festivals %}
+                <li class="culture-item">{{ festival }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="culture-section">
+            <h2 class="section-title">
+                <i class="fas fa-utensils"></i>
+                전통 음식
+            </h2>
+            <ul class="culture-list">
+                {% for food in culture.traditional_food %}
+                <li class="culture-item">{{ food }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="activities-section">
+        <h2 class="section-title">문화 체험 활동</h2>
+        <div class="activities-grid">
+            {% for activity in culture.activities %}
+            <div class="activity-card">
+                <div class="activity-icon">
+                    <i class="fas fa-hands"></i>
+                </div>
+                <h3 class="activity-name">{{ activity }}</h3>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

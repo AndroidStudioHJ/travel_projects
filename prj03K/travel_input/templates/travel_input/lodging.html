@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}숙박 정보{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/lodging.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="lodging-container">
+    <h1 class="page-title">숙박 정보</h1>
+
+    <div class="categories-grid">
+        {% for category in lodging.categories %}
+        <div class="category-card">
+            <h2 class="category-name">{{ category.name }}</h2>
+            <p class="category-description">{{ category.description }}</p>
+            <ul class="options-list">
+                {% for option in category.options %}
+                <li class="option-item">{{ option }}</li>
+                {% endfor %}
+            </ul>
+            <p class="price-range">{{ category.price_range }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="popular-areas">
+        <h2 class="section-title">인기 지역</h2>
+        <div class="areas-list">
+            {% for area in lodging.popular_areas %}
+            <span class="area-tag">{{ area }}</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="booking-tips">
+        <h2 class="section-title">예약 팁</h2>
+        <ul class="tips-list">
+            {% for tip in lodging.booking_tips %}
+            <li class="tip-item">{{ tip }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

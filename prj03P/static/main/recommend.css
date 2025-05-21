@@ -1,0 +1,126 @@
+body {
+    font-family: 'Pretendard', sans-serif;
+    background: #f7f4ef;
+    color: #4e342e;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 700px;
+    margin: 50px auto;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2.2rem;
+    color: #5d4037;
+}
+
+header p {
+    font-size: 1.1rem;
+    color: #8d6e63;
+}
+
+.recommend-section {
+    padding-top: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #6d4c41;
+    font-size: 1.1rem;
+}
+
+.form-group select {
+    padding: 10px;
+    border: 1px solid #d7ccc8;
+    border-radius: 8px;
+    background-color: #fdfaf7;
+    font-size: 1rem;
+}
+
+.cta-button {
+    background-color: #ffcc80;
+    color: #4e342e;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 20px;
+}
+
+.cta-button:hover {
+    background-color: #ffb74d;
+}
+
+.recommendation-box {
+    margin-top: 30px;
+    padding: 20px;
+    background: #fff8e1;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(255, 200, 50, 0.3);
+}
+
+.recommendation-box h2 {
+    margin-top: 0;
+    color: #f57c00;
+}
+
+.recommendation-box p {
+    font-size: 1.3rem;
+    color: #c98474;
+}
+
+/* 홈 버튼 스타일 */
+.home-button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 8px 16px;
+    background-color: #a1887f;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.home-button:hover {
+    background-color: #6d4c41;
+}
+
+/* 반응형 */
+@media (max-width: 480px) {
+  .container {
+    margin: 20px;
+    padding: 20px;
+  }
+  header h1 {
+    font-size: 1.5rem;
+  }
+  .recommendation-box p {
+    font-size: 1.1rem;
+  }
+  .cta-button {
+    font-size: 0.9rem;
+    padding: 10px 15px;
+  }
+}

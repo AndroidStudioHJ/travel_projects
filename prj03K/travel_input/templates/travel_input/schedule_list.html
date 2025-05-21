@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}일정 목록{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/schedule.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="schedule-list-container">
+    <div class="page-header">
+        <h1 class="page-title">내 여행 일정</h1>
+        <a href="{% url 'travel_input:schedule_create' %}" class="create-button">새 일정 만들기</a>
+    </div>
+
+    {% if schedules %}
+    <div class="schedule-grid">
+        {% for schedule in schedules %}
+        <div class="schedule-card">
+            <h2 class="schedule-title">{{ schedule.title }}</h2>
+            <div class="schedule-info">
+                <div class="info-item">
+                    <span class="info-label">여행지</span>
+                    <span class="info-value">{{ schedule.destination }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">기간</span>
+                    <span class="info-value">{{ schedule.start_date|date:"Y.m.d" }} ~ {{ schedule.end_date|date:"Y.m.d" }}</span>
+                </div>
+                {% if schedule.budget %}
+                <div class="info-item">
+                    <span class="info-label">예산</span>
+                    <span class="info-value">{{ schedule.budget|floatformat:0 }}원</span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-actions">
+                <a href="{% url 'travel_input:schedule_detail' schedule.pk %}" class="action-button view-button">상세보기</a>
+                <a href="{% url 'travel_input:schedule_update' schedule.pk %}" class="action-button edit-button">수정</a>
+                <a href="{% url 'travel_input:schedule_delete' schedule.pk %}" class="action-button delete-button">삭제</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if schedules.count > 1 %}
+    <div class="delete-all-container">
+        <a href="{% url 'travel_input:schedule_delete_all' %}" class="delete-all-button">전체 삭제</a>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="empty-state">
+        <p class="empty-message">아직 등록된 일정이 없습니다.</p>
+        <a href="{% url 'travel_input:schedule_create' %}" class="create-button">첫 일정 만들기</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

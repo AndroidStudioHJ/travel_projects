@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>네이버 블로그 검색</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f6fa;
+            color: #222;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        h1 {
+            color: #1565c0;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.8em;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.07);
+        }
+        .subtitle {
+            text-align: center;
+            color: #555;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+        .search-form {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background-color: #f0f2f5;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .search-input {
+            width: 70%;
+            padding: 18px;
+            font-size: 18px;
+            border: 2px solid #d1d9e6;
+            border-radius: 12px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+            color: #222;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #1565c0;
+            box-shadow: 0 0 0 3px rgba(21,101,192,0.13);
+        }
+        .search-button {
+            padding: 18px 36px;
+            font-size: 18px;
+            background-color: #1565c0;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .search-button:hover {
+            background-color: #003c8f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.10);
+        }
+        .stats-section {
+            margin-bottom: 30px;
+        }
+        .stats-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1565c0;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0 0 0;
+            padding: 30px 0;
+            background-color: #f0f2f5;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            min-width: 120px;
+        }
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .positive .stat-value { color: #2e7d32; }
+        .neutral .stat-value { color: #1565c0; }
+        .negative .stat-value { color: #c62828; }
+        .total .stat-value { color: #222; }
+        .stat-label {
+            color: #555;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .sentiment-tabs {
+            display: flex;
+            margin: 40px 0 20px 0;
+            border-bottom: 2px solid #e0e3e7;
+            padding: 0 20px;
+            justify-content: center;
+            gap: 10px;
+        }
+        .sentiment-tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: #555;
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 8px;
+        }
+        .sentiment-tab:hover {
+            color: #1565c0;
+            background-color: #e3f2fd;
+        }
+        .sentiment-tab.active {
+            color: #1565c0;
+            background-color: #e3f2fd;
+        }
+        .sentiment-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #1565c0;
+        }
+        .results-section {
+            margin-top: 40px;
+        }
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #1565c0;
+            margin-bottom: 18px;
+            margin-top: 40px;
+        }
+        .no-results {
+            text-align: center;
+            color: #c62828;
+            font-size: 1.2em;
+            margin: 40px 0;
+        }
+        .post-item {
+            background-color: #f9fafb;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            border: 2.5px solid #b0b8c1;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+        }
+        .post-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(21,101,192,0.08);
+            border-color: #1565c0;
+        }
+        .post-icon {
+            font-size: 2.2em;
+            margin-top: 2px;
+        }
+        .post-content {
+            flex: 1;
+        }
+        .post-title {
+            color: #1565c0;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 20px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .post-title:hover {
+            color: #003c8f;
+            text-decoration: underline;
+        }
+        .post-date {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .post-summary {
+            color: #222;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+        .post-summary-strong {
+            font-weight: bold;
+            color: #222;
+        }
+        h3 {
+            color: #222;
+            margin: 40px 0 25px;
+            font-size: 1.8em;
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e3e7;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            .search-input {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+            .search-button {
+                width: 100%;
+            }
+            .stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .sentiment-tabs {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .sentiment-tab {
+                width: 100%;
+                text-align: center;
+            }
+            h1 {
+                font-size: 2em;
+            }
+        }
+        .review-heading {
+            font-size: 1.35em;
+            font-weight: bold;
+            margin-bottom: 12px;
+            margin-top: 18px;
+            letter-spacing: -1px;
+        }
+        .review-heading.positive { color: #2e7d32; }
+        .review-heading.negative { color: #c62828; }
+        .review-heading.neutral  { color: #1565c0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>네이버 블로그 검색</h1>
+        <div class="subtitle">네이버 블로그에서 여행지, 맛집, 호텔 등 다양한 키워드로 실제 후기를 한눈에 확인하세요.</div>
+        <div class="search-form">
+            <form method="get">
+                <input type="text" name="q" value="{{ query }}" class="search-input" placeholder="검색어를 입력하세요 (예: 제주도 여행, 맛집, 호텔)">
+                <button type="submit" class="search-button">검색</button>
+            </form>
+        </div>
+
+        {% if results %}
+        <div class="stats-section">
+            <div class="stats-title">검색 결과 요약</div>
+            <div class="stats">
+                <div class="stat-item positive">
+                    <div class="stat-value">{{ results.positive_count }}</div>
+                    <div class="stat-label">긍정적</div>
+                </div>
+                <div class="stat-item neutral">
+                    <div class="stat-value">{{ results.neutral_count }}</div>
+                    <div class="stat-label">중립적</div>
+                </div>
+                <div class="stat-item negative">
+                    <div class="stat-value">{{ results.negative_count }}</div>
+                    <div class="stat-label">부정적</div>
+                </div>
+                <div class="stat-item total">
+                    <div class="stat-value">{{ results.total }}</div>
+                    <div class="stat-label">전체</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sentiment-tabs">
+            <button class="sentiment-tab {% if not results.view_type %}active{% endif %}" onclick="location.href='?q={{ query }}'">전체 보기</button>
+            <button class="sentiment-tab {% if results.view_type == 'positive' %}active{% endif %}" onclick="location.href='?q={{ query }}&view=positive'">긍정적 리뷰</button>
+            <button class="sentiment-tab {% if results.view_type == 'neutral' %}active{% endif %}" onclick="location.href='?q={{ query }}&view=neutral'">중립적 리뷰</button>
+            <button class="sentiment-tab {% if results.view_type == 'negative' %}active{% endif %}" onclick="location.href='?q={{ query }}&view=negative'">부정적 리뷰</button>
+        </div>
+
+        <div class="results-section">
+            {% if results.view_type == 'positive' %}
+                <div class="section-title">긍정적 리뷰</div>
+                {% if results.positive_posts|length == 0 %}
+                    <div class="no-results">긍정적 리뷰가 없습니다.</div>
+                {% endif %}
+                {% for post in results.positive_posts %}
+                <div class="post-item">
+                    <div class="post-content">
+                        <a href="{{ post.link }}" class="post-title" target="_blank">{{ post.title }}</a>
+                        <div class="post-date">{{ post.date }}</div>
+                        <div class="post-summary">{{ post.summary }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% elif results.view_type == 'negative' %}
+                <div class="section-title">부정적 리뷰</div>
+                {% if results.negative_posts|length == 0 %}
+                    <div class="no-results">부정적 리뷰가 없습니다.</div>
+                {% endif %}
+                {% for post in results.negative_posts %}
+                <div class="post-item">
+                    <div class="post-content">
+                        <a href="{{ post.link }}" class="post-title" target="_blank">{{ post.title }}</a>
+                        <div class="post-date">{{ post.date }}</div>
+                        <div class="post-summary">{{ post.summary }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% elif results.view_type == 'neutral' %}
+                <div class="section-title">중립적 리뷰</div>
+                {% if results.neutral_posts|length == 0 %}
+                    <div class="no-results">중립적 리뷰가 없습니다.</div>
+                {% endif %}
+                {% for post in results.neutral_posts %}
+                <div class="post-item">
+                    <div class="post-content">
+                        <a href="{{ post.link }}" class="post-title" target="_blank">{{ post.title }}</a>
+                        <div class="post-date">{{ post.date }}</div>
+                        <div class="post-summary">{{ post.summary }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="section-title">전체 리뷰</div>
+                {% if results.positive_list|length == 0 and results.negative_list|length == 0 and results.neutral_list|length == 0 %}
+                    <div class="no-results">검색 결과가 없습니다.</div>
+                {% endif %}
+                <div style="margin-bottom:30px;">
+                    <div class="review-heading positive">긍정적 리뷰</div>
+                    {% for post in results.positive_list %}
+                    <div class="post-item">
+                        <div class="post-content">
+                            <a href="{{ post.link }}" class="post-title" target="_blank">{{ post.title }}</a>
+                            <div class="post-date">{{ post.date }}</div>
+                            <div class="post-summary">{{ post.summary }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div style="margin-bottom:30px;">
+                    <div class="review-heading negative">부정적 리뷰</div>
+                    {% for post in results.negative_list %}
+                    <div class="post-item">
+                        <div class="post-content">
+                            <a href="{{ post.link }}" class="post-title" target="_blank">{{ post.title }}</a>
+                            <div class="post-date">{{ post.date }}</div>
+                            <div class="post-summary">{{ post.summary }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div>
+                    <div class="review-heading neutral">중립적 리뷰</div>
+                    {% for post in results.neutral_list %}
+                    <div class="post-item">
+                        <div class="post-content">
+                            <a href="{{ post.link }}" class="post-title" target="_blank">{{ post.title }}</a>
+                            <div class="post-date">{{ post.date }}</div>
+                            <div class="post-summary">{{ post.summary }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html> 
