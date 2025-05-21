@@ -10,6 +10,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),             # 회원 기능 라우팅
     path('travel/', include('travel_input.urls')),           # 여행 기능 전체 (⭐ 반드시 존재해야 함)
     path('map/', include('map.urls')),                       # 지도 기능 라우팅
+    path('blog/', include('blog.urls')),
 ]
 
 # 개발 환경에서 MEDIA 파일 접근 허용

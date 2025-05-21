@@ -217,8 +217,17 @@
     <div class="nav-bar">
         <div class="nav-links">
             <a href="{% url 'home' %}">홈</a>
-            <a href="{% url 'travel_input:schedule_list' %}">일정</a>
-            <a href="{% url 'travel_input:generate_dummy' %}">더미 생성</a>
+            <div class="dropdown">
+                <a href="{% url 'travel_input:travel_list' %}">여행 정보</a>
+                <div class="dropdown-content">
+                    <div class="row">
+                        <a href="{% url 'travel_input:travel_list' %}">여행지 목록</a>
+                        <a href="{% url 'travel_input:travel_create' %}">여행지 등록</a>
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'map:map_view' %}">지도</a>
+            <a href="{% url 'blog:sentiment_analysis' %}">블로그 감성 분석</a>
         </div>
 
         {% if user.is_authenticated %}

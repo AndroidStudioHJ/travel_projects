@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">네이버 블로그 감성 분석</h1>
+    
+    <form method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="query" class="form-control" placeholder="검색어를 입력하세요" value="{{ query|default:'' }}">
+            <button type="submit" class="btn btn-primary">분석하기</button>
+        </div>
+    </form>
+
+    {% if query %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">분석 결과</h5>
+                <p>전체 후기 수: {{ total_count }}개</p>
+                <p>긍정 후기 수: {{ positive_count }}개</p>
+                <p>부정 후기 수: {{ negative_count }}개</p>
+                <p>중립 후기 수: {{ neutral_count }}개</p>
+            </div>
+        </div>
+
+        {% if positive_posts %}
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">긍정 후기 상위 5개</h5>
+                </div>
+                <div class="card-body">
+                    {% for post in positive_posts %}
+                        <div class="mb-3">
+                            <h6>{{ post.date }} | {{ post.title }}</h6>
+                            <a href="{{ post.link }}" target="_blank" class="text-decoration-none">{{ post.link }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if negative_posts %}
+            <div class="card mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">부정 후기 상위 5개</h5>
+                </div>
+                <div class="card-body">
+                    {% for post in negative_posts %}
+                        <div class="mb-3">
+                            <h6>{{ post.date }} | {{ post.title }}</h6>
+                            <a href="{{ post.link }}" target="_blank" class="text-decoration-none">{{ post.link }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if neutral_posts %}
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">중립 후기 상위 5개</h5>
+                </div>
+                <div class="card-body">
+                    {% for post in neutral_posts %}
+                        <div class="mb-3">
+                            <h6>{{ post.date }} | {{ post.title }}</h6>
+                            <a href="{{ post.link }}" target="_blank" class="text-decoration-none">{{ post.link }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %} 

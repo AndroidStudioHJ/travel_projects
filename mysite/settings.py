@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'travel_input.apps.TravelInputConfig',
     'map.apps.MapConfig',
+    'blog.apps.BlogConfig',
 ]
 
 # 🧱 미들웨어 설정
